@@ -10,7 +10,8 @@ $def with (form, text, relation, fds)
     </head>
     
     <body>
-		<div class="container">
+	<div class="panel panel-default">
+  <div class="panel-body">
 		<h1>DB->normalizer</h1>
         <br/>
 			<form class="form" method="post"> 
@@ -19,14 +20,20 @@ $def with (form, text, relation, fds)
 							$:form.render_css()
 						</div>
 						<div class="form-group">
+							<button id="generateWithoutMvds" type="submit" class="btn btn-default" value="send">Generiere neues Schema (ohne MVDs)</button>
+							<button id="generateWithMvds" type="submit" class="btn btn-default" value="send">Generiere neues Schema (mit MVDs)</button>
+						</div>
+						<div class="form-group">
 							<button id="submitbutton" type="submit" class="btn btn-primary" value="send">Submit</button>
-							<a href="." class="btn btn-default">neues Schema erzeugen</a>
 						</div>
 					</fieldset>				
 			</form>
-			</div>
 		<br/>
-        <span id="results"><div class="container">$text</div></span>  	
+		<div class="form-group">
+        <span id="results">$text</span> 
+</div>		
+</div>
+</div>
     </body>
 	
 	
@@ -45,7 +52,37 @@ $def with (form, text, relation, fds)
 							type: "POST",
 							data: {inputfields : input_string},
 							success: function(data) {
-							jQuery('#results').html(data).hide().fadeIn(1000);
+							jQuery('#results').html(data);
+							},
+							});
+					return false;
+					});
+		});
+	</script>
+	<script type="text/javascript">
+		jQuery(document).ready(function(){
+			jQuery("#generateWithoutMvds").click(function(){
+					var input_string = "false";
+					jQuery.ajax({
+							type: "POST",
+							data: {inputfields : input_string},
+							success: function(data) {
+							jQuery('body').html(data);
+							},
+							});
+					return false;
+					});
+		});
+	</script>
+	<script type="text/javascript">
+		jQuery(document).ready(function(){
+			jQuery("#generateWithMvds").click(function(){
+					var input_string = "true";
+					jQuery.ajax({
+							type: "POST",
+							data: {inputfields : input_string},
+							success: function(data) {
+							jQuery('body').html(data);
 							},
 							});
 					return false;

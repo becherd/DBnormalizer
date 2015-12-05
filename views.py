@@ -69,7 +69,7 @@ def schemaToString(schema):
 		
 		
 def wrapInPanel(heading, content):
-	panelString = "<div class=\"col-md-4\"><div class=\"panel panel-primary\"><div class=\"panel-heading\"><h3 class=\"panel-title\">"+heading+"</h3></div><div class=\"panel-body\">"+content+"</div></div></div>"
+	panelString = "<div class=\"col-xs-6 col-md-4\"><div class=\"panel panel-primary\"><div class=\"panel-heading\"><h3 class=\"panel-title\">"+heading+"</h3></div><div class=\"panel-body\">"+content+"</div></div></div>"
 	return panelString
 	
 	
@@ -84,4 +84,4 @@ def resultToString(relation, fds, mvds, keys, normalForms, targetNf, newSchema) 
 	mvdsPanel = wrapInPanel("MVDs", mvdsToString(mvds)) if mvds != [] else ""
 	normalformsPanel = wrapInPanel("Normal Forms", normalFormsToString(normalForms))
 	newschemaPanel = wrapInPanel("Schema in "+targetNf, schemaToString(newSchema)) if newSchema != [] else ""
-	return "<div class=\"container\"><h3>Eingabe</h3><div class=\"row\">"+relationPanel + "" + fdsPanel + "" + mvdsPanel + "</div><h3>Ergebnis</h3><div class=\"row\">"+ keysPanel + "" + normalformsPanel+ ""+ newschemaPanel+ "</div></div>"
+	return "<h3>Eingabe</h3><div class=\"row\">"+relationPanel + "" + fdsPanel + "" + mvdsPanel + "</div><br/><h3>Ergebnis</h3><div class=\"row\">"+ keysPanel + "" + normalformsPanel+ ""+ newschemaPanel+ "</div>"

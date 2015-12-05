@@ -25,20 +25,24 @@ app = web.application(urls, globals())
 formRelation = web.form.Form(
                 web.form.Textbox('Relation', class_='form-control', id='relation'),
                 web.form.Textarea('FDs / MVDs', class_='form-control', id='fds', rows=6),
-                web.form.Dropdown('In folgende Normalform umwandeln', [('None', 'Keine'), ('3NF', '3NF'), ('BCNF', 'BCNF'), ('4NF', '4NF')], class_='form-control', id='targetNf')
+                web.form.Dropdown('In folgende Normalform umwandeln', [('3NF', '3NF'), ('BCNF', 'BCNF'), ('4NF', '4NF')], class_='form-control', id='targetNf')
                 )
 
 class dbnormalizer:
     def GET(self):
 		form = formRelation()
-		initRelation, initFds, initMvds = DBnormalizer.generateNewProblem(5)
+		initRelation, initFds, initMvds = DBnormalizer.generateNewProblem(5, 'false')
 		return render.dbnormalizer(form, "", views.setOfAttributesToString(initRelation), views.fdsToString(initFds)+views.mvdsToString(initMvds))
         
     def POST(self):
-        form = formRelation()
-        form.validates()
-        result = form.value['inputfields']
-        return printResults(result)
+		form = formRelation()
+		form.validates()
+		result = form.value['inputfields']
+		if result == 'true' or result == 'false':
+			initRelation, initFds, initMvds = DBnormalizer.generateNewProblem(5, result)
+			return render.dbnormalizer(form, "", views.setOfAttributesToString(initRelation), views.fdsToString(initFds)+views.mvdsToString(initMvds))
+		else:
+			return printResults(result)
 
 if __name__ == '__main__':
     app.run()

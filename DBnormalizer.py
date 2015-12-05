@@ -395,11 +395,11 @@ def generateNewRelation(numberOfAttributes):
 	alphabet = list(string.ascii_uppercase)	
 	return set(alphabet[:numberOfAttributes])	
 
-def generateNewProblem(numberOfAttributes):
+def generateNewProblem(numberOfAttributes, includeMvds):
 	random.seed(datetime.now())
 	relation = generateNewRelation(numberOfAttributes)
 	fds = generateFDs(relation)
-	mvds = generateMVDs(relation)
+	mvds = generateMVDs(relation) if includeMvds == 'true' else []
 	return (relation, fds, mvds)
 
 def parseInputFDsMVDs(inputString):
