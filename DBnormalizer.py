@@ -4,6 +4,7 @@ import random
 import string
 from datetime import datetime
 import re
+import views
 #computes the attributhuelle of the attributes "huelle" for the given fds
 def attributhuelle(huelle, fds):
 	if len(huelle) > 0:
@@ -241,17 +242,10 @@ def removeRedundantSchemas(relations):
 	
 
 def synthesealgorithm(fds, keys):
-	print "-----------------------"
-	print "---Synthesealgorithm---"
-	print "-----------------------"
 	ccover= canonicalCover(fds)
-	print "--- Canonical Cover ---"
-	print ccover
 	newRelations = generateNewRelations(ccover)
 	newRelations = addRelationWithKey(newRelations, keys)
 	newRelations = removeRedundantSchemas(newRelations)
-	print "---  New Relations ---"
-	print newRelations
 	return newRelations
 	
 
@@ -291,13 +285,8 @@ def mvdsInRelation(mvds, relation):
 
 	
 def decompositionAlgorithm(fds, relation):
-	print "------------------------"
-	print "---Dekomposition Algo---"
-	print "------------------------"
 	collapseEqualLeftSides(fds)
 	newRelations =  decompositionAlgorithmRec(fds, relation, []) if not isBCNF(relation, fds) else relation
-	print "---  New Relations ---"
-	print newRelations
 	return newRelations if type(newRelations) == list else [newRelations]
 
 
@@ -319,13 +308,8 @@ def decompositionAlgorithmRec(fds, relation, relations):
 		
 	
 def decompositionAlgorithm4NF(fds, mvds, relation):
-	print "-----------------------------"
-	print "---Dekomposition Algo 4NF ---"
-	print "-----------------------------"
 	collapseEqualLeftSides(fds)
 	newRelations =  decompositionAlgorithmRec4NF(fds, mvds, relation, []) if not isFourNF(relation, fds, mvds) else relation
-	print "---  New Relations ---"
-	print newRelations
 	return newRelations if type(newRelations) == list else [newRelations]
 
 
@@ -357,21 +341,6 @@ def checkIfAllAttributesAreInRelation(fds, mvds, relation):
 	
 
 	
-def printNormalForms(relation, fds, mvds):
-	print "--- Normal Forms ---"
-	if isOneNF(relation, fds):
-		print("1NF")
-	else:
-		print("Not even 1NF")
-	if isTwoNF(relation, fds):
-		print("2NF")
-	if isThreeNF(relation, fds):
-		print("3NF")
-	if isBCNF(relation, fds):
-		print("BCNF")		
-	if isFourNF(relation, fds, mvds):
-		print("4NF")	
-	return True
 
 def getNormalForms(relation, fds, mvds):
 	normalForms = []
@@ -401,7 +370,6 @@ def generateNewFD(relation):
 		
 		
 def generateFDs(relation):
-	random.seed(datetime.now())
 	fds = []
 	randomNumber = random.randint(1, 100)
 	x = 125
@@ -413,7 +381,6 @@ def generateFDs(relation):
 	return fds
 	
 def generateMVDs (relation):
-	random.seed(datetime.now())
 	mvds = []
 	randomNumber = random.randint(1, 100)
 	x = 75
@@ -425,10 +392,15 @@ def generateMVDs (relation):
 	return mvds
 	
 def generateNewRelation(numberOfAttributes):
-	random.seed(datetime.now())
 	alphabet = list(string.ascii_uppercase)	
 	return set(alphabet[:numberOfAttributes])	
 
+def generateNewProblem(numberOfAttributes):
+	random.seed(datetime.now())
+	relation = generateNewRelation(numberOfAttributes)
+	fds = generateFDs(relation)
+	mvds = generateMVDs(relation)
+	return (relation, fds, mvds)
 
 def parseInputFDsMVDs(inputString):
 	fdsAndMvds = inputString.splitlines()
@@ -441,22 +413,22 @@ def parseInputFDsMVDs(inputString):
 		elif "->" in element:
 			newfd = (re.split('->', element, 1))
 			fds.append((set(newfd[0]), set(newfd[1])))
-		else:
-			print("Cannot parse this!")
-			exit()
+		elif not re.search("\s+", element):
+			#Cannot parse this as it is no empty line and has no -> or ->> included
+			return ([],[])
 	return (fds,mvds)
 
 def validateInput(relation, fds, mvds):
 	if not checkIfAllAttributesAreInRelation(fds, mvds, relation):
-		return "There are attributes in FDs/MVDs which do not appear in the Relation!"
+		return views.getErrorMessageBox("There are attributes in FDs/MVDs which do not appear in the Relation!")
+	elif fds==[] and mvds==[]:
+		return views.getErrorMessageBox("Cannot parse this. Have you entered all FDs/MVDs correctly?")
 	else:
 		return "OK"
 	
 
 #Input is of form [Relation][FD1 FD2...]
 def parseInput(input):
-	print input
-	#match = re.search("\\[([A-Za-z]+)\\]\\[([[A-Za-z]\s->]+)\\]", input)
 	match = re.search("\[([A-Za-z]+)\]\[(([A-Za-z]|\n|->{1,2})+)\]\[(.+)\]", input)
 	if match:
 		relation = set(match.group(1))
@@ -468,7 +440,7 @@ def parseInput(input):
 		else:
 			return (inputCheck,)
 	else:
-		return ("Wrong Format",)
+		return (views.getErrorMessageBox("Wrong Format"),)
 
 		
 def computeEverything(relation, fds, mvds, targetNf):
@@ -523,7 +495,6 @@ keys = getKeys(relation, fds)
 print("--- Candidate Keys ---")
 print(keys)
 
-printNormalForms(relation, fds, mvds)
 
 synthesealgorithm(fds, keys)
 #decompositionAlgorithm(fds, relation)

@@ -1,9 +1,10 @@
-$def with (form, text)
+$def with (form, text, relation, fds)
 
 <!doctype html>
 
 <html>
     <head>
+		<meta charset="utf-8">
         <title>DBnormalizer</title>
         <link rel="stylesheet" type="text/css" href="/static/css/bootstrapcosmo.min.css" />
     </head>
@@ -18,7 +19,8 @@ $def with (form, text)
 							$:form.render_css()
 						</div>
 						<div class="form-group">
-							<button type="submit" class="btn btn-primary" value="send">Submit</button>
+							<button id="submitbutton" type="submit" class="btn btn-primary" value="send">Submit</button>
+							<a href="." class="btn btn-default">neues Schema erzeugen</a>
 						</div>
 					</fieldset>				
 			</form>
@@ -31,7 +33,13 @@ $def with (form, text)
 	<script type="text/javascript" src="/static/js/jquery-1.11.3.min.js"></script>
 	<script type="text/javascript">
 		jQuery(document).ready(function(){
-			jQuery(".btn").click(function(){
+			document.getElementById('relation').value = "$relation";
+			document.getElementById('fds').value = "$fds".replace(/&lt;br\/&gt;/g, "\n").replace(/&gt;/g, ">");
+		});
+	</script>
+	<script type="text/javascript">
+		jQuery(document).ready(function(){
+			jQuery("#submitbutton").click(function(){
 					var input_string = "["+$$("#relation").val() + "]["+ $$("#fds").val()+"]["+ $$("#targetNf").val()+"]";
 					jQuery.ajax({
 							type: "POST",
