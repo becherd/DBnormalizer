@@ -3,7 +3,7 @@
 import random 
 import string
 from datetime import datetime
-
+import re
 #computes the attributhuelle of the attributes "huelle" for the given fds
 def attributhuelle(huelle, fds):
 	if len(huelle) > 0:
@@ -385,6 +385,7 @@ def generateNewFD(relation):
 		
 		
 def generateFDs(relation):
+	random.seed(datetime.now())
 	fds = []
 	randomNumber = random.randint(1, 100)
 	x = 125
@@ -396,6 +397,7 @@ def generateFDs(relation):
 	return fds
 	
 def generateMVDs (relation):
+	random.seed(datetime.now())
 	mvds = []
 	randomNumber = random.randint(1, 100)
 	x = 75
@@ -406,16 +408,54 @@ def generateMVDs (relation):
 		x=x-25
 	return mvds
 	
-def generateNewRelation():
+def generateNewRelation(numberOfAttributes):
 	random.seed(datetime.now())
 	alphabet = list(string.ascii_uppercase)	
 	return set(alphabet[:numberOfAttributes])	
 
 
+def parseInputFDsMVDs(inputString):
+	fdsAndMvds = inputString.splitlines()
+	fds = []
+	mvds = []
+	for element in fdsAndMvds:
+		if "->>" in element:
+			newmvd = (re.split('->>', element, 1))
+			mvds.append((set(newmvd[0]), set(newmvd[1])))
+		elif "->" in element:
+			newfd = (re.split('->', element, 1))
+			fds.append((set(newfd[0]), set(newfd[1])))
+		else:
+			print("Cannot parse this!")
+			exit()
+	return (fds,mvds)
 
-
-
+def validateInput(relation, fds, mvds):
+	if not checkIfAllAttributesAreInRelation(fds, mvds, relation):
+		return "There are attributes in FDs/MVDs which do not appear in the Relation!"
+	else:
+		return "OK"
 	
+
+#Input is of form [Relation][FD1 FD2...]
+def parseInput(input):
+	print input
+	#match = re.search("\\[([A-Za-z]+)\\]\\[([[A-Za-z]\s->]+)\\]", input)
+	match = re.search("\[([A-Za-z]+)\]\[(([A-Za-z]|\n|->)+)\]", input)
+	if match:
+		fds, mvds = parseInputFDsMVDs(match.group(2).replace(" ", "\n"))
+		relation = set(match.group(1))
+		inputCheck = validateInput(relation, fds, mvds)
+		if inputCheck == "OK":
+			return(relation, fds, mvds)
+		else:
+			return (inputCheck,)
+	else:
+		return ("Wrong Format",)
+
+		
+		
+
 #Some test data
 
 #fds = [(set("D"),set("CA")), (set("C"),set("BA"))]
@@ -435,7 +475,7 @@ relation = set("ABCDEF")
 numberOfAttributes=5
 
 #generate new problem
-relation = generateNewRelation()
+relation = generateNewRelation(numberOfAttributes)
 fds = generateFDs(relation)
 mvds = generateMVDs(relation)
 	
@@ -448,20 +488,13 @@ print("------ MVDs -------")
 print(mvds)
 	
 	
-#check for user fail :)
-if not checkIfAllAttributesAreInRelation(fds, mvds, relation):
-			print("There are attributes in FDs/MVDs which do not appear in the Relation!")
-			#exit()
-			
 	
 
 keys = getKeys(relation, fds)
 print("--- Candidate Keys ---")
 print(keys)
 
-
 printNormalForms(relation, fds, mvds)
-
 
 synthesealgorithm(fds, keys)
 decompositionAlgorithm(fds, relation)
