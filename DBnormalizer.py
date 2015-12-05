@@ -135,7 +135,7 @@ def isBCNF(relation, fds):
 			return False
 	return True
 	
-def is4NF(relation, fds, mvds):
+def isFourNF(relation, fds, mvds):
 	keys = getKeys(relation, fds)
 	for mvd in fds+mvds:
 		if (not(isTrivial4NF(mvd, relation))) & (not(isSuperKey(mvd[0], keys))):
@@ -219,7 +219,10 @@ def addRelationWithKey(relations, keys):
 				keyFound=True
 				break
 	if not(keyFound):
-		relations.append(set(random.sample(keys, 1)))
+		addKey = []
+		for attr in random.sample(keys, 1)[0]:
+			addKey.append(attr)
+		relations.append(set(addKey))
 	return relations
 	
 def removeRedundantSchemas(relations):
@@ -295,7 +298,7 @@ def decompositionAlgorithm(fds, relation):
 	newRelations =  decompositionAlgorithmRec(fds, relation, []) if not isBCNF(relation, fds) else relation
 	print "---  New Relations ---"
 	print newRelations
-	return newRelations
+	return newRelations if type(newRelations) == list else [newRelations]
 
 
 def decompositionAlgorithmRec(fds, relation, relations):
@@ -320,10 +323,10 @@ def decompositionAlgorithm4NF(fds, mvds, relation):
 	print "---Dekomposition Algo 4NF ---"
 	print "-----------------------------"
 	collapseEqualLeftSides(fds)
-	newRelations =  decompositionAlgorithmRec4NF(fds, mvds, relation, []) if not is4NF(relation, fds, mvds) else relation
+	newRelations =  decompositionAlgorithmRec4NF(fds, mvds, relation, []) if not isFourNF(relation, fds, mvds) else relation
 	print "---  New Relations ---"
 	print newRelations
-	return newRelations
+	return newRelations if type(newRelations) == list else [newRelations]
 
 
 	
@@ -366,10 +369,23 @@ def printNormalForms(relation, fds, mvds):
 		print("3NF")
 	if isBCNF(relation, fds):
 		print("BCNF")		
-	if is4NF(relation, fds, mvds):
+	if isFourNF(relation, fds, mvds):
 		print("4NF")	
 	return True
 
+def getNormalForms(relation, fds, mvds):
+	normalForms = []
+	if isOneNF(relation, fds):
+		normalForms.append("1NF")
+	if isTwoNF(relation, fds):
+		normalForms.append("2NF")
+	if isThreeNF(relation, fds):
+		normalForms.append("3NF")
+	if isBCNF(relation, fds):
+		normalForms.append("BCNF")
+	if isFourNF(relation, fds, mvds):
+		normalForms.append("4NF")
+	return normalForms
 	
 def generateNewFD(relation):
 		numberOfAttributesLeft = random.randint(1, 3)
@@ -441,32 +457,45 @@ def validateInput(relation, fds, mvds):
 def parseInput(input):
 	print input
 	#match = re.search("\\[([A-Za-z]+)\\]\\[([[A-Za-z]\s->]+)\\]", input)
-	match = re.search("\[([A-Za-z]+)\]\[(([A-Za-z]|\n|->)+)\]", input)
+	match = re.search("\[([A-Za-z]+)\]\[(([A-Za-z]|\n|->{1,2})+)\]\[(.+)\]", input)
 	if match:
-		fds, mvds = parseInputFDsMVDs(match.group(2).replace(" ", "\n"))
 		relation = set(match.group(1))
+		fds, mvds = parseInputFDsMVDs(match.group(2).replace(" ", "\n"))
+		targetNf = match.group(4)
 		inputCheck = validateInput(relation, fds, mvds)
 		if inputCheck == "OK":
-			return(relation, fds, mvds)
+			return(relation, fds, mvds, targetNf)
 		else:
 			return (inputCheck,)
 	else:
 		return ("Wrong Format",)
 
 		
-		
+def computeEverything(relation, fds, mvds, targetNf):
+	keys = getKeys(relation, fds)
+	normalForms = getNormalForms(relation, fds, mvds)
+	newSchema = []
+	if targetNf == "3NF":
+		newSchema = synthesealgorithm(fds, keys)
+	elif targetNf == "BCNF":
+		newSchema = decompositionAlgorithm(fds, relation)
+	elif targetNf == "4NF":
+		newSchema = decompositionAlgorithm4NF(fds, mvds, relation)	
+	return (keys, normalForms, newSchema)
 
+	
+"""	
 #Some test data
 
 #fds = [(set("D"),set("CA")), (set("C"),set("BA"))]
-fds = [(set("A"),set("B")), (set("C"),set("D")), (set("E"),set("AC")), (set("F"),set("CD")), (set("D"),set("BEF"))]
+#fds = [(set("A"),set("B")), (set("C"),set("D")), (set("E"),set("AC")), (set("F"),set("CD")), (set("D"),set("BEF"))]
 #fds = [(set("AD"),set("BC")), (set("DE"),set("BG")), (set("FCD"),set("A")), (set("AF"),set("DE")), (set("C"),set("AB"))]
 #fds = [(set("B"),set("DA")), (set("DEF"),set("B")), (set("C"),set("EA"))]
-
+fds = [(set("AB"),set("C"))]
 mvds = [(set("A"),set("CD"))]
 
-#relation = set("ABCD")
-relation = set("ABCDEF")
+relation = set("ABCD")
+#relation = set("ABCDEF")
 #relation = set("ABCDEFGH")
 #relation = set("ABCDEF")
 
@@ -475,9 +504,9 @@ relation = set("ABCDEF")
 numberOfAttributes=5
 
 #generate new problem
-relation = generateNewRelation(numberOfAttributes)
-fds = generateFDs(relation)
-mvds = generateMVDs(relation)
+#relation = generateNewRelation(numberOfAttributes)
+#fds = generateFDs(relation)
+#mvds = generateMVDs(relation)
 	
 
 print("---- Relation ----")
@@ -497,5 +526,6 @@ print(keys)
 printNormalForms(relation, fds, mvds)
 
 synthesealgorithm(fds, keys)
-decompositionAlgorithm(fds, relation)
-decompositionAlgorithm4NF(fds, mvds, relation)
+#decompositionAlgorithm(fds, relation)
+#decompositionAlgorithm4NF(fds, mvds, relation)
+"""

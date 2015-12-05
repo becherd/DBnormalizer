@@ -1,0 +1,48 @@
+$def with (form, text)
+
+<!doctype html>
+
+<html>
+    <head>
+        <title>DBnormalizer</title>
+        <link rel="stylesheet" type="text/css" href="/static/css/bootstrapcosmo.min.css" />
+    </head>
+    
+    <body>
+		<div class="container">
+		<h1>DB->normalizer</h1>
+        <br/>
+			<form class="form" method="post"> 
+				  <fieldset>
+						<div class="form-group">
+							$:form.render_css()
+						</div>
+						<div class="form-group">
+							<button type="submit" class="btn btn-primary" value="send">Submit</button>
+						</div>
+					</fieldset>				
+			</form>
+			</div>
+		<br/>
+        <span id="results"><div class="container">$text</div></span>  	
+    </body>
+	
+	
+	<script type="text/javascript" src="/static/js/jquery-1.11.3.min.js"></script>
+	<script type="text/javascript">
+		jQuery(document).ready(function(){
+			jQuery(".btn").click(function(){
+					var input_string = "["+$$("#relation").val() + "]["+ $$("#fds").val()+"]["+ $$("#targetNf").val()+"]";
+					jQuery.ajax({
+							type: "POST",
+							data: {inputfields : input_string},
+							success: function(data) {
+							jQuery('#results').html(data).hide().fadeIn(1000);
+							},
+							});
+					return false;
+					});
+		});
+	</script>
+    
+</html>
