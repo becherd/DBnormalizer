@@ -75,7 +75,7 @@ def html(relation, fds, numberOfAttributes):
 		<form class="form-inline" action="index.py" method="POST">
 				<div class="form-group">
 				<h4>Neues Schema generieren</h4>
-				Generiere neuees Schema mit
+				Generiere neues Schema mit
 				<select class="form-control input-sm" name="numberOfAttributes">
 """+attributesOptions+"""
 </select> Attributen

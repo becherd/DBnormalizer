@@ -424,9 +424,13 @@ def parseInputFDsMVDs(inputString):
 	for element in fdsAndMvds:
 		if "->>" in element:
 			newmvd = (re.split('->>', element, 1))
+			if newmvd[0]=="":
+				return([],[])
 			mvds.append((set(newmvd[0]), set(newmvd[1])))
 		elif "->" in element:
 			newfd = (re.split('->', element, 1))
+			if newfd[0]=="":
+				return([],[])
 			fds.append((set(newfd[0]), set(newfd[1])))
 		elif not re.search("\s+", element):
 			#Cannot parse this as it is no empty line and has no -> or ->> included
