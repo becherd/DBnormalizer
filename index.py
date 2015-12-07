@@ -15,9 +15,9 @@ def printResults(string):
 		relation = x[0]
 		fds = x[1]
 		mvds = x[2]
-		targetNf = x[3]
-		keys, normalForms, newSchema = DBnormalizer.computeEverything(relation, fds, mvds, targetNf)
-		return views.resultToString(relation, fds, mvds, keys, normalForms, targetNf, newSchema) 
+		numberOfAttributes = x[3]
+		keys, normalForms, newSchema = DBnormalizer.computeEverything(relation, fds, mvds)
+		return views.resultToString(relation, fds, mvds, keys, normalForms, newSchema) 
 	
 print """
 	<html>
@@ -29,7 +29,8 @@ print """
 			<script src="http://home.in.tum.de/~becher/static/js/bootstrap.min.js"></script>
 		</head>"""
 
-def html(relation, fds, targetNfOptions):
+def html(relation, fds, numberOfAttributes):
+	attributesOptions = views.numberOfAttributesOptions(numberOfAttributes)
 	return  """
 	<body>
 	<div class="panel panel-default">
@@ -53,7 +54,6 @@ def html(relation, fds, targetNfOptions):
 		</div>
 		<br/>
 		<form class="form" action="index.py" method="POST"> 
-			<fieldset>
 				<div class="form-group">
 					<h4>Relation eingeben</h4>
 					<input type="text" class="form-control" name="relation" value="
@@ -63,37 +63,26 @@ def html(relation, fds, targetNfOptions):
 					<textarea type="text" class="form-control" rows="6" name="fds">
 """+ fds + """
 </textarea>
-					<h4>Ziel-Normalform auswählen</h4>
-					 <select class="form-control" name="targetNf">
-"""+targetNfOptions+"""
-</select>
 					<input type="hidden" value="showResults" name="mode"></input>
+					<input type="hidden" value="
+"""+str(numberOfAttributes)+"""
+" name="numberOfAttributes"></input>
 				</div>
 				<div class="form-group">
 						<button id="submitbutton" type="submit" class="btn btn-primary" value="send">Absenden</button>
-				</div>
-			</fieldset>				
+				</div>			
 		</form>
-		<div class="col-xs-3">
-		<form class="form" action="index.py" method="POST">
-			<fieldset>
+		<form class="form-inline" action="index.py" method="POST">
 				<div class="form-group">
-					<input type="hidden" value="generateFds" name="mode"></input>
-					<button id="generateWithoutMvds" type="submit" class="btn btn-default" value="send">Generiere neues Schema (ohne MVDs)</button>
-		   		</div>
-			</fieldset>
-		</form>
+				<h4>Neues Schema generieren</h4>
+				Generiere neuees Schema mit
+				<select class="form-control input-sm" name="numberOfAttributes">
+"""+attributesOptions+"""
+</select> Attributen
+			<button id="mode" name="mode" type="submit" class="btn btn-default btn-sm" value="generateFds">ohne MVDs</button>
+			<button id="mode" name="mode"  type="submit" class="btn btn-default btn-sm" value="generateMvds">mit MVDs</button>	
 		</div>
-		<div class="col-xs-3">
-		<form class="form" action="index.py" method="POST">
-	                <fieldset>
-				<div class="form-group">
-				        <input type="hidden" value="generateMvds" name="mode"></input>
-				        <button id="generateWithMvds" type="submit" class="btn btn-default" value="send">Generiere neues Schema (mit MVDs)</button>
-				</div>
-	                </fieldset>
                 </form>
-		</div>
 		</div>
 		<br/>"""
 
@@ -123,36 +112,24 @@ htmlend="""
 """
 
 
-def targetNfOptions(targetNf):
-	if (targetNf=="3NF"):
-		option3NF = "<option selected>3NF</option>"
-	else:
-                option3NF = "<option>3NF</option>"
-        if (targetNf=="BCNF"):
-                optionBCNF = "<option selected>BCNF</option>"
-        else:
-                optionBCNF = "<option>BCNF</option>"
-        if (targetNf=="4NF"):
-                option4NF = "<option selected>4NF</option>"
-        else:
-                option4NF = "<option>4NF</option>"
-	return option3NF+optionBCNF+option4NF
+
+
 
 try:
 	mode = form['mode'].value
+	numberOfAttributes = form['numberOfAttributes'].value
 	if mode=='generateFds':
-		 relation, fds, mvds = DBnormalizer.generateNewProblem(5, False)
-		 print html(views.setOfAttributesToString(relation), views.fdsToString(fds)+views.mvdsToString(mvds), targetNfOptions("3NF"))+htmlend
+		 relation, fds, mvds = DBnormalizer.generateNewProblem(numberOfAttributes, False)
+		 print html(views.setOfAttributesToString(relation), views.fdsToString(fds)+views.mvdsToString(mvds), numberOfAttributes)+htmlend
 	elif mode=='generateMvds':
-		 relation, fds, mvds = DBnormalizer.generateNewProblem(5, True)
-		 print html(views.setOfAttributesToString(relation), views.fdsToString(fds)+views.mvdsToString(mvds), targetNfOptions("3NF"))+htmlend
+		 relation, fds, mvds = DBnormalizer.generateNewProblem(numberOfAttributes, True)
+		 print html(views.setOfAttributesToString(relation), views.fdsToString(fds)+views.mvdsToString(mvds), numberOfAttributes)+htmlend
 	else:
 		#Mode is showResults
 		relation = str(form['relation'].value)
         	fds = str(form['fds'].value)
-       	 	targetNf = form['targetNf'].value
-		input = "["+relation+"]["+fds+"]["+targetNf+"]"
-		print html(relation, fds, targetNfOptions(targetNf)) + printResults(input) + htmlend
+		input = "["+relation+"]["+fds+"]["+str(int(numberOfAttributes))+"]"
+		print html(relation, fds, numberOfAttributes) + printResults(input) + htmlend
 except KeyError:
     relation, fds, mvds = DBnormalizer.generateNewProblem(5, False)
-    print html(views.setOfAttributesToString(relation), views.fdsToString(fds)+views.mvdsToString(mvds), targetNfOptions("3NF"))+htmlend
+    print html(views.setOfAttributesToString(relation), views.fdsToString(fds)+views.mvdsToString(mvds), 5)+htmlend

@@ -410,7 +410,7 @@ def generateNewRelation(numberOfAttributes):
 
 def generateNewProblem(numberOfAttributes, includeMvds):
 	random.seed(datetime.now())
-	relation = generateNewRelation(numberOfAttributes)
+	relation = generateNewRelation(int(numberOfAttributes))
 	fds = generateFDs(relation)
 	mvds = []
 	if includeMvds:
@@ -434,7 +434,9 @@ def parseInputFDsMVDs(inputString):
 	return (fds,mvds)
 
 def validateInput(relation, fds, mvds):
-	if not checkIfAllAttributesAreInRelation(fds, mvds, relation):
+	if len(relation) >9:
+		return views.getErrorMessageBox("Bitte nicht mehr als 9 Attribute eingeben!")
+	elif not checkIfAllAttributesAreInRelation(fds, mvds, relation):
 		return views.getErrorMessageBox("Es gibt Attribute, die in FDs/MVDs vorkommen, aber nicht in der Relation!")
 	elif fds==[] and mvds==[]:
 		return views.getErrorMessageBox("Ich verstehe deine Eingabe nicht. Hast du die FDs/MVDs korrekt eingegeben?")
@@ -448,27 +450,24 @@ def parseInput(input):
 	if match:
 		relation = set(match.group(1).replace(" ", ""))
 		fds, mvds = parseInputFDsMVDs(match.group(2).replace(" ", ""))
-		targetNf = match.group(4)
+		numberOfAttributes = match.group(4)
 		inputCheck = validateInput(relation, fds, mvds)
 		if inputCheck == "OK":
-			return(relation, fds, mvds, targetNf)
+			return(relation, fds, mvds, numberOfAttributes)
 		else:
 			return (inputCheck,)
 	else:
 		return (views.getErrorMessageBox("Falsches Eingabeformat. Bitte überprüfe deine Eingabe!"),)
 
 		
-def computeEverything(relation, fds, mvds, targetNf):
+def computeEverything(relation, fds, mvds):
 	keys = getKeys(relation, fds)
 	normalForms = getNormalForms(relation, fds, mvds)
-	newSchema = []
-	if targetNf == "3NF":
-		newSchema = synthesealgorithm(fds, keys)
-	elif targetNf == "BCNF":
-		newSchema = decompositionAlgorithm(fds, relation)
-	elif targetNf == "4NF":
-		newSchema = decompositionAlgorithm4NF(fds, mvds, relation)	
-	return (keys, normalForms, newSchema)
+	newSchemas = []
+	newSchemas.append(synthesealgorithm(fds, keys))
+	newSchemas.append(decompositionAlgorithm(fds, relation))
+	newSchemas.append(decompositionAlgorithm4NF(fds, mvds, relation))
+	return (keys, normalForms, newSchemas)
 
 	
 """	

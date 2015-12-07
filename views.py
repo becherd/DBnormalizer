@@ -71,8 +71,17 @@ def schemaToString(schema):
 	for relation in schema:
 		i=i+1
 		schemaString = schemaString + relationToString(relation, str(i)) + "<br/>"
-	return schemaString
-		
+	return schemaString	
+
+
+def numberOfAttributesOptions(x):
+	options=""
+	for i in range(3,8):
+		options = options + "<option"
+		if i==int(x):
+			options = options + " selected"
+		options = options + ">"+str(i)+"</option>"
+	return options
 		
 		
 def wrapInPanel(heading, content):
@@ -84,7 +93,7 @@ def getErrorMessageBox(message):
 		return "<div class=\"container\"><div class=\"col-md-8\"><div class=\"alert alert-danger\" role=\"alert\"><span class=\"glyphicon glyphicon-exclamation-sign\" aria-hidden=\"true\"></span><span class=\"sr-only\">Error:</span> "+message+"</div></div></div>"
 	
 	
-def resultToString(relation, fds, mvds, keys, normalForms, targetNf, newSchema) :
+def resultToString(relation, fds, mvds, keys, normalForms, newSchema) :
 	keysPanel = wrapInPanel("Kandidatenschlüssel", keysToString(keys))
 	relationPanel = wrapInPanel("Relation", relationToString(relation,""))
 	fdsPanel = wrapInPanel("FDs", fdsToHtmlString(fds))
@@ -93,8 +102,8 @@ def resultToString(relation, fds, mvds, keys, normalForms, targetNf, newSchema) 
 	else:
 		mvdsPanel= ""
 	normalformsPanel = wrapInPanel("Normalformen", normalFormsToString(normalForms))
-	if newSchema != []:
-		newschemaPanel = wrapInPanel("Schema in "+targetNf, schemaToString(newSchema))
- 	else:
-		newschemaPanel=""
-	return "<div class=\"panel-body\"><h3>Eingabe</h3><div class=\"row\">"+relationPanel + "" + fdsPanel + "" + mvdsPanel + "</div><br/><h3>Ergebnis</h3><div class=\"row\">"+ keysPanel + "" + normalformsPanel+ ""+ newschemaPanel+ "</div></div>"
+	newschema3NFPanel = wrapInPanel("Schema in 3NF", schemaToString(newSchema[0]))
+	newschemaBCNFPanel = wrapInPanel("Schema in BCNF", schemaToString(newSchema[1]))
+	newschema4NFPanel = wrapInPanel("Schema in 4NF", schemaToString(newSchema[2]))
+
+	return """<div class="panel-body"><h3>Eingabe</h3><div class="row">"""+relationPanel + fdsPanel + mvdsPanel + """</div><br/><h3>Ergebnis</h3><div class="row">"""+ keysPanel  + normalformsPanel+ """</div><div class="row">"""+newschema3NFPanel+newschemaBCNFPanel+newschema4NFPanel+ """</div></div>"""
