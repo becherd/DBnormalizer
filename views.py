@@ -9,7 +9,8 @@ def keysToString(keys):
 	for key in keys:
 		keyString = keyString + "{"
 		for attr in key:
-			keyString = keyString + attr
+			if attr != DBnormalizer.EMPTY_SET:
+				keyString = keyString + attr
 		keyString = keyString + "}<br/>"
 	return keyString
 	
@@ -17,7 +18,8 @@ def keysToString(keys):
 def setOfAttributesToString(attributes):
 	setOfAttributesString=""
 	for attr in attributes:
-		setOfAttributesString = setOfAttributesString + attr
+		if attr != DBnormalizer.EMPTY_SET:
+			setOfAttributesString = setOfAttributesString + attr
 	return setOfAttributesString
 	
 def relationToString(relation, i):
@@ -31,9 +33,18 @@ def fdsToString(fds):
 	fdString=""
 	for fd in fds:
 		for attr in fd[0]:
+			if attr == DBnormalizer.EMPTY_SET:
+				if len(fd[0])==1:
+					#this attribute (which is empty set) is the only one -> display empty set
+					attr = "&empty;"
+				else:
+					#remove the EMPTY_SET place holder
+					attr=""
 			fdString = fdString + attr
 		fdString = fdString + "->"
 		for attr in fd[1]:
+			if attr == DBnormalizer.EMPTY_SET:
+				attr = ""
 			fdString = fdString + attr
 		fdString = fdString + "\n"
 	return fdString
@@ -47,10 +58,18 @@ def mvdsToString(mvds):
 	mvdString=""
 	for mvd in mvds:
 		for attr in mvd[0]:
+			if attr == DBnormalizer.EMPTY_SET:
+				if len(fd[0])==1:
+					#this attribute (which is empty set) is the only one -> display empty set
+					attr = "&empty;"
+				else:
+					#remove the EMPTY_SET place holder
+					attr=""
 			mvdString = mvdString + attr
 		mvdString = mvdString + "->>"
 		for attr in mvd[1]:
-			mvdString = mvdString + attr
+			if attr == DBnormalizer.EMPTY_SET:
+				attr = ""
 		mvdString = mvdString + "\n"
 	return mvdString
 

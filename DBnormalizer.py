@@ -6,6 +6,11 @@ import string
 from datetime import datetime
 import re
 import views
+
+
+EMPTY_SET = "$"
+
+
 #computes the attributhuelle of the attributes "huelle" for the given fds
 def attributhuelle(huelle, fds):
 	if len(huelle) > 0:
@@ -25,15 +30,15 @@ def isKey(attributes, relation, fds):
 	
 	
 #generate all permutations of all elements in the set of sets. used to first generate all combinations of attributes in order to check each one of then if it is a key
-def makePermutations(setOfSets, relation):
+def makePermutations(setOfSets, relation, fds):
 	newSetOfSets = setOfSets.copy()
 	for element1 in setOfSets:
 		for element2 in setOfSets:
-				newSetOfSets.add(element1|element2)
+			newSetOfSets.add(element1|element2)
 	if relation in newSetOfSets:
 		return newSetOfSets
 	else:
-		return makePermutations(newSetOfSets, relation)			
+		return makePermutations(newSetOfSets, relation, fds)			
 	
 
 #filters the keys from all permutations of all attributes. Thus, this function generates the superkeys
@@ -67,17 +72,36 @@ def getSetOfSingleElementSets(relation):
 #computes all candidate keys for the relation	
 def getKeys(relation, fds):
 	relationSubsets = getSetOfSingleElementSets(relation)
-	allCombinations = makePermutations(relationSubsets, relation)
+	allCombinations = makePermutations(relationSubsets, relation, fds)
 	superKeys = filterKeys(allCombinations, relation, fds)
 	candidateKeys = pruneSubsets(superKeys)
 	return candidateKeys
 	
+
+
 #checks if the given attribute is contained in a key
 def isKeyAttribute(attribute, keys):
 	for attrSet in keys:
 		if attribute in attrSet:
 			return True
 	return False
+
+
+
+def getRightSideAttributes(relation, fds):
+	rightSideAttributes=set("")
+	for fd in fds:
+		rightSideAttributes=rightSideAttributes.fd[1]
+	return rightSideAttributes
+
+#checks if Attribute appears on the right side of a fd
+def isAttributeOnRightSide(attribute, fds):
+	for fd in fds:
+		for attr in fd:
+			if attr == attribute:
+				return True
+	return False
+
 	
 #checks if all given attributes are contained in a key
 def areAllKeyAttributes(attributes, keys):
@@ -168,15 +192,16 @@ def rightReduction(fds):
 	for i in range(len(fds)):
 		rightSide=fds[i][1].copy()
 		for attr in rightSide:
-			#new fd with one less attribute on the right
-			newFdTest = (newfds[i][0], newfds[i][1]-set(attr))
-			#remember what we had so far
-			oldFds = newfds[:]
-			#add new test fd. Then, we check if we can keep it or whether we have to go back to the old state
-			newfds[i]=newFdTest
+			if attr != EMPTY_SET:
+				#new fd with one less attribute on the right
+				newFdTest = (newfds[i][0], newfds[i][1]-set(attr))
+				#remember what we had so far
+				oldFds = newfds[:]
+				#add new test fd. Then, we check if we can keep it or whether we have to go back to the old state
+				newfds[i]=newFdTest
 
-			if attributhuelle(oldFds[i][0], newfds) != attributhuelle(oldFds[i][0], oldFds):
-				newfds[i]=oldFds[i]
+				if attributhuelle(oldFds[i][0], newfds) != attributhuelle(oldFds[i][0], oldFds):
+					newfds[i]=oldFds[i]
 	return newfds
 
 #removes fds ALPHA->[EMPTY]	
@@ -348,7 +373,7 @@ def decompositionAlgorithmRec4NF(fds, mvds, relation, relations):
 def checkIfAllAttributesAreInRelation(fds, mvds, relation):
 	for fd in fds+mvds:
 		for attr in fd[0]|fd[1]:
-			if attr not in relation:
+			if attr not in relation and attr != EMPTY_SET:
 				return False
 	return True
 	
@@ -424,13 +449,15 @@ def parseInputFDsMVDs(inputString):
 	for element in fdsAndMvds:
 		if "->>" in element:
 			newmvd = (re.split('->>', element, 1))
-			if newmvd[0]=="":
-				return([],[])
+			#add empty sets on both sides of the mvd
+			newmvd[0] = newmvd[0]+EMPTY_SET
+			newmvd[1] = newmvd[1]+EMPTY_SET	
 			mvds.append((set(newmvd[0]), set(newmvd[1])))
 		elif "->" in element:
 			newfd = (re.split('->', element, 1))
-			if newfd[0]=="":
-				return([],[])
+			#add empty sets on both sides of the fd
+			newfd[0] = newfd[0]+EMPTY_SET
+			newfd[1] = newfd[1]+EMPTY_SET			
 			fds.append((set(newfd[0]), set(newfd[1])))
 		elif not re.search("\s+", element):
 			#Cannot parse this as it is no empty line and has no -> or ->> included
@@ -465,6 +492,7 @@ def parseInput(input):
 
 		
 def computeEverything(relation, fds, mvds):
+	relation.add(EMPTY_SET)
 	keys = getKeys(relation, fds)
 	normalForms = getNormalForms(relation, fds, mvds)
 	newSchemas = []
@@ -499,7 +527,9 @@ numberOfAttributes=5
 #mvds = generateMVDs(relation)
 	
 
-print("---- Relation ----")
+
+
+("---- Relation ----")
 print(relation)
 print("------ FDs -------")
 print(fds)
