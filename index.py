@@ -24,9 +24,9 @@ print """
 		<head>
 			<meta charset="utf-8">
 			<title>DBnormalizer</title>
-			<link rel="stylesheet" type="text/css" href="../../html-data/static/css/bootstrapcosmo.min.css" />
-			<script src="../../html-data/static/js/jquery-1.11.3.min.js"></script>
-			<script src="../../html-data/static/js/bootstrap.min.js"></script>
+			<link rel="stylesheet" type="text/css" href="http://home.in.tum.de/~becher/static/css/bootstrapcosmo.min.css" />
+			<script src="http://home.in.tum.de/~becher/static/js/jquery-1.11.3.min.js"></script>
+			<script src="http://home.in.tum.de/~becher/static/js/bootstrap.min.js"></script>
 		</head>"""
 
 def html(relation, fds, targetNfOptions):
