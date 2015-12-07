@@ -13,11 +13,11 @@ def printResults(string):
 		return x[0]
 	else:
 		relation = x[0]
-		fds = x[1]
-		mvds = x[2]
+		fds = x[1][:]
+		mvds = x[2][:]
 		numberOfAttributes = x[3]
 		keys, normalForms, newSchema = DBnormalizer.computeEverything(relation, fds, mvds)
-		return views.resultToString(relation, fds, mvds, keys, normalForms, newSchema) 
+		return views.resultToString(relation, x[1], x[2], keys, normalForms, newSchema) 
 	
 print """
 	<html>
