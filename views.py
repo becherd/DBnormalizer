@@ -1,3 +1,4 @@
+#! /usr/local/dist/bin/python
 # -*- coding: utf8 -*-
 
 import DBnormalizer 
@@ -9,7 +10,7 @@ def keysToString(keys):
 		keyString = keyString + "{"
 		for attr in key:
 			keyString = keyString + attr
-		keyString = keyString + "}"
+		keyString = keyString + "}<br/>"
 	return keyString
 	
 	
@@ -20,7 +21,7 @@ def setOfAttributesToString(attributes):
 	return setOfAttributesString
 	
 def relationToString(relation, i):
-	relationString="R"+i+":={"
+	relationString="R<sub>"+i+"</sub>:={"
 	relationString=relationString+setOfAttributesToString(relation)
 	relationString = relationString + "}"
 	return relationString
@@ -34,10 +35,12 @@ def fdsToString(fds):
 		fdString = fdString + "->"
 		for attr in fd[1]:
 			fdString = fdString + attr
-		fdString = fdString + "<br/>"
+		fdString = fdString + "\n"
 	return fdString
 
 	
+def fdsToHtmlString(fds):
+	return fdsToString(fds).replace("\n", "<br/>")
 	
 	
 def mvdsToString(mvds):
@@ -48,8 +51,12 @@ def mvdsToString(mvds):
 		mvdString = mvdString + "->>"
 		for attr in mvd[1]:
 			mvdString = mvdString + attr
-		mvdString = mvdString + "<br/>"
+		mvdString = mvdString + "\n"
 	return mvdString
+
+def mvdsToHtmlString(mvds):
+        return mvdsToString(mvds).replace("\n", "<br/>")
+
 	
 def normalFormsToString(normalForms):
 	nfString = ""
@@ -78,10 +85,16 @@ def getErrorMessageBox(message):
 	
 	
 def resultToString(relation, fds, mvds, keys, normalForms, targetNf, newSchema) :
-	keysPanel = wrapInPanel("Keys", keysToString(keys))
+	keysPanel = wrapInPanel("Kandidatenschlüssel", keysToString(keys))
 	relationPanel = wrapInPanel("Relation", relationToString(relation,""))
-	fdsPanel = wrapInPanel("FDs", fdsToString(fds))
-	mvdsPanel = wrapInPanel("MVDs", mvdsToString(mvds)) if mvds != [] else ""
-	normalformsPanel = wrapInPanel("Normal Forms", normalFormsToString(normalForms))
-	newschemaPanel = wrapInPanel("Schema in "+targetNf, schemaToString(newSchema)) if newSchema != [] else ""
-	return "<h3>Eingabe</h3><div class=\"row\">"+relationPanel + "" + fdsPanel + "" + mvdsPanel + "</div><br/><h3>Ergebnis</h3><div class=\"row\">"+ keysPanel + "" + normalformsPanel+ ""+ newschemaPanel+ "</div>"
+	fdsPanel = wrapInPanel("FDs", fdsToHtmlString(fds))
+	if mvds != []:
+		mvdsPanel = wrapInPanel("MVDs", mvdsToHtmlString(mvds))
+	else:
+		mvdsPanel= ""
+	normalformsPanel = wrapInPanel("Normalformen", normalFormsToString(normalForms))
+	if newSchema != []:
+		newschemaPanel = wrapInPanel("Schema in "+targetNf, schemaToString(newSchema))
+ 	else:
+		newschemaPanel=""
+	return "<div class=\"panel-body\"><h3>Eingabe</h3><div class=\"row\">"+relationPanel + "" + fdsPanel + "" + mvdsPanel + "</div><br/><h3>Ergebnis</h3><div class=\"row\">"+ keysPanel + "" + normalformsPanel+ ""+ newschemaPanel+ "</div></div>"

@@ -1,3 +1,4 @@
+#! /usr/local/dist/bin/python
 # -*- coding: utf8 -*-
 
 import random 
@@ -196,7 +197,7 @@ def collapseEqualLeftSides(fds):
 	return removeEmptyRightSide(fds)
 
 
-	
+#computes the canonical cover of the given fds	
 def canonicalCover(fds):
 	newfds = leftReduction(fds)
 	newfds = rightReduction(newfds)
@@ -286,8 +287,14 @@ def mvdsInRelation(mvds, relation):
 	
 def decompositionAlgorithm(fds, relation):
 	collapseEqualLeftSides(fds)
-	newRelations =  decompositionAlgorithmRec(fds, relation, []) if not isBCNF(relation, fds) else relation
-	return newRelations if type(newRelations) == list else [newRelations]
+	if not isBCNF(relation, fds):
+		newRelations =  decompositionAlgorithmRec(fds, relation, [])  
+	else:
+		newRelations =  relation
+	if type(newRelations) == list:
+		return newRelations
+	else:
+		return [newRelations]
 
 
 def decompositionAlgorithmRec(fds, relation, relations):
@@ -309,8 +316,14 @@ def decompositionAlgorithmRec(fds, relation, relations):
 	
 def decompositionAlgorithm4NF(fds, mvds, relation):
 	collapseEqualLeftSides(fds)
-	newRelations =  decompositionAlgorithmRec4NF(fds, mvds, relation, []) if not isFourNF(relation, fds, mvds) else relation
-	return newRelations if type(newRelations) == list else [newRelations]
+	if not isFourNF(relation, fds, mvds):
+		newRelations =  decompositionAlgorithmRec4NF(fds, mvds, relation, []) 
+	else:
+		newRelations = relation
+	if type(newRelations) == list:
+		return newRelations
+	else:
+		return  [newRelations]
 
 
 	
@@ -380,7 +393,7 @@ def generateFDs(relation):
 		x=x-25	
 	return fds
 	
-def generateMVDs (relation):
+def generateMVDs(relation):
 	mvds = []
 	randomNumber = random.randint(1, 100)
 	x = 75
@@ -399,11 +412,13 @@ def generateNewProblem(numberOfAttributes, includeMvds):
 	random.seed(datetime.now())
 	relation = generateNewRelation(numberOfAttributes)
 	fds = generateFDs(relation)
-	mvds = generateMVDs(relation) if includeMvds == 'true' else []
+	mvds = []
+	if includeMvds:
+		mvds = generateMVDs(relation)
 	return (relation, fds, mvds)
 
 def parseInputFDsMVDs(inputString):
-	fdsAndMvds = inputString.splitlines()
+	fdsAndMvds = inputString.split()
 	fds = []
 	mvds = []
 	for element in fdsAndMvds:
@@ -420,19 +435,19 @@ def parseInputFDsMVDs(inputString):
 
 def validateInput(relation, fds, mvds):
 	if not checkIfAllAttributesAreInRelation(fds, mvds, relation):
-		return views.getErrorMessageBox("There are attributes in FDs/MVDs which do not appear in the Relation!")
+		return views.getErrorMessageBox("Es gibt Attribute, die in FDs/MVDs vorkommen, aber nicht in der Relation!")
 	elif fds==[] and mvds==[]:
-		return views.getErrorMessageBox("Cannot parse this. Have you entered all FDs/MVDs correctly?")
+		return views.getErrorMessageBox("Ich verstehe deine Eingabe nicht. Hast du die FDs/MVDs korrekt eingegeben?")
 	else:
 		return "OK"
 	
 
 #Input is of form [Relation][FD1 FD2...]
 def parseInput(input):
-	match = re.search("\[([A-Za-z]+)\]\[(([A-Za-z]|\n|->{1,2})+)\]\[(.+)\]", input)
+	match = re.search("\[([A-Za-z\s]+)\]\[(([A-Za-z]|\s|->{1,2})+)\]\[(.+)\]", input)
 	if match:
-		relation = set(match.group(1))
-		fds, mvds = parseInputFDsMVDs(match.group(2).replace(" ", "\n"))
+		relation = set(match.group(1).replace(" ", ""))
+		fds, mvds = parseInputFDsMVDs(match.group(2).replace(" ", ""))
 		targetNf = match.group(4)
 		inputCheck = validateInput(relation, fds, mvds)
 		if inputCheck == "OK":
@@ -440,7 +455,7 @@ def parseInput(input):
 		else:
 			return (inputCheck,)
 	else:
-		return (views.getErrorMessageBox("Wrong Format"),)
+		return (views.getErrorMessageBox("Falsches Eingabeformat. Bitte überprüfe deine Eingabe!"),)
 
 		
 def computeEverything(relation, fds, mvds, targetNf):
