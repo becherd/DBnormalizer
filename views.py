@@ -59,7 +59,7 @@ def mvdsToString(mvds):
 	for mvd in mvds:
 		for attr in mvd[0]:
 			if attr == DBnormalizer.EMPTY_SET:
-				if len(fd[0])==1:
+				if len(mvd[0])==1:
 					#this attribute (which is empty set) is the only one -> display empty set
 					attr = "&empty;"
 				else:
@@ -70,6 +70,7 @@ def mvdsToString(mvds):
 		for attr in mvd[1]:
 			if attr == DBnormalizer.EMPTY_SET:
 				attr = ""
+			mvdString = mvdString + attr
 		mvdString = mvdString + "\n"
 	return mvdString
 

@@ -120,7 +120,7 @@ def isKeyAttribute(attribute, keys):
 
 #returns a set of left (side=0) or right (side=1) side attributes
 def getLeftOrRightSideAttributes(fds, side):
-	attributes="$"
+	attributes=EMPTY_SET
 	for fd in fds:
 		for attr in fd[side]:
 			attributes=attributes+attr
@@ -137,9 +137,9 @@ def getRightSideAttributes(fds):
 
 def getLRB(fds):
 	#those attributes that only occur on the left side (not on the right)
-	l = getLeftSideAttributes(fds) - (getRightSideAttributes(fds)-frozenset("$"))
+	l = getLeftSideAttributes(fds) - (getRightSideAttributes(fds)-frozenset(EMPTY_SET))
 	#those attributes that only occur on the right side (not on the left)
-	r = getRightSideAttributes(fds) - (getLeftSideAttributes(fds)-frozenset("$"))
+	r = getRightSideAttributes(fds) - (getLeftSideAttributes(fds)-frozenset(EMPTY_SET))
 	#those attributes that occur on both sides
 	b = getLeftSideAttributes(fds) & getRightSideAttributes(fds)
 	return (l,r,b)
