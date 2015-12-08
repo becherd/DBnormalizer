@@ -95,6 +95,16 @@ def getKeys(relation, fds):
 		return pruneSubsets(keys)
 
 
+def convertEmptySetKeyToRelation(keys, relation):
+	emptySet = set("")
+	emptySet.add(frozenset(EMPTY_SET))	
+	if keys == emptySet:
+		relationSet = set("")
+		relationSet.add(frozenset(relation))
+		return relationSet
+	else:
+		return keys
+
 
 def findRestCandidateKeys(l, b, fds, relation):
 	#l=l.copy()
@@ -541,10 +551,11 @@ def parseInput(input):
 	else:
 		return (views.getErrorMessageBox("Falsches Eingabeformat. Bitte überprüfe deine Eingabe!"),)
 
+
 		
 def computeEverything(relation, fds, mvds):
 	relation.add(EMPTY_SET)
-	keys = getKeys(relation, fds)
+	keys = convertEmptySetKeyToRelation(getKeys(relation, fds), relation)
 	normalForms = getNormalForms(relation, fds, mvds)
 	newSchemas = []
 	newSchemas.append(synthesealgorithm(fds, keys))
