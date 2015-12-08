@@ -69,15 +69,46 @@ def getSetOfSingleElementSets(relation):
 	return soses
 	
 	
-#computes all candidate keys for the relation	
-def getKeys(relation, fds):
+#computes all candidate keys for the relation (not very efficient). But it works.
+def getKeysNotEfficient(relation, fds):
 	relationSubsets = getSetOfSingleElementSets(relation)
 	allCombinations = makePermutations(relationSubsets, relation, fds)
 	superKeys = filterKeys(allCombinations, relation, fds)
 	candidateKeys = pruneSubsets(superKeys)
 	return candidateKeys
-	
 
+
+#computes all candidate keys for the relation quite efficient
+def getKeys(relation, fds):
+	ccover = canonicalCover(fds)
+	l,r,b = getLRB(ccover)
+	relationOnlyFDAttributes = l.union(r.union(b))
+	if attributhuelle(l, fds) == relationOnlyFDAttributes:
+		return  set((l.union(relation-relationOnlyFDAttributes),))
+	else:
+		#step 3, consider b
+		#add attributes from b to l
+		partkeys = findRestCandidateKeys(l,b,fds, relationOnlyFDAttributes)
+		keys = set("")
+		for key in partkeys:
+			keys.add(key|(relation-relationOnlyFDAttributes))
+		return pruneSubsets(keys)
+
+
+
+def findRestCandidateKeys(l, b, fds, relation):
+	#l=l.copy()
+	#b=b.copy()
+	keys =	set(frozenset(""))
+	for battr in b:
+		if attributhuelle(l | frozenset(battr), fds) == relation:
+			#key
+			keys.add(l | frozenset(battr))
+		else:
+			#here the new b (b-frozenset(battr)) contains possibly attributes that have been added as a key in the if.
+			#thus we create superkeys here and have to prune them later
+			keys=keys|(findRestCandidateKeys(l | frozenset(battr), b-frozenset(battr), fds, relation))
+	return keys
 
 #checks if the given attribute is contained in a key
 def isKeyAttribute(attribute, keys):
@@ -87,12 +118,31 @@ def isKeyAttribute(attribute, keys):
 	return False
 
 
-
-def getRightSideAttributes(relation, fds):
-	rightSideAttributes=set("")
+#returns a set of left (side=0) or right (side=1) side attributes
+def getLeftOrRightSideAttributes(fds, side):
+	attributes="$"
 	for fd in fds:
-		rightSideAttributes=rightSideAttributes.fd[1]
-	return rightSideAttributes
+		for attr in fd[side]:
+			attributes=attributes+attr
+	attributes = frozenset(attributes)
+	return attributes
+
+
+def getLeftSideAttributes(fds):
+	return getLeftOrRightSideAttributes(fds, 0)
+
+def getRightSideAttributes(fds):
+	return getLeftOrRightSideAttributes(fds, 1)
+
+
+def getLRB(fds):
+	#those attributes that only occur on the left side (not on the right)
+	l = getLeftSideAttributes(fds) - (getRightSideAttributes(fds)-frozenset("$"))
+	#those attributes that only occur on the right side (not on the left)
+	r = getRightSideAttributes(fds) - (getLeftSideAttributes(fds)-frozenset("$"))
+	#those attributes that occur on both sides
+	b = getLeftSideAttributes(fds) & getRightSideAttributes(fds)
+	return (l,r,b)
 
 #checks if Attribute appears on the right side of a fd
 def isAttributeOnRightSide(attribute, fds):
@@ -101,6 +151,7 @@ def isAttributeOnRightSide(attribute, fds):
 			if attr == attribute:
 				return True
 	return False
+
 
 	
 #checks if all given attributes are contained in a key
@@ -257,7 +308,7 @@ def removeRedundantSchemas(relations):
 	
 	for i in range(len(relations)):
 		for j in range(len(relations)):
-			if (i != j) and (relations[i] <= relations[j]):
+			if (i > j) and (relations[i] <= relations[j]):
 				removeIndexes.add(i)
 	newRelations = []
 	for i in range(len(relations)):
