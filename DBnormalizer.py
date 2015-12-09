@@ -443,17 +443,19 @@ def checkIfAllAttributesAreInRelation(fds, mvds, relation):
 	
 
 def getNormalForms(relation, fds, mvds):
-	normalForms = []
-	if isOneNF(relation, fds):
-		normalForms.append("1NF")
-	if isTwoNF(relation, fds):
-		normalForms.append("2NF")
-	if isThreeNF(relation, fds):
-		normalForms.append("3NF")
-	if isBCNF(relation, fds):
-		normalForms.append("BCNF")
+	normalForms = ()
 	if isFourNF(relation, fds, mvds):
-		normalForms.append("4NF")
+		normalForms = (True,True,True,True,True)
+	elif isBCNF(relation, fds):
+		normalForms = (True,True,True,True,False)
+	elif isThreeNF(relation, fds):
+		normalForms = (True,True,True,False,False)
+	elif isTwoNF(relation, fds):
+		normalForms = (True,True,False,False,False)
+	elif isOneNF(relation, fds):
+		normalForms = (True,False,False,False,False)
+	else:
+		normalForms = (True,False,False,False,False)
 	return normalForms
 	
 def generateNewFD(relation):

@@ -89,9 +89,17 @@ def mvdsToHtmlString(mvds):
 
 	
 def normalFormsToString(normalForms):
+	allNormalForms = ["1NF", "2NF", "3NF", "BCNF", "4NF"]
 	nfString = ""
-	for nf in normalForms:
-		nfString = nfString + nf + "<br/>"
+	for i in range(len(allNormalForms)):
+		nfString = nfString+"""<span class="label label-"""
+		if(normalForms[i]):
+			label="success"
+			glyphicon = "ok"
+		else:
+			label="danger"
+			glyphicon = "flash"
+		nfString = nfString+label+"""">"""+allNormalForms[i]+""" <span class="glyphicon glyphicon-"""+glyphicon+"""" aria-hidden=" """+glyphicon+""""></span></span>   """
 	return nfString
 
 	
@@ -145,9 +153,20 @@ def canonicalCoverToString(algorithmResult):
 
 
 
-def synthesealgorithmToString(algorithmResult):
+def infoNFwasAlreadySatisfied(normalForm):
+	return """<span class="label label-danger"><span class="glyphicon glyphicon-info-sign" aria-hidden="info"></span> Das ursprüngliche Schema war bereits in """+normalForm+"""!</span>"""
+
+
+def synthesealgorithmToString(algorithmResult, satisfiedNormalForms):
 	numberOfColumns = 4
-	resultString = """<br/><div class="panel panel-default"><div class="panel-heading"><h4>Synthesealgorithmus (überführt R in 3NF)</h4></div></div><div class="row">"""
+
+	if satisfiedNormalForms[2]:
+		#original schema was already in 3NF. Let the user know this
+		info = infoNFwasAlreadySatisfied("3NF")
+	else:
+		info = ""
+
+	resultString = """<br/><div class="panel panel-default"><div class="panel-heading">"""+info+"""<h4>Synthesealgorithmus (überführt R in 3NF)</h4></div></div><div class="row">"""
 	resultString =  resultString+wrapInPanel("&#x2460; Kanonische Überdeckung", fdsToHtmlString(algorithmResult[0]),numberOfColumns)
 	resultString =  resultString+wrapInPanel("&#x2461; Relationsschemata formen", schemaToString(algorithmResult[1]),numberOfColumns)
 	resultString =  resultString+wrapInPanel("&#x2462; Schlüssel hinzufügen", schemaToString(algorithmResult[2]),numberOfColumns)
@@ -155,9 +174,19 @@ def synthesealgorithmToString(algorithmResult):
 	resultString =  resultString + """</div>"""
 	return resultString
 
-def decompositionAlgorithmToString(algorithmResult, normalForm):
+def decompositionAlgorithmToString(algorithmResult, normalForm, satisfiedNormalForms):
 	numberOfColumns = 1
-	resultString = """<br/><div class="panel panel-default"><div class="panel-heading"><h4>Dekompositionsalgorithmus (überführt R in """+normalForm+""")</h4></div></div><div class="row">"""
+	if normalForm == "BCNF" and satisfiedNormalForms[3]:
+		#original schema was already in 3NF. Let the user know this
+		info = infoNFwasAlreadySatisfied("BCNF")
+	elif normalForm == "4NF" and satisfiedNormalForms[4]:
+		#original schema was already in 3NF. Let the user know this
+		info = infoNFwasAlreadySatisfied("4NF")
+	else:
+		info = ""
+
+
+	resultString = """<br/><div class="panel panel-default"><div class="panel-heading">"""+info+"""<h4>Dekompositionsalgorithmus (überführt R in """+normalForm+""")</h4></div></div><div class="row">"""
 	resultString = resultString+ wrapInPanel("Schema in "+normalForm, schemaToString(algorithmResult),numberOfColumns)
 	resultString = resultString+ """</div>"""
 	return resultString
@@ -179,9 +208,9 @@ def resultToString(relation, fds, mvds, result) :
 	numberOfColumns = 2
 	keysPanel = wrapInPanel("Kandidatenschlüssel", keysToString(result['keys']),numberOfColumns)
 	normalformsPanel = wrapInPanel("Normalformen", normalFormsToString(result['normalForms']),numberOfColumns)
-	newschema3NFPanel = synthesealgorithmToString(result['schema3NF'])
+	newschema3NFPanel = synthesealgorithmToString(result['schema3NF'], result['normalForms'])
 	canonicalCoverPanel = canonicalCoverToString(result['canonicalCover'])
-	newschemaBCNFPanel = decompositionAlgorithmToString(result['schemaBCNF'], "BCNF")
-	newschema4NFPanel = decompositionAlgorithmToString(result['schema4NF'], "4NF")
+	newschemaBCNFPanel = decompositionAlgorithmToString(result['schemaBCNF'], "BCNF", result['normalForms'])
+	newschema4NFPanel = decompositionAlgorithmToString(result['schema4NF'], "4NF", result['normalForms'])
 
 	return """<div class="panel-body"><h2>Eingabe</h2><div class="panel panel-default"><div class="panel-body"><div class="row">"""+relationPanel + fdsPanel + mvdsPanel + """</div></div></div><br/><h2>Ergebnis</h2><div class="panel panel-default"><div class="panel-body"><div class="row">"""+ keysPanel  + normalformsPanel+ """</div>"""+canonicalCoverPanel+newschema3NFPanel+newschemaBCNFPanel+newschema4NFPanel+ """</div></div></div>"""
