@@ -318,7 +318,9 @@ def removeRedundantSchemas(relations):
 	
 	for i in range(len(relations)):
 		for j in range(len(relations)):
-			if (i != j) and (relations[i] <= relations[j]):
+			if (i != j) and (relations[i] < relations[j]):
+				removeIndexes.add(i)
+			elif (i > j) and (relations[i] == relations[j]):
 				removeIndexes.add(i)
 	newRelations = []
 	for i in range(len(relations)):
