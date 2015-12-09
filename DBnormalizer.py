@@ -80,7 +80,7 @@ def getKeysNotEfficient(relation, fds):
 
 #computes all candidate keys for the relation quite efficient
 def getKeys(relation, fds):
-	ccover = canonicalCover(fds)
+	ccover = canonicalCover(fds)[-1]
 	l,r,b = getLRB(ccover)
 	relationOnlyFDAttributes = l.union(r.union(b))
 	if attributhuelle(l, fds) == relationOnlyFDAttributes:
@@ -269,7 +269,7 @@ def rightReduction(fds):
 def removeEmptyRightSide(fds):
 	newfds = []
 	for fd in fds:
-		if len(fd[1]) > 0:
+		if len(fd[1]) > 0 and fd[1] != set(EMPTY_SET):
 			newfds.append(fd)
 	return newfds
 	
@@ -285,11 +285,11 @@ def collapseEqualLeftSides(fds):
 
 #computes the canonical cover of the given fds	
 def canonicalCover(fds):
-	newfds = leftReduction(fds)
-	newfds = rightReduction(newfds)
-	newfds = removeEmptyRightSide(newfds)
-	newfds = collapseEqualLeftSides(newfds)
-	return newfds
+	step1 = leftReduction(fds[:])
+	step2 = rightReduction(step1[:])
+	step3 = removeEmptyRightSide(step2[:])
+	step4 = collapseEqualLeftSides(step3[:])
+	return (step1, step2, step3, step4)
 
 #generates relations from fds of the canonical cover
 def generateNewRelations(canonicalCover):
@@ -318,7 +318,7 @@ def removeRedundantSchemas(relations):
 	
 	for i in range(len(relations)):
 		for j in range(len(relations)):
-			if (i > j) and (relations[i] <= relations[j]):
+			if (i != j) and (relations[i] <= relations[j]):
 				removeIndexes.add(i)
 	newRelations = []
 	for i in range(len(relations)):
@@ -328,12 +328,13 @@ def removeRedundantSchemas(relations):
 	
 	
 
-def synthesealgorithm(fds, keys):
-	ccover= canonicalCover(fds)
-	newRelations = generateNewRelations(ccover)
-	newRelations = addRelationWithKey(newRelations, keys)
-	newRelations = removeRedundantSchemas(newRelations)
-	return newRelations
+def synthesealgorithm(canonicalCover, keys):
+	#canonical cover
+	step1 = canonicalCover[-1]
+	step2 = generateNewRelations(step1[:])
+	step3 = addRelationWithKey(step2[:], keys)
+	step4 = removeRedundantSchemas(step3[:])
+	return (step1,step2,step3,step4)
 	
 
 def getFirstNonBCNFfd(relation, fds):
@@ -557,11 +558,12 @@ def computeEverything(relation, fds, mvds):
 	relation.add(EMPTY_SET)
 	keys = convertEmptySetKeyToRelation(getKeys(relation, fds), relation)
 	normalForms = getNormalForms(relation, fds, mvds)
-	newSchemas = []
-	newSchemas.append(synthesealgorithm(fds, keys))
-	newSchemas.append(decompositionAlgorithm(fds, relation))
-	newSchemas.append(decompositionAlgorithm4NF(fds, mvds, relation))
-	return (keys, normalForms, newSchemas)
+	cCover = canonicalCover(fds[:])
+	schema3NF = synthesealgorithm(cCover, keys)
+	schemaBCNF = decompositionAlgorithm(fds, relation)
+	schema4NF = decompositionAlgorithm4NF(fds, mvds, relation)
+	result = {"keys":keys, "normalForms":normalForms, "canonicalCover":cCover, "schema3NF":schema3NF, "schemaBCNF":schemaBCNF, "schema4NF":schema4NF}
+	return result
 
 	
 """	

@@ -16,8 +16,8 @@ def printResults(string):
 		fds = x[1][:]
 		mvds = x[2][:]
 		numberOfAttributes = x[3]
-		keys, normalForms, newSchema = DBnormalizer.computeEverything(relation, fds, mvds)
-		return views.resultToString(relation, x[1], x[2], keys, normalForms, newSchema) 
+		result = DBnormalizer.computeEverything(relation, fds, mvds)
+		return views.resultToString(relation, x[1], x[2], result) 
 	
 print """
 	<html>
@@ -79,8 +79,8 @@ def html(relation, fds, numberOfAttributes):
 				<select class="form-control input-sm" name="numberOfAttributes">
 """+attributesOptions+"""
 </select> Attributen
-			<button id="mode" name="mode" type="submit" class="btn btn-default btn-sm" value="generateFds">ohne MVDs</button>
-			<button id="mode" name="mode"  type="submit" class="btn btn-default btn-sm" value="generateMvds">mit MVDs</button>	
+			<button id="mode" name="mode" type="submit" class="btn btn-default btn-sm" value="generateFds">nur mit FDs</button>
+			<button id="mode" name="mode"  type="submit" class="btn btn-default btn-sm" value="generateMvds">auch mit MVDs</button>	
 		</div>
                 </form>
 		</div>
