@@ -114,7 +114,7 @@ def schemaToString(schema):
 
 def numberOfAttributesOptions(x):
 	options=""
-	for i in range(3,8):
+	for i in range(3,DBnormalizer.MAX_NUM_OF_ATTRIBUTES+1):
 		options = options + "<option"
 		if i==int(x):
 			options = options + " selected"
@@ -136,7 +136,7 @@ def wrapInPanel(heading, content, numberOfColumns):
 	
 	
 def getErrorMessageBox(message):
-		return "<div class=\"container\"><div class=\"col-md-8\"><div class=\"alert alert-danger\" role=\"alert\"><span class=\"glyphicon glyphicon-exclamation-sign\" aria-hidden=\"true\"></span><span class=\"sr-only\">Error:</span> "+message+"</div></div></div>"
+		return """<div class="row"><div class="col-md-12"><div class="alert alert-danger" role="alert"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="exclamation"></span><span class="sr-only">Error:</span> """+message+"""</div></div></div>"""
 	
 
 

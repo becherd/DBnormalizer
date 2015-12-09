@@ -9,6 +9,7 @@ import views
 
 
 EMPTY_SET = "$"
+MAX_NUM_OF_ATTRIBUTES=20
 
 
 #computes the attributhuelle of the attributes "huelle" for the given fds
@@ -531,8 +532,8 @@ def parseInputFDsMVDs(inputString):
 	return (fds,mvds)
 
 def validateInput(relation, fds, mvds):
-	if len(relation) >9:
-		return views.getErrorMessageBox("Bitte nicht mehr als 9 Attribute eingeben!")
+	if len(relation) >MAX_NUM_OF_ATTRIBUTES:
+		return views.getErrorMessageBox("Bitte nicht mehr als "+str(MAX_NUM_OF_ATTRIBUTES)+" Attribute eingeben!")
 	elif not checkIfAllAttributesAreInRelation(fds, mvds, relation):
 		return views.getErrorMessageBox("Es gibt Attribute, die in FDs/MVDs vorkommen, aber nicht in der Relation!")
 	elif fds==[] and mvds==[]:
