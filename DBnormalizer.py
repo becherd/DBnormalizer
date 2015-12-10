@@ -371,7 +371,7 @@ def mvdsInRelation(mvds, relation):
 	for mvd in mvds:
 		if (mvd[0]|mvd[1]) <= relation:
 			mvdsInRelation.append(mvd)
-	return collapseEqualLeftSides(mvdsInRelation)
+	return mvdsInRelation
 	
 
 	
@@ -396,7 +396,7 @@ def decompositionAlgorithmRec(fds, relation, relations):
 		#Split the relation into two relations based on the fd which hurts the BCNF (currentfd)
 		#and test them again recursively
 		r1 = currentfd[0]|currentfd[1]
-		r2 = relation - currentfd[1]
+		r2 = (relation - currentfd[1]) | set(EMPTY_SET)
 		decompositionAlgorithmRec(fds, r1, relations)
 		decompositionAlgorithmRec(fds, r2, relations)
 		return relations
@@ -427,7 +427,7 @@ def decompositionAlgorithmRec4NF(fds, mvds, relation, relations):
 		#Split the relation into two relations based on the mvd which hurts the 4NF (currentmvd)
 		#and test them again recursively
 		r1 = currentmvd[0]|currentmvd[1]
-		r2 = relation - currentmvd[1]
+		r2 = (relation - currentmvd[1]) | set(EMPTY_SET)
 		decompositionAlgorithmRec4NF(fds, mvds, r1, relations)
 		decompositionAlgorithmRec4NF(fds, mvds, r2, relations)
 		return relations
