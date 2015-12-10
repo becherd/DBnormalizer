@@ -3,24 +3,31 @@
 
 import DBnormalizer 
 
+EMPTY_SET_HTML="&empty;"
 
 def keysToString(keys):
 	keyString=""
 	for key in keys:
 		keyString = keyString + "{"
-		for attr in key:
-			if attr != DBnormalizer.EMPTY_SET:
-				keyString = keyString + attr
+		keyString = keyString + setOfAttributesToString(key)
 		keyString = keyString + "}<br/>"
 	return keyString
 	
 	
 def setOfAttributesToString(attributes):
 	setOfAttributesString=""
-	for attr in attributes:
+	delimiter=""
+	for i,attr in enumerate(attributes):
 		if attr != DBnormalizer.EMPTY_SET:
-			setOfAttributesString = setOfAttributesString + attr
+			if DBnormalizer.dictionaryReplToName:
+				attr = DBnormalizer.dictionaryReplToName[attr]
+				if i < len(attributes)-2:
+					delimiter=", "
+				else:
+					delimiter=""
+			setOfAttributesString = setOfAttributesString + attr + delimiter
 	return setOfAttributesString
+
 	
 def relationToString(relation, i):
 	relationString="R<sub>"+i+"</sub>:={"
@@ -30,62 +37,45 @@ def relationToString(relation, i):
 	
 	
 def fdsToString(fds):
-	fdString=""
-	for fd in fds:
-		for attr in fd[0]:
-			if attr == DBnormalizer.EMPTY_SET:
-				if len(fd[0])==1:
-					#this attribute (which is empty set) is the only one -> display empty set
-					attr = "&empty;"
-				else:
-					#remove the EMPTY_SET place holder
-					attr=""
-			fdString = fdString + attr
-		fdString = fdString + "->"
-		for attr in fd[1]:
-			if attr == DBnormalizer.EMPTY_SET:
-				if len(fd[1])==1:
-					#this attribute (which is empty set) is the only one -> display empty set
-					attr = "&empty;"
-				else:
-					#remove the EMPTY_SET place holder
-					attr=""
-			fdString = fdString + attr
-		fdString = fdString + "\n"
-	return fdString
+	return fdsMvdsToString(fds, True)
 
 	
 def fdsToHtmlString(fds):
 	return fdsToString(fds).replace("\n", "<br/>")
 	
-	
+
+
 def mvdsToString(mvds):
-	mvdString=""
-	for mvd in mvds:
-		for attr in mvd[0]:
-			if attr == DBnormalizer.EMPTY_SET:
-				if len(mvd[0])==1:
-					#this attribute (which is empty set) is the only one -> display empty set
-					attr = "&empty;"
-				else:
-					#remove the EMPTY_SET place holder
-					attr=""
-			mvdString = mvdString + attr
-		mvdString = mvdString + "->>"
-		for attr in mvd[1]:
-			if attr == DBnormalizer.EMPTY_SET:
-				if len(mvd[1])==1:
-					#this attribute (which is empty set) is the only one -> display empty set
-					attr = "&empty;"
-				else:
-					#remove the EMPTY_SET place holder
-					attr=""
-			mvdString = mvdString + attr
-		mvdString = mvdString + "\n"
-	return mvdString
+	return fdsMvdsToString(mvds, False)
 
 def mvdsToHtmlString(mvds):
         return mvdsToString(mvds).replace("\n", "<br/>")
+
+
+
+def fdsMvdsToString(fdMvds, isFds):
+	if isFds:
+		delimiter="->"
+	else:
+		delimiter="->>"
+	fdMvdString=""
+	for fdMvd in fdMvds:
+		left = setOfAttributesToString(fdMvd[0])
+		right = setOfAttributesToString(fdMvd[1])
+		if left == "":
+			left = EMPTY_SET_HTML
+		if right == "":
+			right = EMPTY_SET_HTML
+		fdMvdString = fdMvdString + left
+		fdMvdString = fdMvdString + delimiter
+		fdMvdString = fdMvdString + right
+		fdMvdString = fdMvdString + "\n"
+	return fdMvdString
+
+
+
+	
+
 
 	
 def normalFormsToString(normalForms):

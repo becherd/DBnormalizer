@@ -509,23 +509,60 @@ def generateNewProblem(numberOfAttributes, includeMvds):
 		mvds = generateMVDs(relation)
 	return (relation, fds, mvds)
 
+
+
+def splitFdMvd(fdMvd, isFd):
+	if isFd:
+		delimiter = '->'
+	else:
+		delimiter = '->>'
+	return re.split(delimiter, fdMvd, 1)
+
+def parseFdMvd(fdMvd, isFd):
+	newfdMvd = splitFdMvd(fdMvd, isFd)
+
+	left = newfdMvd[0]
+	right = newfdMvd[1]
+
+
+	leftArray = left.split(",")
+	rightArray = right.split(",")
+	
+	if dictionaryNameToRepl:
+		if left != "":
+			left=""
+			for attr in leftArray:
+				next = dictionaryNameToRepl.get(attr)
+				if not next:
+					#this attribute does not appear in the relation
+					#add something which is definitely not a attribute name, such that an error message will be displayed when validating
+					left=left+"!"
+				else:
+					left = left + next
+		if right.replace(" ","") != "":
+			right=""
+			for attr in rightArray:
+				next = dictionaryNameToRepl.get(attr)
+				if not next:
+					right= right+"!"
+				else:
+					right = right + next
+	
+	left = left+EMPTY_SET
+	right = right+EMPTY_SET	
+	#add empty sets on both sides of the fd / mvd	
+	return (set(left), set(right))
+
+
 def parseInputFDsMVDs(inputString):
 	fdsAndMvds = inputString.split()
 	fds = []
 	mvds = []
 	for element in fdsAndMvds:
 		if "->>" in element:
-			newmvd = (re.split('->>', element, 1))
-			#add empty sets on both sides of the mvd
-			newmvd[0] = newmvd[0]+EMPTY_SET
-			newmvd[1] = newmvd[1]+EMPTY_SET	
-			mvds.append((set(newmvd[0]), set(newmvd[1])))
-		elif "->" in element:
-			newfd = (re.split('->', element, 1))
-			#add empty sets on both sides of the fd
-			newfd[0] = newfd[0]+EMPTY_SET
-			newfd[1] = newfd[1]+EMPTY_SET			
-			fds.append((set(newfd[0]), set(newfd[1])))
+			mvds.append(parseFdMvd(element, False))
+		elif "->" in element:		
+			fds.append(parseFdMvd(element, True))
 		elif not re.search("\s+", element):
 			#Cannot parse this as it is no empty line and has no -> or ->> included
 			return ([],[])
@@ -542,13 +579,47 @@ def validateInput(relation, fds, mvds):
 		return "OK"
 	
 
+
+#dictionaries to remember what we have replaced by what. We store this in both directions
+dictionaryReplToName = {}
+dictionaryNameToRepl = {}
+
+def resetDictionaries():
+	dictionaryReplToName = {}
+	dictionaryNameToRepl = {}
+
+
 #Input is of form [Relation][FD1 FD2...]
 def parseInput(input):
+	#one character attribute names, i.e. in R(ABC)
 	match = re.search("\[([A-Za-z\s]+)\]\[(([A-Za-z]|\s|->{1,2})+)\]\[(.+)\]", input)
-	if match:
-		relation = set(match.group(1).replace(" ", ""))
-		fds, mvds = parseInputFDsMVDs(match.group(2).replace(" ", ""))
-		numberOfAttributes = match.group(4)
+	#attribute names with multiple characters, like in R(Attr1,Attr2,Attr3)
+	match2 = re.search("\[([A-Za-z\s,]+)\]\[(([A-Za-z,]|\s|->{1,2})+)\]\[(.+)\]", input)
+	resetDictionaries()
+	if match or match2:
+		if match:
+			relationString = match.group(1).replace(" ", "")
+			fdMvdString = match.group(2).replace(" ", "")
+			numberOfAttributes = match.group(4)
+		else:
+			numberOfAttributes = match2.group(4)
+			relationString = match2.group(1).replace(" ", "")
+			relationStringArray = relationString.split(",")
+			relationString = ""
+			attributes = set("")
+			alphabet = list(string.ascii_uppercase)	
+			for attr in relationStringArray:
+				if attr not in attributes:
+					replacement = alphabet[len(attributes)]
+					attributes.add(attr)
+					dictionaryReplToName[replacement] = attr	
+					dictionaryNameToRepl[attr] = replacement					
+					relationString = relationString + replacement			
+			fdMvdString = match2.group(2).replace(" ", "")		
+
+		relation = set(relationString)
+		fds, mvds = parseInputFDsMVDs(fdMvdString)
+
 		inputCheck = validateInput(relation, fds, mvds)
 		if inputCheck == "OK":
 			return(relation, fds, mvds, numberOfAttributes)
@@ -556,6 +627,9 @@ def parseInput(input):
 			return (inputCheck,)
 	else:
 		return (views.getErrorMessageBox("Falsches Eingabeformat. Bitte überprüfe deine Eingabe!"),)
+
+
+
 
 
 		

@@ -53,6 +53,12 @@ def html(relation, fds, numberOfAttributes):
 			</div>
 		</div>
 		<br/>
+		<br/>
+		<div class="panel panel-default">
+			<div class="panel-body">
+			<span class="label label-success">neu!</span> Längere Attributnamen möglich, einfach durch Komma trennen: <code>AttributA,AttributB,AttributC</code>, <code>AttributA,AttributB->AttributC</code>
+			</div>
+		</div>
 		<form class="form" action="index.py" method="POST"> 
 				<div class="form-group">
 					<h4>Relation eingeben</h4>
@@ -99,7 +105,12 @@ htmlend="""
 					<h3 class="modal-title">Hilfe</h3>
 				</div>
 				<div class="modal-body">
-					<p>Hier könnte ein hilfreicher Hilfetext oder ein informativer Informationstext stehen.</p>
+					<p>
+						<h4>Relationen und FDs/MVDs eingeben</h4>
+						<p>Eine Relation kann z.B. als <code>ABCD</code> eingegeben werden, wobei dann jeder Buchstabe ein Attribut bezeichet (hier gäbe es Attribute A,B,C,D). Alternativ können auch längere Attributnamen verwendet werden, diese sind dann durch Kommata zu trennen, z.B. <code>AttributA,AttributB,AttributC</code></p>
+						<p>FDs werden mittels <code>-></code> eingegeben, wobei links und rechts des Pfeils Attribute stehen können. Diese können wieder entweder ohne Kommata eingegeben werden (jeder Buchstabe ein Attribut, z.B. <code>ABC->D</code>), oder durch Kommata getrennt (z.B. <code>AttributA,AttributB->AttributC</code>). Wird kein Attribut angegeben, wird dies als leere Menge (&empty;) interpretiert.</p>
+						<p>MVDs werden mittels <code>->></code> angegeben, ansonsten analog zu FDs
+					</p>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
