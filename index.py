@@ -33,8 +33,12 @@ def html(relation, fds, numberOfAttributes, funMode):
 	attributesOptions = views.numberOfAttributesOptions(numberOfAttributes)
 	if funMode==1:
 		funModeURL="?fun=1"
+		funModeAlert="""<div class="alert alert-info">
+  <strong>Du befindest dich im Fun-Mode!</strong> Zu viel Fun?  <a href="./index.py" class="alert-link">Bring mich wieder zurück!</a>
+</div>"""
 	else:
 		funModeURL=""
+		funModeAlert=""
 	return  """
 	<body>
 	<div class="panel panel-default">
@@ -49,14 +53,13 @@ def html(relation, fds, numberOfAttributes, funMode):
 				</p>
 			</div>
 		</div>
-		<br/>
+"""+funModeAlert+"""
 		<br/>
 		<div class="panel panel-default">
 			<div class="panel-body">
 			<span class="label label-success">DB-Fragen? DB fragen:</span> <a href="mailto:david.becher@mytum.de">david.becher@mytum.de</a>
 			</div>
 		</div>
-		<br/>
 		<br/>
 		<div class="panel panel-default">
 			<div class="panel-body">
