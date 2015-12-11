@@ -29,8 +29,12 @@ print """
 			<script src="http://home.in.tum.de/~becher/static/js/bootstrap.min.js"></script>
 		</head>"""
 
-def html(relation, fds, numberOfAttributes):
+def html(relation, fds, numberOfAttributes, funMode):
 	attributesOptions = views.numberOfAttributesOptions(numberOfAttributes)
+	if funMode==1:
+		funModeURL="?fun=1"
+	else:
+		funModeURL=""
 	return  """
 	<body>
 	<div class="panel panel-default">
@@ -59,7 +63,7 @@ def html(relation, fds, numberOfAttributes):
 			<span class="label label-success">neu!</span> Längere Attributnamen möglich, einfach durch Komma trennen: <code>AttributA,AttributB,AttributC</code>, <code>AttributA,AttributB->AttributC</code>
 			</div>
 		</div>
-		<form class="form" action="index.py" method="POST"> 
+		<form class="form" action="index.py"""+funModeURL+"""" method="POST"> 
 				<div class="form-group">
 					<h4>Relation eingeben</h4>
 					<input type="text" class="form-control" name="relation" value="
@@ -71,6 +75,8 @@ def html(relation, fds, numberOfAttributes):
 </textarea>
 					<input type="hidden" value="showResults" name="mode"></input>
 					<input type="hidden" value="
+"""+str(funMode)+"""" name="fun"></input>
+					<input type="hidden" value="
 """+str(numberOfAttributes)+"""
 " name="numberOfAttributes"></input>
 				</div>
@@ -78,13 +84,14 @@ def html(relation, fds, numberOfAttributes):
 						<button id="submitbutton" type="submit" class="btn btn-primary" value="send">Absenden</button>
 				</div>			
 		</form>
-		<form class="form-inline" action="index.py" method="POST">
+		<form class="form-inline" action="index.py"""+funModeURL+"""" method="POST">
 				<div class="form-group">
 				<h4>Neues Schema generieren</h4>
 				Generiere neues Schema mit
 				<select class="form-control input-sm" name="numberOfAttributes">
 """+attributesOptions+"""
-</select> Attributen
+</select> <input type="hidden" value="
+"""+str(funMode)+"""" name="fun"></input>Attributen
 			<button id="mode" name="mode" type="submit" class="btn btn-default btn-sm" value="generateFds">nur mit FDs</button>
 			<button id="mode" name="mode"  type="submit" class="btn btn-default btn-sm" value="generateMvds">auch mit MVDs</button>	
 		</div>
@@ -129,18 +136,26 @@ htmlend="""
 try:
 	mode = form['mode'].value
 	numberOfAttributes = form['numberOfAttributes'].value
+	try:
+		funMode=int(form['fun'].value)
+	except:
+		funMode=0
 	if mode=='generateFds':
-		 relation, fds, mvds = DBnormalizer.generateNewProblem(numberOfAttributes, False)
-		 print html(views.setOfAttributesToString(relation), views.fdsToString(fds)+views.mvdsToString(mvds), numberOfAttributes)+htmlend
+		 relation, fds, mvds = DBnormalizer.generateNewProblem(numberOfAttributes, False, funMode)
+		 print html(views.setOfAttributesToString(relation), views.fdsToString(fds)+views.mvdsToString(mvds), numberOfAttributes, funMode)+htmlend
 	elif mode=='generateMvds':
-		 relation, fds, mvds = DBnormalizer.generateNewProblem(numberOfAttributes, True)
-		 print html(views.setOfAttributesToString(relation), views.fdsToString(fds)+views.mvdsToString(mvds), numberOfAttributes)+htmlend
+		 relation, fds, mvds = DBnormalizer.generateNewProblem(numberOfAttributes, True, funMode)
+		 print html(views.setOfAttributesToString(relation), views.fdsToString(fds)+views.mvdsToString(mvds), numberOfAttributes, funMode)+htmlend
 	else:
 		#Mode is showResults
 		relation = str(form['relation'].value)
         	fds = str(form['fds'].value)
 		input = "["+relation+"]["+fds+"]["+str(int(numberOfAttributes))+"]"
-		print html(relation, fds, numberOfAttributes) + printResults(input) + htmlend
+		print html(relation, fds, numberOfAttributes, funMode) + printResults(input) + htmlend
 except KeyError:
-    relation, fds, mvds = DBnormalizer.generateNewProblem(5, False)
-    print html(views.setOfAttributesToString(relation), views.fdsToString(fds)+views.mvdsToString(mvds), 5)+htmlend
+	try:
+		funMode=int(form['fun'].value)
+	except:
+		funMode=0
+    	relation, fds, mvds = DBnormalizer.generateNewProblem(5, False, funMode)
+    	print html(views.setOfAttributesToString(relation), views.fdsToString(fds)+views.mvdsToString(mvds), 5, funMode)+htmlend

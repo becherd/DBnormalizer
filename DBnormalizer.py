@@ -10,7 +10,7 @@ import views
 
 EMPTY_SET = "$"
 MAX_NUM_OF_ATTRIBUTES=20
-
+UMLAUTS="äöüÄÖÜß"
 
 #computes the attributhuelle of the attributes "huelle" for the given fds
 def attributhuelle(huelle, fds):
@@ -108,8 +108,6 @@ def convertEmptySetKeyToRelation(keys, relation):
 
 
 def findRestCandidateKeys(l, b, fds, relation):
-	#l=l.copy()
-	#b=b.copy()
 	keys =	set(frozenset(""))
 	for battr in b:
 		if attributhuelle(l | frozenset(battr), fds) == relation:
@@ -496,13 +494,39 @@ def generateMVDs(relation):
 		x=x-25
 	return mvds
 	
+#generates relation
 def generateNewRelation(numberOfAttributes):
 	alphabet = list(string.ascii_uppercase)	
-	return set(alphabet[:numberOfAttributes])	
+	return set(alphabet[:numberOfAttributes])
 
-def generateNewProblem(numberOfAttributes, includeMvds):
+
+#generates relation with random german words as attribute names
+def generateNewRelationFun(numberOfAttributes):
+	resetDictionaries()
+	lines = set("")
+	attributes = set("")
+	for i in range(0,numberOfAttributes):
+		#pick random line numbers between 0 and 113643 (this is where the nouns in the ngerman file end)
+		lines.add(random.randint(0,113643))
+	f = open("static/dict/ngerman")
+	try:
+		for i, line in enumerate(f):
+			if i in lines:
+				attribute = line.replace("\n","")
+				attributes.add(attribute)
+				
+	finally:
+		f.close()
+	return attributes
+
+	
+
+def generateNewProblem(numberOfAttributes, includeMvds, funMode):
 	random.seed(datetime.now())
-	relation = generateNewRelation(int(numberOfAttributes))
+	if funMode==1:
+		relation = generateNewRelationFun(int(numberOfAttributes))
+	else:
+		relation = generateNewRelation(int(numberOfAttributes))
 	fds = generateFDs(relation)
 	mvds = []
 	if includeMvds:
@@ -591,10 +615,11 @@ def resetDictionaries():
 
 #Input is of form [Relation][FD1 FD2...]
 def parseInput(input):
+	wordCharacters = "A-Za-z\s"+UMLAUTS
 	#one character attribute names, i.e. in R(ABC)
-	match = re.search("\[([A-Za-z\s]+)\]\[(([A-Za-z]|\s|->{1,2})+)\]\[(.+)\]", input)
+	match = re.search("\[(["+wordCharacters+"]+)\]\[((["+wordCharacters+"]|\s|->{1,2})+)\]\[(.+)\]", input)
 	#attribute names with multiple characters, like in R(Attr1,Attr2,Attr3)
-	match2 = re.search("\[([A-Za-z\s,]+)\]\[(([A-Za-z,]|\s|->{1,2})+)\]\[(.+)\]", input)
+	match2 = re.search("\[(["+wordCharacters+",]+)\]\[((["+wordCharacters+",]|\s|->{1,2})+)\]\[(.+)\]", input)
 	resetDictionaries()
 	if match or match2:
 		if match:

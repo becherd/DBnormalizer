@@ -25,6 +25,16 @@ def setOfAttributesToString(attributes):
 					delimiter=", "
 				else:
 					delimiter=""
+			elif len(attr)>1:
+				#fun mode
+				if DBnormalizer.EMPTY_SET in attributes:
+					offset = 2
+				else:
+					offset=1
+				if i < len(attributes)-offset :
+					delimiter=", "
+				else:
+					delimiter=""
 			setOfAttributesString = setOfAttributesString + attr + delimiter
 	return setOfAttributesString
 
