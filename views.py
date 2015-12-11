@@ -2,6 +2,7 @@
 # -*- coding: utf8 -*-
 
 import DBnormalizer 
+import random
 
 EMPTY_SET_HTML="&empty;"
 
@@ -14,11 +15,16 @@ def keysToString(keys):
 	return keyString
 	
 	
-def setOfAttributesToString(attributes):
+def setOfAttributesToString(attributes, key=None):
 	setOfAttributesString=""
 	delimiter=""
 	for i,attr in enumerate(attributes):
 		if attr != DBnormalizer.EMPTY_SET:
+			if key is not None and attr in key:
+				underlineAttribute=True
+			else:
+				underlineAttribute=False
+
 			if DBnormalizer.longAttributeNamesUsed():
 				attr = DBnormalizer.dictionaryReplToName[attr]
 				if i < len(attributes)-2:
@@ -35,13 +41,21 @@ def setOfAttributesToString(attributes):
 					delimiter=", "
 				else:
 					delimiter=""
-			setOfAttributesString = setOfAttributesString + attr + delimiter
+
+			setOfAttributesString = setOfAttributesString + underlineString(attr, underlineAttribute) + delimiter
 	return setOfAttributesString
 
+
+def underlineString(string, underline):
+	if underline:
+		return "<u>"+string+"</u>"
+	else:
+		return string
+
 	
-def relationToString(relation, i):
+def relationToString(relation, i, key = None):
 	relationString="R<sub>"+i+"</sub>:={"
-	relationString=relationString+setOfAttributesToString(relation)
+	relationString=relationString+setOfAttributesToString(relation, key)
 	relationString = relationString + "}"
 	return relationString
 	
@@ -103,12 +117,18 @@ def normalFormsToString(normalForms):
 	return nfString
 
 	
-def schemaToString(schema):
+def schemaToString(schema, keys=None):
 	schemaString=""
 	i=0
 	for relation in schema:
 		i=i+1
-		schemaString = schemaString + relationToString(relation, str(i)) + "<br/>"
+		if keys is not None:
+			x = keys[i-1]
+			key = random.sample(x,1)[0]
+		else:
+			key = None
+		#print "KEY:"+str(isinstance(keys,list))
+		schemaString = schemaString + relationToString(relation, str(i), key) + "<br/>"
 	return schemaString	
 
 
@@ -174,9 +194,9 @@ def synthesealgorithmToString(algorithmResult, satisfiedNormalForms):
 
 	resultString = """<br/><div class="panel panel-default"><div class="panel-heading">"""+info+"""<h4>Synthesealgorithmus (überführt R in 3NF)</h4></div></div><div class="row">"""
 	resultString =  resultString+wrapInPanel("&#x2460; Kanonische Überdeckung", fdsToHtmlString(algorithmResult[0]),numberOfColumns)
-	resultString =  resultString+wrapInPanel("&#x2461; Relationsschemata formen", schemaToString(algorithmResult[1]),numberOfColumns)
-	resultString =  resultString+wrapInPanel("&#x2462; Schlüssel hinzufügen", schemaToString(algorithmResult[2]),numberOfColumns)
-	resultString =  resultString+wrapInPanel("&#x2463; Redundante Schemata eliminieren", schemaToString(algorithmResult[3]),numberOfColumns)
+	resultString =  resultString+wrapInPanel("&#x2461; Relationsschemata formen", schemaToString(algorithmResult[1][0]),numberOfColumns)
+	resultString =  resultString+wrapInPanel("&#x2462; Schlüssel hinzufügen", schemaToString(algorithmResult[2][0]),numberOfColumns)
+	resultString =  resultString+wrapInPanel("&#x2463; Redundante Schemata eliminieren", schemaToString(algorithmResult[3][0], algorithmResult[3][1]),numberOfColumns)
 	resultString =  resultString + """</div>"""
 	return resultString
 

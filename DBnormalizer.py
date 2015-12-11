@@ -329,14 +329,27 @@ def removeRedundantSchemas(relations):
 	
 	
 
-def synthesealgorithm(canonicalCover, keys):
+def synthesealgorithm(canonicalCover, keys, fds):
 	#canonical cover
 	step1 = canonicalCover[-1]
 	step2 = generateNewRelations(step1[:])
+	step2Keys = getKeysOfRelations(step2, fds)
 	step3 = addRelationWithKey(step2[:], keys)
+	step3Keys = getKeysOfRelations(step3, fds)
 	step4 = removeRedundantSchemas(step3[:])
-	return (step1,step2,step3,step4)
+	step4Keys = getKeysOfRelations(step4, fds)
+	#return result relations for each step together with their keys. For step 1, we return the canonical cover
+	return (step1,(step2,step2Keys),(step3,step3Keys),(step4,step4Keys))
 	
+
+def getKeysOfRelations(relations, fds):
+	keysOfRelations = []
+	for r in relations:
+		fdsInR = fdsInRelation(fds, r)
+		keys = getKeys(r, fdsInR)
+		keysOfRelations.append(keys)
+	return keysOfRelations
+
 
 def getFirstNonBCNFfd(relation, fds):
 	keys = getKeys(relation, fds)
@@ -672,7 +685,7 @@ def computeEverything(relation, fds, mvds):
 	keys = convertEmptySetKeyToRelation(getKeys(relation, fds), relation)
 	normalForms = getNormalForms(relation, fds, mvds)
 	cCover = canonicalCover(fds[:])
-	schema3NF = synthesealgorithm(cCover, keys)
+	schema3NF = synthesealgorithm(cCover, keys, fds)
 	schemaBCNF = decompositionAlgorithm(fds, relation)
 	schema4NF = decompositionAlgorithm4NF(fds, mvds, relation)
 	result = {"keys":keys, "normalForms":normalForms, "canonicalCover":cCover, "schema3NF":schema3NF, "schemaBCNF":schemaBCNF, "schema4NF":schema4NF}
