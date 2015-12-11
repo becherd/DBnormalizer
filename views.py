@@ -19,7 +19,7 @@ def setOfAttributesToString(attributes):
 	delimiter=""
 	for i,attr in enumerate(attributes):
 		if attr != DBnormalizer.EMPTY_SET:
-			if DBnormalizer.dictionaryReplToName:
+			if DBnormalizer.longAttributeNamesUsed():
 				attr = DBnormalizer.dictionaryReplToName[attr]
 				if i < len(attributes)-2:
 					delimiter=", "
@@ -142,7 +142,10 @@ def getErrorMessageBox(message):
 
 
 def canonicalCoverToString(algorithmResult):
-	numberOfColumns = 4
+	if DBnormalizer.longAttributeNamesUsed():
+		numberOfColumns = 2
+	else:
+		numberOfColumns = 4
 	resultString = """<br/><div class="panel panel-default"><div class="panel-heading"><h4>Kanonische Überdeckung</h4></div></div><div class="row">"""
 	resultString =  resultString+wrapInPanel("&#x2460; Linksreduktion", fdsToHtmlString(algorithmResult[0]),numberOfColumns)
 	resultString =  resultString+wrapInPanel("&#x2461; Rechtsreduktion", fdsToHtmlString(algorithmResult[1]),numberOfColumns)
@@ -158,7 +161,10 @@ def infoNFwasAlreadySatisfied(normalForm):
 
 
 def synthesealgorithmToString(algorithmResult, satisfiedNormalForms):
-	numberOfColumns = 4
+	if DBnormalizer.longAttributeNamesUsed():
+		numberOfColumns = 2
+	else:
+		numberOfColumns = 4
 
 	if satisfiedNormalForms[2]:
 		#original schema was already in 3NF. Let the user know this

@@ -552,7 +552,8 @@ def parseFdMvd(fdMvd, isFd):
 	leftArray = left.split(",")
 	rightArray = right.split(",")
 	
-	if dictionaryNameToRepl:
+	if longAttributeNamesUsed():
+		#long attribute names are being used
 		if left != "":
 			left=""
 			for attr in leftArray:
@@ -611,6 +612,14 @@ dictionaryNameToRepl = {}
 def resetDictionaries():
 	dictionaryReplToName = {}
 	dictionaryNameToRepl = {}
+
+#returns whether long attribute names are used or not
+def longAttributeNamesUsed():
+	if dictionaryReplToName or dictionaryNameToRepl:
+		#long attribute names are used when the dictionaries are filled
+		return True
+	else:
+		return False
 
 
 #Input is of form [Relation][FD1 FD2...]
