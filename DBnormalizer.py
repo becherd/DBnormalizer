@@ -391,14 +391,16 @@ def decompositionAlgorithm(fds, relation):
 	collapseEqualLeftSides(fds)
 	stepsString = ""
 	resultString = ""
+	heading = "Schema in BCNF"
 	if not isBCNF(relation, fds):
 		res =  decompositionAlgorithmRec(fds, relation, [])
 		newRelations=res[0]
 		for r in res[1]:
 			stepsString = stepsString + r
-		resultString =  views.wrapInPanel("Schema in BCNF", res[2], 2)  
+		resultString =  views.wrapInPanel(heading, res[2], 2)  
 	else:
 		newRelations =  relation
+		resultString =  views.wrapInPanel(heading, views.relationToString(relation, ""), 2)
 	if type(newRelations) == list:
 		return (newRelations, stepsString, resultString)
 	else:
