@@ -240,7 +240,7 @@ def leftReduction(fds):
 			oldFds = newfds[:]
 			#add new test fd. Then, we check if we can keep it or whether we have to go back to the old state
 			newfds[i]=newFdTest
-			if attributhuelle(newFdTest[0], oldFds) != attributhuelle(leftSide, oldFds):
+			if not newfds[i][1] <= attributhuelle(newFdTest[0], oldFds):
 				newfds[i]=oldFds[i]
 	return newfds
 	
@@ -354,15 +354,16 @@ def getKeysOfRelations(relations, fds):
 def getFirstNonBCNFfd(relation, fds):
 	keys = getKeys(relation, fds)
 	for fd in fds:
-		if (not(isTrivial(fd))) & (not(isSuperKey(fd[0], keys))):
-			return fd
+		if not isTrivial(fd) and not isSuperKey(fd[0], keys):
+			#just return the non-trivial part of this fd
+			return (fd[0], fd[1]-fd[0]|set(EMPTY_SET))
 	return ()
 	
 	
 def getFirstNon4NFmvd(relation, fds, mvds):
 	keys = getKeys(relation, fds)
 	for mvd in fds+mvds:
-		if (not(isTrivial4NF(mvd, relation))) & (not(isSuperKey(mvd[0], keys))):
+		if not isTrivial4NF(mvd, relation) and not isSuperKey(mvd[0], keys):
 			return mvd
 	return ()
 	
@@ -388,19 +389,24 @@ def mvdsInRelation(mvds, relation):
 	
 def decompositionAlgorithm(fds, relation):
 	collapseEqualLeftSides(fds)
+	stepsString = ""
+	resultString = ""
 	if not isBCNF(relation, fds):
-		newRelations =  decompositionAlgorithmRec(fds, relation, [])  
+		res =  decompositionAlgorithmRec(fds, relation, [])
+		newRelations=res[0]
+		for r in res[1]:
+			stepsString = stepsString + r
+		resultString =  views.wrapInPanel("Schema in BCNF", res[2], 2)  
 	else:
 		newRelations =  relation
 	if type(newRelations) == list:
-		return newRelations
+		return (newRelations, stepsString, resultString)
 	else:
-		return [newRelations]
+		return ([newRelations],stepsString, resultString)
 
 
-def decompositionAlgorithmRec(fds, relation, relations):
+def decompositionAlgorithmRec(fds, relation, relations, stepsString=[], resultString="", i=""):
 	fdsInR = fdsInRelation(fds, relation)
-	
 	currentfd = getFirstNonBCNFfd(relation, fdsInR)
 
 	if currentfd != ():
@@ -408,11 +414,17 @@ def decompositionAlgorithmRec(fds, relation, relations):
 		#and test them again recursively
 		r1 = currentfd[0]|currentfd[1]
 		r2 = (relation - currentfd[1]) | set(EMPTY_SET)
-		decompositionAlgorithmRec(fds, r1, relations)
-		decompositionAlgorithmRec(fds, r2, relations)
-		return relations
+		stepsString.append(views.wrapInPanel(views.relationToString(relation, i)+" aufspalten", views.relationToString(r1, i+"1")+"<br/>"+views.relationToString(r2, i+"2"), 2))
+		
+		res = decompositionAlgorithmRec(fds, r1, relations, stepsString, resultString, i+"1")
+		res2 = decompositionAlgorithmRec(fds, r2, relations, stepsString, resultString, i+"2")
+		
+		return (relations, stepsString, resultString+res[2]+res2[2])
 	else:
-		return relations.append(relation) 
+		#print """<div class="row">"""
+		resultString=resultString+views.relationToString(relation, i)+"<br/>"
+		#print "</div>"
+		return (relations.append(relation), stepsString, resultString) 
 		
 	
 def decompositionAlgorithm4NF(fds, mvds, relation):

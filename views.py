@@ -210,10 +210,15 @@ def decompositionAlgorithmToString(algorithmResult, normalForm, satisfiedNormalF
 		info = infoNFwasAlreadySatisfied("4NF")
 	else:
 		info = ""
+	
+	if normalForm=="BCNF":
+        	algoResultString = algorithmResult[1]+algorithmResult[2]
+	else:
+		algoResultString =  wrapInPanel("Schema in "+normalForm, schemaToString(algorithmResult),numberOfColumns)
 
 
 	resultString = """<br/><div class="panel panel-default"><div class="panel-heading">"""+info+"""<h4>Dekompositionsalgorithmus (überführt R in """+normalForm+""")</h4></div></div><div class="row">"""
-	resultString = resultString+ wrapInPanel("Schema in "+normalForm, schemaToString(algorithmResult),numberOfColumns)
+	resultString = resultString+ algoResultString
 	resultString = resultString+ """</div>"""
 	return resultString
 
