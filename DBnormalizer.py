@@ -236,12 +236,9 @@ def leftReduction(fds):
 		for attr in leftSide:
 			#new fd with one less attribute on the right
 			newFdTest = (newfds[i][0]-set(attr), newfds[i][1])
-			#remember what we had so far
-			oldFds = newfds[:]
-			#add new test fd. Then, we check if we can keep it or whether we have to go back to the old state
-			newfds[i]=newFdTest
-			if not newfds[i][1] <= attributhuelle(newFdTest[0], oldFds):
-				newfds[i]=oldFds[i]
+			#if the new FD passes the test, replace the old one
+			if newFdTest[1] <= attributhuelle(newFdTest[0], fds):
+				newfds[i]=newFdTest
 	return newfds
 	
 	
@@ -416,15 +413,18 @@ def decompositionAlgorithmRec(fds, relation, relations, stepsString=[], resultSt
 		#and test them again recursively
 		r1 = currentfd[0]|currentfd[1]
 		r2 = (relation - currentfd[1]) | set(EMPTY_SET)
-		stepsString.append(views.wrapInPanel(views.relationToString(relation, i)+" aufspalten", views.relationToString(r1, i+"1")+"<br/>"+views.relationToString(r2, i+"2"), 2))
-		
+		keyOfR1 = random.sample(getKeys(r1,fdsInRelation(fds, r1)),1)[0]
+		keyOfR2 = random.sample(getKeys(r2,fdsInRelation(fds, r2)),1)[0]
+		stepsString.append(views.wrapInPanel(views.relationToString(relation, i)+" aufspalten", views.relationToString(r1, i+"1", keyOfR1)+"<br/>"+views.relationToString(r2, i+"2", keyOfR2), 2))
+				
 		res = decompositionAlgorithmRec(fds, r1, relations, stepsString, resultString, i+"1")
 		res2 = decompositionAlgorithmRec(fds, r2, relations, stepsString, resultString, i+"2")
 		
 		return (relations, stepsString, resultString+res[2]+res2[2])
 	else:
 		#print """<div class="row">"""
-		resultString=resultString+views.relationToString(relation, i)+"<br/>"
+		keyOfResult = random.sample(getKeys(relation,fdsInRelation(fds, relation)),1)[0]
+		resultString=resultString+views.relationToString(relation, i, keyOfResult)+"<br/>"
 		#print "</div>"
 		return (relations.append(relation), stepsString, resultString) 
 		
