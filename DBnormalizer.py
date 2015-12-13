@@ -397,7 +397,8 @@ def decompositionAlgorithm(fds, relation):
 		resultString =  views.wrapInPanel(heading, res[2], 2)  
 	else:
 		newRelations =  relation
-		resultString =  views.wrapInPanel(heading, views.relationToString(relation, ""), 2)
+		keyOfResult =  random.sample(getKeys(relation,fdsInRelation(fds, relation)),1)[0] 
+		resultString =  views.wrapInPanel(heading, views.relationToString(relation, "", keyOfResult), 2)
 	if type(newRelations) == list:
 		return (newRelations, stepsString, resultString)
 	else:
