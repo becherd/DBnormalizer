@@ -359,7 +359,7 @@ def getFirstNonBCNFfd(relation, fds):
 	for fd in fds:
 		if not isTrivial(fd) and not isSuperKey(fd[0], keys):
 			#just return the non-trivial part of this fd
-			return (fd[0], fd[1]-fd[0]|set(EMPTY_SET))
+			return (fd[0], (fd[1]-fd[0])|set(EMPTY_SET))
 	return ()
 	
 	
@@ -378,7 +378,7 @@ def fdsInRelation(fds, relation):
 			newfd = (fd[0], set(b))
 			if (newfd[0]|newfd[1]) <= relation:
 				fdsInRelation.append(newfd)
-	return collapseEqualLeftSides(fdsInRelation)
+	return fdsInRelation
 	
 	
 def mvdsInRelation(mvds, relation):
@@ -391,7 +391,6 @@ def mvdsInRelation(mvds, relation):
 
 	
 def decompositionAlgorithm(fds, relation, mvds=None):
-	collapseEqualLeftSides(fds)
 	stepsString = ""
 	resultString = ""
 	if mvds is None:
@@ -402,8 +401,7 @@ def decompositionAlgorithm(fds, relation, mvds=None):
 	res =  decompositionAlgorithmRec(fds, relation, mvds)
 	newRelations=res[0]
 	for r in res[1]:
-		stepsString = stepsString + r
-	#resultString =  views.wrapInPanel(heading, res[2], 2)  
+		stepsString = stepsString + r  
 	for r in res[2]:
 		resultString = resultString + r
 		
@@ -425,7 +423,6 @@ def decompositionAlgorithmRec(fds, relation, mvds=None, relations=[], stepsStrin
 	relationString = views.relationToString(relation, i, keyOfRelation)+"<br/>"
 
 	if currentfd != ():
-
 		#remove the relation from the result string as this will be splitted now
 		for x, r in enumerate(resultString):
 			if r == relationString:
@@ -438,7 +435,7 @@ def decompositionAlgorithmRec(fds, relation, mvds=None, relations=[], stepsStrin
 		r2 = (relation - currentfd[1]) | set(EMPTY_SET)
 		keyOfR1 = getFirstKey(getKeys(r1,fdsInRelation(fds, r1)))
 		keyOfR2 = getFirstKey(getKeys(r2,fdsInRelation(fds, r2)))
-		newStepString = views.wrapInPanel(views.relationToString(relation, i)+" aufspalten", views.relationToString(r1, i+"1", keyOfR1)+"<br/>"+views.relationToString(r2, i+"2", keyOfR2), 2)
+		newStepString = views.wrapInPanel(views.relationToString(relation, i)+"  aufspalten", views.relationToString(r1, i+"1", keyOfR1)+"<br/>"+views.relationToString(r2, i+"2", keyOfR2), 2)
 		if newStepString not in stepsString:
 			stepsString.append(newStepString)
 
