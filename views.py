@@ -27,7 +27,7 @@ def setOfAttributesToString(attributes, key=None):
 
 			if DBnormalizer.longAttributeNamesUsed():
 				attr = DBnormalizer.dictionaryReplToName[attr]
-				if i < len(attributes)-2:
+				if i < len(attributes)-1:
 					delimiter=", "
 				else:
 					delimiter=""
@@ -216,7 +216,7 @@ def decompositionAlgorithmToString(algorithmResult, normalForm, satisfiedNormalF
 	if normalForm=="BCNF":
         	algoResultString = algorithmResult[1]+algorithmResult[2]
 	else:
-		algoResultString =  wrapInPanel("Schema in "+normalForm, schemaToString(algorithmResult),numberOfColumns)
+		algoResultString =  algorithmResult[1]+algorithmResult[2]#wrapInPanel("Schema in "+normalForm, schemaToString(algorithmResult),numberOfColumns)
 
 
 	resultString = """<br/><div class="panel panel-default"><div class="panel-heading">"""+info+"""<h4>Dekompositionsalgorithmus (überführt R in """+normalForm+""")</h4></div></div><div class="row">"""

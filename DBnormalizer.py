@@ -390,79 +390,70 @@ def mvdsInRelation(mvds, relation):
 	
 
 	
-def decompositionAlgorithm(fds, relation):
+def decompositionAlgorithm(fds, relation, mvds=None):
 	collapseEqualLeftSides(fds)
 	stepsString = ""
 	resultString = ""
-	heading = "Schema in BCNF"
-	if not isBCNF(relation, fds):
-		res =  decompositionAlgorithmRec(fds, relation, [])
-		newRelations=res[0]
-		for r in res[1]:
-			stepsString = stepsString + r
-		resultString =  views.wrapInPanel(heading, res[2], 2)  
+	if mvds is None:
+		heading = "Schema in BCNF"
 	else:
-		newRelations =  relation
-		keyOfResult =  getFirstKey(getKeys(relation,fdsInRelation(fds, relation))) 
-		resultString =  views.wrapInPanel(heading, views.relationToString(relation, "", keyOfResult), 2)
-	if type(newRelations) == list:
-		return (newRelations, stepsString, resultString)
-	else:
-		return ([newRelations],stepsString, resultString)
+		heading = "Schema in 4NF"
+
+	res =  decompositionAlgorithmRec(fds, relation, mvds)
+	newRelations=res[0]
+	for r in res[1]:
+		stepsString = stepsString + r
+	#resultString =  views.wrapInPanel(heading, res[2], 2)  
+	for r in res[2]:
+		resultString = resultString + r
+		
+	resultString =  views.wrapInPanel(heading, resultString, 2)  
+	return (newRelations, stepsString, resultString)
 
 
-def decompositionAlgorithmRec(fds, relation, relations, stepsString=[], resultString="", i=""):
+
+def decompositionAlgorithmRec(fds, relation, mvds=None, relations=[], stepsString=[], resultString=[], i=""):
 	fdsInR = fdsInRelation(fds, relation)
-	currentfd = getFirstNonBCNFfd(relation, fdsInR)
+
+	if mvds is not None:
+		mvdsInR = mvdsInRelation(mvds, relation)
+		currentfd = getFirstNon4NFmvd(relation, fdsInR, mvdsInR)
+	else:
+		currentfd = getFirstNonBCNFfd(relation, fdsInR)
+
+	keyOfRelation = getFirstKey(getKeys(relation,fdsInRelation(fds, relation)))
+	relationString = views.relationToString(relation, i, keyOfRelation)+"<br/>"
 
 	if currentfd != ():
+
+		#remove the relation from the result string as this will be splitted now
+		for x, r in enumerate(resultString):
+			if r == relationString:
+				del(resultString[x])
+
+
 		#Split the relation into two relations based on the fd which hurts the BCNF (currentfd)
 		#and test them again recursively
 		r1 = currentfd[0]|currentfd[1]
 		r2 = (relation - currentfd[1]) | set(EMPTY_SET)
 		keyOfR1 = getFirstKey(getKeys(r1,fdsInRelation(fds, r1)))
 		keyOfR2 = getFirstKey(getKeys(r2,fdsInRelation(fds, r2)))
-		stepsString.append(views.wrapInPanel(views.relationToString(relation, i)+" aufspalten", views.relationToString(r1, i+"1", keyOfR1)+"<br/>"+views.relationToString(r2, i+"2", keyOfR2), 2))
-				
-		res = decompositionAlgorithmRec(fds, r1, relations, stepsString, resultString, i+"1")
-		res2 = decompositionAlgorithmRec(fds, r2, relations, stepsString, resultString, i+"2")
-		
-		return (relations, stepsString, resultString+res[2]+res2[2])
+		newStepString = views.wrapInPanel(views.relationToString(relation, i)+" aufspalten", views.relationToString(r1, i+"1", keyOfR1)+"<br/>"+views.relationToString(r2, i+"2", keyOfR2), 2)
+		if newStepString not in stepsString:
+			stepsString.append(newStepString)
+
+		res = decompositionAlgorithmRec(fds, r1, mvds, relations, stepsString, resultString, i+"1")
+		res2 = decompositionAlgorithmRec(fds, r2, mvds, relations, stepsString, resultString, i+"2")
+
+		return (relations, stepsString, resultString)
 	else:
-		keyOfResult = getFirstKey(getKeys(relation,fdsInRelation(fds, relation)))
-		resultString=resultString+views.relationToString(relation, i, keyOfResult)+"<br/>"
-		return (relations.append(relation), stepsString, resultString) 
-		
+		if relationString not in resultString:
+			resultString.append(relationString)
+
+		relations.append(relation)
+		relations = removeRedundantSchemas(relations)
+		return (relations, stepsString, resultString) 
 	
-def decompositionAlgorithm4NF(fds, mvds, relation):
-	collapseEqualLeftSides(fds)
-	if not isFourNF(relation, fds, mvds):
-		newRelations =  decompositionAlgorithmRec4NF(fds, mvds, relation, []) 
-	else:
-		newRelations = relation
-	if type(newRelations) == list:
-		return newRelations
-	else:
-		return  [newRelations]
-
-
-	
-def decompositionAlgorithmRec4NF(fds, mvds, relation, relations):
-	fdsInR = fdsInRelation(fds, relation)
-	mvdsInR = mvdsInRelation(mvds, relation)
-
-	currentmvd = getFirstNon4NFmvd(relation, fdsInR, mvdsInR)
-
-	if currentmvd != ():
-		#Split the relation into two relations based on the mvd which hurts the 4NF (currentmvd)
-		#and test them again recursively
-		r1 = currentmvd[0]|currentmvd[1]
-		r2 = (relation - currentmvd[1]) | set(EMPTY_SET)
-		decompositionAlgorithmRec4NF(fds, mvds, r1, relations)
-		decompositionAlgorithmRec4NF(fds, mvds, r2, relations)
-		return relations
-	else:
-		return relations.append(relation) 
 	
 #checks if all attributes in the fds and mvds are contained in the relation
 def checkIfAllAttributesAreInRelation(fds, mvds, relation):
@@ -706,7 +697,7 @@ def computeEverything(relation, fds, mvds):
 	cCover = canonicalCover(fds[:])
 	schema3NF = synthesealgorithm(cCover, keys, fds)
 	schemaBCNF = decompositionAlgorithm(fds, relation)
-	schema4NF = decompositionAlgorithm4NF(fds, mvds, relation)
+	schema4NF = decompositionAlgorithm(fds, relation, mvds)
 	result = {"keys":keys, "normalForms":normalForms, "canonicalCover":cCover, "schema3NF":schema3NF, "schemaBCNF":schemaBCNF, "schema4NF":schema4NF}
 	return result
 
