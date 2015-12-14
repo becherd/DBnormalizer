@@ -96,6 +96,14 @@ def getKeys(relation, fds):
 		return pruneSubsets(keys)
 
 
+#returns a sorted list of attributes
+def getFirstKey(keys):
+	keysList = []
+	for key in keys:
+		keysList.append(sorted(list(key)))
+	return sorted(keysList)[0]
+
+
 def convertEmptySetKeyToRelation(keys, relation):
 	emptySet = set("")
 	emptySet.add(frozenset(EMPTY_SET))	
@@ -303,9 +311,7 @@ def addRelationWithKey(relations, keys):
 				keyFound=True
 				break
 	if not(keyFound):
-		addKey = []
-		for attr in random.sample(keys, 1)[0]:
-			addKey.append(attr)
+		addKey = getFirstKey(keys)
 		relations.append(set(addKey))
 	return relations
 	
@@ -397,7 +403,7 @@ def decompositionAlgorithm(fds, relation):
 		resultString =  views.wrapInPanel(heading, res[2], 2)  
 	else:
 		newRelations =  relation
-		keyOfResult =  random.sample(getKeys(relation,fdsInRelation(fds, relation)),1)[0] 
+		keyOfResult =  getFirstKey(getKeys(relation,fdsInRelation(fds, relation))) 
 		resultString =  views.wrapInPanel(heading, views.relationToString(relation, "", keyOfResult), 2)
 	if type(newRelations) == list:
 		return (newRelations, stepsString, resultString)
@@ -414,8 +420,8 @@ def decompositionAlgorithmRec(fds, relation, relations, stepsString=[], resultSt
 		#and test them again recursively
 		r1 = currentfd[0]|currentfd[1]
 		r2 = (relation - currentfd[1]) | set(EMPTY_SET)
-		keyOfR1 = random.sample(getKeys(r1,fdsInRelation(fds, r1)),1)[0]
-		keyOfR2 = random.sample(getKeys(r2,fdsInRelation(fds, r2)),1)[0]
+		keyOfR1 = getFirstKey(getKeys(r1,fdsInRelation(fds, r1)))
+		keyOfR2 = getFirstKey(getKeys(r2,fdsInRelation(fds, r2)))
 		stepsString.append(views.wrapInPanel(views.relationToString(relation, i)+" aufspalten", views.relationToString(r1, i+"1", keyOfR1)+"<br/>"+views.relationToString(r2, i+"2", keyOfR2), 2))
 				
 		res = decompositionAlgorithmRec(fds, r1, relations, stepsString, resultString, i+"1")
@@ -423,10 +429,8 @@ def decompositionAlgorithmRec(fds, relation, relations, stepsString=[], resultSt
 		
 		return (relations, stepsString, resultString+res[2]+res2[2])
 	else:
-		#print """<div class="row">"""
-		keyOfResult = random.sample(getKeys(relation,fdsInRelation(fds, relation)),1)[0]
+		keyOfResult = getFirstKey(getKeys(relation,fdsInRelation(fds, relation)))
 		resultString=resultString+views.relationToString(relation, i, keyOfResult)+"<br/>"
-		#print "</div>"
 		return (relations.append(relation), stepsString, resultString) 
 		
 	

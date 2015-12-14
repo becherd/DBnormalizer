@@ -18,7 +18,7 @@ def keysToString(keys):
 def setOfAttributesToString(attributes, key=None):
 	setOfAttributesString=""
 	delimiter=""
-	for i,attr in enumerate(attributes):
+	for i,attr in enumerate(sortSet(attributes)):
 		if attr != DBnormalizer.EMPTY_SET:
 			if key is not None and attr in key:
 				underlineAttribute=True
@@ -45,6 +45,9 @@ def setOfAttributesToString(attributes, key=None):
 			setOfAttributesString = setOfAttributesString + underlineString(attr, underlineAttribute) + delimiter
 	return setOfAttributesString
 
+
+def sortSet(s):
+	return sorted(list(s))
 
 def underlineString(string, underline):
 	if underline:
@@ -116,18 +119,17 @@ def normalFormsToString(normalForms):
 		nfString = nfString+label+"""">"""+allNormalForms[i]+""" <span class="glyphicon glyphicon-"""+glyphicon+"""" aria-hidden=" """+glyphicon+""""></span></span>   """
 	return nfString
 
-	
+
+#schema to string. Input is a list of relations (schema) and a list of candidate keys (one set of candicate keys for each relation in schema)
 def schemaToString(schema, keys=None):
 	schemaString=""
 	i=0
 	for relation in schema:
 		i=i+1
 		if keys is not None:
-			x = keys[i-1]
-			key = random.sample(x,1)[0]
+			key = DBnormalizer.getFirstKey(keys[i-1])
 		else:
 			key = None
-		#print "KEY:"+str(isinstance(keys,list))
 		schemaString = schemaString + relationToString(relation, str(i), key) + "<br/>"
 	return schemaString	
 
@@ -194,8 +196,8 @@ def synthesealgorithmToString(algorithmResult, satisfiedNormalForms):
 
 	resultString = """<br/><div class="panel panel-default"><div class="panel-heading">"""+info+"""<h4>Synthesealgorithmus (überführt R in 3NF)</h4></div></div><div class="row">"""
 	resultString =  resultString+wrapInPanel("&#x2460; Kanonische Überdeckung", fdsToHtmlString(algorithmResult[0]),numberOfColumns)
-	resultString =  resultString+wrapInPanel("&#x2461; Relationsschemata formen", schemaToString(algorithmResult[1][0]),numberOfColumns)
-	resultString =  resultString+wrapInPanel("&#x2462; Schlüssel hinzufügen", schemaToString(algorithmResult[2][0]),numberOfColumns)
+	resultString =  resultString+wrapInPanel("&#x2461; Relationsschemata formen", schemaToString(algorithmResult[1][0], algorithmResult[1][1]),numberOfColumns)
+	resultString =  resultString+wrapInPanel("&#x2462; Schlüssel hinzufügen", schemaToString(algorithmResult[2][0], algorithmResult[2][1]),numberOfColumns)
 	resultString =  resultString+wrapInPanel("&#x2463; Redundante Schemata eliminieren", schemaToString(algorithmResult[3][0], algorithmResult[3][1]),numberOfColumns)
 	resultString =  resultString + """</div>"""
 	return resultString
