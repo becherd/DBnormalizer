@@ -391,67 +391,99 @@ def mvdsInRelation(mvds, relation):
 
 	
 def decompositionAlgorithm(fds, relation, mvds=None):
-	stepsString = ""
-	resultString = ""
 	if mvds is None:
 		heading = "Schema in BCNF"
 	else:
 		heading = "Schema in 4NF"
 
-	res =  decompositionAlgorithmRec(fds, relation, mvds)
+	res =  decompositionAlgorithmIter(fds, relation, mvds)
 	newRelations=res[0]
-	for r in res[1]:
-		stepsString = stepsString + r  
-	for r in res[2]:
-		resultString = resultString + r
-		
-	resultString =  views.wrapInPanel(heading, resultString, 2)  
+	stepsString=res[1]	
+	resultString =  views.wrapInPanel(heading, res[2], 2)  
 	return (newRelations, stepsString, resultString)
 
 
 
-def decompositionAlgorithmRec(fds, relation, mvds=None, relations=[], stepsString=[], resultString=[], i=""):
-	fdsInR = fdsInRelation(fds, relation)
+def getFirstNonBCNFRelation(relations, fds):
+	for i, r in enumerate(relations):
+		fdsInR = fdsInRelation(fds, r)
+		if not isBCNF(r, fdsInR):
+			return (i,r)
+	return (-1,None)
 
-	if mvds is not None:
-		mvdsInR = mvdsInRelation(mvds, relation)
-		currentfd = getFirstNon4NFmvd(relation, fdsInR, mvdsInR)
+def getFirstNon4NFRelation(relations, fds, mvds):
+	for i, r in enumerate(relations):
+		fdsInR = fdsInRelation(fds, r)
+		mvdsInR = mvdsInRelation(mvds, r)
+		if not isFourNF(r, fdsInR, mvdsInR):
+			return (i,r)
+	return (-1,None)
+
+
+
+def decompositionAlgorithmIter(fds, relation, mvds=None):
+	if mvds is None:
+		to4NF=False
 	else:
-		currentfd = getFirstNonBCNFfd(relation, fdsInR)
+		to4NF=True
 
 	keyOfRelation = getFirstKey(getKeys(relation,fdsInRelation(fds, relation)))
-	relationString = views.relationToString(relation, i, keyOfRelation)+"<br/>"
 
-	if currentfd != ():
-		#remove the relation from the result string as this will be splitted now
-		for x, r in enumerate(resultString):
-			if r == relationString:
-				del(resultString[x])
+	#relation, key of relation, relation name
+	relations = [(relation, "", keyOfRelation)]
 
+	stepsStrings = []
 
-		#Split the relation into two relations based on the fd which hurts the BCNF (currentfd)
-		#and test them again recursively
-		r1 = currentfd[0]|currentfd[1]
-		r2 = (relation - currentfd[1]) | set(EMPTY_SET)
-		keyOfR1 = getFirstKey(getKeys(r1,fdsInRelation(fds, r1)))
-		keyOfR2 = getFirstKey(getKeys(r2,fdsInRelation(fds, r2)))
-		newStepString = views.wrapInPanel(views.relationToString(relation, i)+"  aufspalten", views.relationToString(r1, i+"1", keyOfR1)+"<br/>"+views.relationToString(r2, i+"2", keyOfR2), 2)
-		if newStepString not in stepsString:
-			stepsString.append(newStepString)
-
-		res = decompositionAlgorithmRec(fds, r1, mvds, relations, stepsString, resultString, i+"1")
-		res2 = decompositionAlgorithmRec(fds, r2, mvds, relations, stepsString, resultString, i+"2")
-
-		return (relations, stepsString, resultString)
-	else:
-		if relationString not in resultString:
-			resultString.append(relationString)
-
-		relations.append(relation)
-		relations = removeRedundantSchemas(relations)
-		return (relations, stepsString, resultString) 
 	
+	targetNfReached = False
+
+	while not targetNfReached:
+		#print str(relations)
+		if not to4NF:
+			#BCNF
+			i,r=getFirstNonBCNFRelation([x[0] for x in relations], fds)
+			if i==-1:
+				targetNfReached=True
+			else:
+				fdsInR = fdsInRelation(fds, r)
+				currentfd = getFirstNonBCNFfd(r, fdsInR)
+				currentfdString = views.fdsMvdsToString([currentfd], True)
+		else:
+			#4NF
+			i,r=getFirstNon4NFRelation([x[0] for x in relations], fds, mvds)
+			if i==-1:
+				targetNfReached=True
+			else:
+				fdsInR = fdsInRelation(fds, r)
+				mvdsInR = mvdsInRelation(mvds, r)
+				currentfd = getFirstNon4NFmvd(r, fdsInR, mvdsInR)
+				currentfdString = views.fdsMvdsToString([currentfd], False)
+
+		if not targetNfReached:
+			r1 = currentfd[0]|currentfd[1]
+			r2 = (r - currentfd[1]) | set(EMPTY_SET)
+
+			keyOfR1 = getFirstKey(getKeys(r1,fdsInRelation(fds, r1)))
+			keyOfR2 = getFirstKey(getKeys(r2,fdsInRelation(fds, r2)))
+
+			relations.append((r1, relations[i][1]+"1", keyOfR1))
+			relations.append((r2, relations[i][1]+"2", keyOfR2))
+
+			stepsStrings.append(views.wrapInPanel(views.relationToString(relations[i][0], relations[i][1])+"  anhand "+currentfdString+" aufspalten", views.relationToString(r1, relations[i][1]+"1", keyOfR1)+"<br/>"+views.relationToString(r2, relations[i][1]+"2", keyOfR2), 2))
+			del relations[i]
+			
+	resultString = ""
+	for r in relations:
+		resultString = resultString + views.relationToString(r[0], r[1], r[2])+"<br/>"
+	stepsString = ""
+	for r in stepsStrings:
+		stepsString = stepsString + r  
+	return (relations, stepsString, resultString)
 	
+
+
+
+
 #checks if all attributes in the fds and mvds are contained in the relation
 def checkIfAllAttributesAreInRelation(fds, mvds, relation):
 	for fd in fds+mvds:
