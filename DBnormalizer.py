@@ -12,8 +12,8 @@ EMPTY_SET = "$"
 MAX_NUM_OF_ATTRIBUTES=20
 UMLAUTS="äöüÄÖÜß"
 
-#computes the attributhuelle of the attributes "huelle" for the given fds
-def attributhuelle(huelle, fds):
+#computes the closure of the attributes "huelle" for the given fds
+def closure(huelle, fds):
 	if len(huelle) > 0:
 		huelleNeu = huelle.copy()
 		first=True
@@ -27,7 +27,7 @@ def attributhuelle(huelle, fds):
 
 
 def isKey(attributes, relation, fds):
-	return relation <= attributhuelle(attributes, fds)
+	return relation <= closure(attributes, fds)
 	
 	
 #generate all permutations of all elements in the set of sets. used to first generate all combinations of attributes in order to check each one of then if it is a key
@@ -84,7 +84,7 @@ def getKeys(relation, fds):
 	ccover = canonicalCover(fds)[-1]
 	l,r,b = getLRB(ccover)
 	relationOnlyFDAttributes = l.union(r.union(b))
-	if attributhuelle(l, fds) == relationOnlyFDAttributes:
+	if closure(l, fds) == relationOnlyFDAttributes:
 		return  set((l.union(relation-relationOnlyFDAttributes),))
 	else:
 		#step 3, consider b
@@ -118,7 +118,7 @@ def convertEmptySetKeyToRelation(keys, relation):
 def findRestCandidateKeys(l, b, fds, relation):
 	keys =	set(frozenset(""))
 	for battr in b:
-		if attributhuelle(l | frozenset(battr), fds) == relation:
+		if closure(l | frozenset(battr), fds) == relation:
 			#key
 			keys.add(l | frozenset(battr))
 		else:
@@ -245,7 +245,7 @@ def leftReduction(fds):
 			#new fd with one less attribute on the right
 			newFdTest = (newfds[i][0]-set(attr), newfds[i][1])
 			#if the new FD passes the test, replace the old one
-			if newFdTest[1] <= attributhuelle(newFdTest[0], fds):
+			if newFdTest[1] <= closure(newFdTest[0], fds):
 				newfds[i]=newFdTest
 	return newfds
 	
@@ -265,7 +265,7 @@ def rightReduction(fds):
 				#add new test fd. Then, we check if we can keep it or whether we have to go back to the old state
 				newfds[i]=newFdTest
 
-				if attributhuelle(oldFds[i][0], newfds) != attributhuelle(oldFds[i][0], oldFds):
+				if closure(oldFds[i][0], newfds) != closure(oldFds[i][0], oldFds):
 					newfds[i]=oldFds[i]
 	return newfds
 
@@ -374,10 +374,13 @@ def getFirstNon4NFmvd(relation, fds, mvds):
 def fdsInRelation(fds, relation):
 	fdsInRelation = []
 	for fd in fds:
-		for b in fd[1]:
-			newfd = (fd[0], set(b))
-			if (newfd[0]|newfd[1]) <= relation:
-				fdsInRelation.append(newfd)
+		if fd[0] <= relation:
+			rightOfFd = set("")
+			for b in fd[1]:
+				if b in relation:
+					rightOfFd.add(b)
+			if rightOfFd != set(EMPTY_SET):
+				fdsInRelation.append((fd[0], rightOfFd))
 	return fdsInRelation
 	
 	
@@ -389,18 +392,6 @@ def mvdsInRelation(mvds, relation):
 	return mvdsInRelation
 	
 
-	
-def decompositionAlgorithm(fds, relation, mvds=None):
-	if mvds is None:
-		heading = "Schema in BCNF"
-	else:
-		heading = "Schema in 4NF"
-
-	res =  decompositionAlgorithmIter(fds, relation, mvds)
-	newRelations=res[0]
-	stepsString=res[1]	
-	resultString =  views.wrapInPanel(heading, res[2], 2)  
-	return (newRelations, stepsString, resultString)
 
 
 
@@ -421,11 +412,13 @@ def getFirstNon4NFRelation(relations, fds, mvds):
 
 
 
-def decompositionAlgorithmIter(fds, relation, mvds=None):
+def decompositionAlgorithm(fds, relation, mvds=None):
 	if mvds is None:
 		to4NF=False
+		heading = "Schema in BCNF"
 	else:
 		to4NF=True
+		heading = "Schema in 4NF"
 
 	keyOfRelation = getFirstKey(getKeys(relation,fdsInRelation(fds, relation)))
 
@@ -475,6 +468,11 @@ def decompositionAlgorithmIter(fds, relation, mvds=None):
 	resultString = ""
 	for r in relations:
 		resultString = resultString + views.relationToString(r[0], r[1], r[2])+"<br/>"
+	if len(stepsStrings) % 2 == 0:
+		numberOfColumns = 1
+	else:
+		numberOfColumns = 2
+	resultString =  views.wrapInPanel(heading, resultString, numberOfColumns)  
 	stepsString = ""
 	for r in stepsStrings:
 		stepsString = stepsString + r  
@@ -721,7 +719,7 @@ def parseInput(input):
 		
 def computeEverything(relation, fds, mvds):
 	relation.add(EMPTY_SET)
-	keys = convertEmptySetKeyToRelation(getKeys(relation, fds), relation)
+	keys = getKeys(relation, fds)
 	normalForms = getNormalForms(relation, fds, mvds)
 	cCover = canonicalCover(fds[:])
 	schema3NF = synthesealgorithm(cCover, keys, fds)
