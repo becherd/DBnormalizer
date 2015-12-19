@@ -415,11 +415,11 @@ def getFirstNon4NFRelation(relations, fds, mvds):
 def decompositionAlgorithm(fds, relation, mvds=None):
 	if mvds is None:
 		to4NF=False
-		heading = "Schema in BCNF"
+		targetNf="BCNF"
 	else:
 		to4NF=True
-		heading = "Schema in 4NF"
-
+		targetNf="4NF"
+	heading = "Schema in "+targetNf
 	keyOfRelation = getFirstKey(getKeys(relation,fdsInRelation(fds, relation)))
 
 	#relation, key of relation, relation name
@@ -439,6 +439,7 @@ def decompositionAlgorithm(fds, relation, mvds=None):
 				targetNfReached=True
 			else:
 				fdsInR = fdsInRelation(fds, r)
+				mvdsInR = []
 				currentfd = getFirstNonBCNFfd(r, fdsInR)
 				currentfdString = views.fdsMvdsToString([currentfd], True)
 		else:
@@ -456,23 +457,26 @@ def decompositionAlgorithm(fds, relation, mvds=None):
 			r1 = currentfd[0]|currentfd[1]
 			r2 = (r - currentfd[1]) | set(EMPTY_SET)
 
-			keyOfR1 = getFirstKey(getKeys(r1,fdsInRelation(fds, r1)))
-			keyOfR2 = getFirstKey(getKeys(r2,fdsInRelation(fds, r2)))
+			fdsInR1 = fdsInRelation(fds, r1)
+			fdsInR2 = fdsInRelation(fds, r2)
+
+			keyOfR1 = getFirstKey(getKeys(r1,fdsInR1))
+			keyOfR2 = getFirstKey(getKeys(r2,fdsInR2))
 
 			relations.append((r1, relations[i][1]+"1", keyOfR1))
 			relations.append((r2, relations[i][1]+"2", keyOfR2))
 
-			stepsStrings.append(views.wrapInPanel(views.relationToString(relations[i][0], relations[i][1])+"  anhand "+currentfdString+" aufspalten", views.relationToString(r1, relations[i][1]+"1", keyOfR1)+"<br/>"+views.relationToString(r2, relations[i][1]+"2", keyOfR2), 2))
+			relationString = views.relationToString(relations[i][0], relations[i][1])
+
+
+			stepsStrings.append(views.wrapInPanel(relationString+"  nicht in "+targetNf, """<div class="row"><div class="col-md-6"><div class="panel panel-default"><div class="panel-heading">"""+currentfdString+" verletzt die "+targetNf+"""</div><div class="panel-body">In """+relationString+" gelten <br/><br/>"+ views.fdsToHtmlString(fdsInR)+views.mvdsToHtmlString(mvdsInR) + " <br/>Die " + targetNf + " wird durch "+currentfdString+""" verletzt.</div></div></div><div class="col-md-6"><div class="panel panel-default"><div class="panel-heading">"""+relationString+"""  aufspalten</div><div class="panel-body">"""+relationString+"  aufspalten anhand "+currentfdString+ "<br/><br/>"+views.relationToString(r1, relations[i][1]+"1", keyOfR1)+"<br/>"+views.relationToString(r2, relations[i][1]+"2", keyOfR2)+"</div></div></div></div>", 1))
+
 			del relations[i]
 			
 	resultString = ""
 	for r in relations:
 		resultString = resultString + views.relationToString(r[0], r[1], r[2])+"<br/>"
-	if len(stepsStrings) % 2 == 0:
-		numberOfColumns = 1
-	else:
-		numberOfColumns = 2
-	resultString =  views.wrapInPanel(heading, resultString, numberOfColumns)  
+	resultString =  views.wrapInPanel(heading, resultString, 1, "info")  
 	stepsString = ""
 	for r in stepsStrings:
 		stepsString = stepsString + r  
