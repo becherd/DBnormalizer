@@ -9,7 +9,7 @@ import views
 
 
 EMPTY_SET = "$"
-MAX_NUM_OF_ATTRIBUTES=20
+MAX_NUM_OF_ATTRIBUTES=12
 UMLAUTS="äöüÄÖÜß"
 
 #computes the closure of the attributes "huelle" for the given fds
@@ -25,30 +25,9 @@ def closure(huelle, fds):
 					huelleNeu = huelleNeu | fds[number][1]
 	return huelle
 
-
-def isKey(attributes, relation, fds):
-	return relation <= closure(attributes, fds)
 	
+		
 	
-#generate all permutations of all elements in the set of sets. used to first generate all combinations of attributes in order to check each one of then if it is a key
-def makePermutations(setOfSets, relation, fds):
-	newSetOfSets = setOfSets.copy()
-	for element1 in setOfSets:
-		for element2 in setOfSets:
-			newSetOfSets.add(element1|element2)
-	if relation in newSetOfSets:
-		return newSetOfSets
-	else:
-		return makePermutations(newSetOfSets, relation, fds)			
-	
-
-#filters the keys from all permutations of all attributes. Thus, this function generates the superkeys
-def filterKeys(permutations, relation, fds):
-	superkeys = set(frozenset(""))
-	for element in permutations:
-		if isKey(element, relation, fds):
-			superkeys.add(element)
-	return superkeys
 	
 #prunes all subsets in the given set of sets (which are the superkeys). Only minimal keys will survive (the candidate keys)
 def pruneSubsets(superkeys):
@@ -60,24 +39,6 @@ def pruneSubsets(superkeys):
 	return superkeys-prune
 	
 	
-#set("ABCDEF")
-#-->
-#set([frozenset("A"), frozenset("B"),frozenset("C"),frozenset("D"),frozenset("E"),frozenset("F")])
-def getSetOfSingleElementSets(relation):
-	soses = set(frozenset(""))
-	for element in relation:
-		soses.add(frozenset(element))
-	return soses
-	
-	
-#computes all candidate keys for the relation (not very efficient). But it works.
-def getKeysNotEfficient(relation, fds):
-	relationSubsets = getSetOfSingleElementSets(relation)
-	allCombinations = makePermutations(relationSubsets, relation, fds)
-	superKeys = filterKeys(allCombinations, relation, fds)
-	candidateKeys = pruneSubsets(superKeys)
-	return candidateKeys
-
 
 #computes all candidate keys for the relation quite efficient
 def getKeys(relation, fds):
@@ -85,7 +46,7 @@ def getKeys(relation, fds):
 	l,r,b = getLRB(ccover)
 	relationOnlyFDAttributes = l.union(r.union(b))
 	if closure(l, fds) == relationOnlyFDAttributes:
-		return  set((l.union(relation-relationOnlyFDAttributes),))
+		return set((l.union(relation-relationOnlyFDAttributes),))
 	else:
 		#step 3, consider b
 		#add attributes from b to l
@@ -189,7 +150,8 @@ def isProperSubsetOfKey(attributes, keys):
 def isTrivial(fd):
 	return fd[1] <= fd[0]
 	
-	
+
+#checks if the given mvd is trivial	
 def isTrivial4NF(mvd, relation):
 	return isTrivial(mvd) or mvd[0]|mvd[1]==relation
 	
@@ -431,7 +393,6 @@ def decompositionAlgorithm(fds, relation, mvds=None):
 	targetNfReached = False
 
 	while not targetNfReached:
-		#print str(relations)
 		if not to4NF:
 			#BCNF
 			i,r=getFirstNonBCNFRelation([x[0] for x in relations], fds)
@@ -526,7 +487,7 @@ def generateNewFD(relation):
 		return newfd
 		
 		
-def generateFDs(relation):
+def generateFDs(relation, numberOfAttributes):
 	fds = []
 	randomNumber = random.randint(1, 100)
 	x = 125
@@ -534,18 +495,18 @@ def generateFDs(relation):
 		#add FD
 		newfd = generateNewFD(relation)
 		fds.append(newfd)
-		x=x-25	
+		x=x-125/numberOfAttributes	
 	return fds
 	
-def generateMVDs(relation):
+def generateMVDs(relation, numberOfAttributes):
 	mvds = []
 	randomNumber = random.randint(1, 100)
-	x = 75
+	x = 100
 	while(x >= randomNumber):
 		#add MVD
 		newmvd = generateNewFD(relation)
 		mvds.append(newmvd)
-		x=x-25
+		x=x-160/numberOfAttributes
 	return mvds
 	
 #generates relation
@@ -581,10 +542,10 @@ def generateNewProblem(numberOfAttributes, includeMvds, funMode):
 		relation = generateNewRelationFun(int(numberOfAttributes))
 	else:
 		relation = generateNewRelation(int(numberOfAttributes))
-	fds = generateFDs(relation)
+	fds = generateFDs(relation, int(numberOfAttributes))
 	mvds = []
 	if includeMvds:
-		mvds = generateMVDs(relation)
+		mvds = generateMVDs(relation, int(numberOfAttributes))
 	return (relation, fds, mvds)
 
 
@@ -731,51 +692,3 @@ def computeEverything(relation, fds, mvds):
 	schema4NF = decompositionAlgorithm(fds, relation, mvds)
 	result = {"keys":keys, "normalForms":normalForms, "canonicalCover":cCover, "schema3NF":schema3NF, "schemaBCNF":schemaBCNF, "schema4NF":schema4NF}
 	return result
-
-	
-"""	
-#Some test data
-
-#fds = [(set("D"),set("CA")), (set("C"),set("BA"))]
-#fds = [(set("A"),set("B")), (set("C"),set("D")), (set("E"),set("AC")), (set("F"),set("CD")), (set("D"),set("BEF"))]
-#fds = [(set("AD"),set("BC")), (set("DE"),set("BG")), (set("FCD"),set("A")), (set("AF"),set("DE")), (set("C"),set("AB"))]
-#fds = [(set("B"),set("DA")), (set("DEF"),set("B")), (set("C"),set("EA"))]
-fds = [(set("AB"),set("C"))]
-mvds = [(set("A"),set("CD"))]
-
-relation = set("ABCD")
-#relation = set("ABCDEF")
-#relation = set("ABCDEFGH")
-#relation = set("ABCDEF")
-
-
-#number of attributes of the random relation to be generated
-numberOfAttributes=5
-
-#generate new problem
-#relation = generateNewRelation(numberOfAttributes)
-#fds = generateFDs(relation)
-#mvds = generateMVDs(relation)
-	
-
-
-
-("---- Relation ----")
-print(relation)
-print("------ FDs -------")
-print(fds)
-print("------ MVDs -------")
-print(mvds)
-	
-	
-	
-
-keys = getKeys(relation, fds)
-print("--- Candidate Keys ---")
-print(keys)
-
-
-synthesealgorithm(fds, keys)
-#decompositionAlgorithm(fds, relation)
-#decompositionAlgorithm4NF(fds, mvds, relation)
-"""
