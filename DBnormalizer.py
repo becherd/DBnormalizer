@@ -327,7 +327,7 @@ def getFirstNonBCNFfd(relation, fds):
 	
 def getFirstNon4NFmvd(relation, fds, mvds):
 	keys = getKeys(relation, fds)
-	for mvd in fds+mvds:
+	for mvd in mvds:
 		if not isTrivial4NF(mvd, relation) and not isSuperKey(mvd[0], keys):
 			return mvd
 	return ()
@@ -411,7 +411,9 @@ def decompositionAlgorithm(fds, relation, mvds=None):
 			else:
 				fdsInR = fdsInRelation(fds, r)
 				mvdsInR = mvdsInRelation(mvds, r)
-				currentfd = getFirstNon4NFmvd(r, fdsInR, mvdsInR)
+				currentfd = getFirstNonBCNFfd(r, fdsInR)
+				if currentfd is ():
+					currentfd = getFirstNon4NFmvd(r, fdsInR, mvdsInR)
 				currentfdString = views.fdsMvdsToString([currentfd], False)
 
 		if not targetNfReached:
