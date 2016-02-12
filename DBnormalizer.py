@@ -329,7 +329,8 @@ def getFirstNon4NFmvd(relation, fds, mvds):
 	keys = getKeys(relation, fds)
 	for mvd in mvds:
 		if not isTrivial4NF(mvd, relation) and not isSuperKey(mvd[0], keys):
-			return mvd
+			#just return the non-trivial part of this mvd
+			return (mvd[0], (mvd[1]-mvd[0])|set(EMPTY_SET))
 	return ()
 	
 	
@@ -476,15 +477,25 @@ def getNormalForms(relation, fds, mvds):
 		normalForms = (True,False,False,False,False)
 	return normalForms
 	
-def generateNewFD(relation):
+def generateNewDependency(relation, generateTrivialParts=False):
 		numberOfAttributesLeft = random.randint(1, 3)
 		numberOfAttributesRight = random.randint(1, 4)
 		newLeft = set("")
 		newRight = set("")
+		if generateTrivialParts:
+			allowTrivialityProbability = 20
+		else:
+			allowTrivialityProbability = 0
 		for i in range(0,numberOfAttributesLeft):
 			newLeft = newLeft|set(random.sample(relation, 1))
 		for i in range(0,numberOfAttributesRight):
-			newRight = newRight|set(random.sample(relation, 1))
+			if random.randint(1,100) < allowTrivialityProbability:
+				#allow trivial parts
+				drawFromSet = relation
+			else:
+				#don't allow trivial parts
+				drawFromSet = relation - newLeft
+			newRight = newRight|set(random.sample(drawFromSet, 1))
 		newfd = (newLeft, newRight)
 		return newfd
 		
@@ -495,7 +506,7 @@ def generateFDs(relation, numberOfAttributes):
 	x = 125
 	while(x >= randomNumber):
 		#add FD
-		newfd = generateNewFD(relation)
+		newfd = generateNewDependency(relation, True)
 		fds.append(newfd)
 		x=x-125/numberOfAttributes	
 	return fds
@@ -506,7 +517,7 @@ def generateMVDs(relation, numberOfAttributes):
 	x = 100
 	while(x >= randomNumber):
 		#add MVD
-		newmvd = generateNewFD(relation)
+		newmvd = generateNewDependency(relation)
 		mvds.append(newmvd)
 		x=x-160/numberOfAttributes
 	return mvds
