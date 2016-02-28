@@ -63,7 +63,7 @@ def html(relation, fds, numberOfAttributes, funMode):
 		<br/>
 		<div class="panel panel-default">
 			<div class="panel-body">
-			<span class="label label-success">neu!</span> Längere Attributnamen möglich, einfach durch Komma trennen: <code>AttributA,AttributB,AttributC</code>, <code>AttributA,AttributB->AttributC</code>
+				Längere Attributnamen möglich, einfach durch Komma trennen: <code>AttributA,AttributB,AttributC</code>, <code>AttributA,AttributB->AttributC</code>
 			</div>
 		</div>
 		<form class="form" action="index.py"""+funModeURL+"""" method="POST"> 

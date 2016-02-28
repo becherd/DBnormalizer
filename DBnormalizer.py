@@ -477,9 +477,9 @@ def getNormalForms(relation, fds, mvds):
 		normalForms = (True,False,False,False,False)
 	return normalForms
 	
-def generateNewDependency(relation, generateTrivialParts=False):
-		numberOfAttributesLeft = random.randint(1, 3)
-		numberOfAttributesRight = random.randint(1, 4)
+def generateNewDependency(relation, numberOfAttributes, generateTrivialParts=False):
+		numberOfAttributesLeft = random.randint(1, min(4, numberOfAttributes-1))
+		numberOfAttributesRight = random.randint(1, min(5, numberOfAttributes-1))
 		newLeft = set("")
 		newRight = set("")
 		if generateTrivialParts:
@@ -488,13 +488,13 @@ def generateNewDependency(relation, generateTrivialParts=False):
 			allowTrivialityProbability = 0
 		for i in range(0,numberOfAttributesLeft):
 			newLeft = newLeft|set(random.sample(relation, 1))
+		if random.randint(1,100) < allowTrivialityProbability:
+			#allow trivial parts
+			drawFromSet = relation
+                else:
+                        #don't allow trivial parts
+                        drawFromSet = relation - newLeft
 		for i in range(0,numberOfAttributesRight):
-			if random.randint(1,100) < allowTrivialityProbability:
-				#allow trivial parts
-				drawFromSet = relation
-			else:
-				#don't allow trivial parts
-				drawFromSet = relation - newLeft
 			newRight = newRight|set(random.sample(drawFromSet, 1))
 		newfd = (newLeft, newRight)
 		return newfd
@@ -506,7 +506,7 @@ def generateFDs(relation, numberOfAttributes):
 	x = 125
 	while(x >= randomNumber):
 		#add FD
-		newfd = generateNewDependency(relation, True)
+		newfd = generateNewDependency(relation, numberOfAttributes, True)
 		fds.append(newfd)
 		x=x-125/numberOfAttributes	
 	return fds
@@ -517,7 +517,7 @@ def generateMVDs(relation, numberOfAttributes):
 	x = 100
 	while(x >= randomNumber):
 		#add MVD
-		newmvd = generateNewDependency(relation)
+		newmvd = generateNewDependency(relation, numberOfAttributes)
 		mvds.append(newmvd)
 		x=x-160/numberOfAttributes
 	return mvds
