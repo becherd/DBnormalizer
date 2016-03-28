@@ -397,10 +397,10 @@ def decompositionAlgorithm(fds, relation, mvds=None):
 		to4NF=True
 		targetNf="4NF"
 	heading = "Schema in "+targetNf
-	keyOfRelation = getFirstKey(getKeys(relation,fdsInRelation(fds, relation)))
+	keysOfRelation = getKeys(relation,fdsInRelation(fds, relation))
 
 	#relation, key of relation, relation name
-	relations = [(relation, "", keyOfRelation)]
+	relations = [(relation, "", keysOfRelation)]
 
 	stepsStrings = []
 	
