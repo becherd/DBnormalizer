@@ -133,6 +133,8 @@ htmlend="""
 		$(document).ready(function(){
    		 $('[data-toggle="tooltip"]').tooltip();   
 		});
+		$('a').setAttribute("style","text-decoration: none"); 
+		
 	</script>
 
 

@@ -439,16 +439,16 @@ def decompositionAlgorithm(fds, relation, mvds=None):
 			fdsInR1 = fdsInRelation(fds, r1)
 			fdsInR2 = fdsInRelation(fds, r2)
 
-			keyOfR1 = getFirstKey(getKeys(r1,fdsInR1))
-			keyOfR2 = getFirstKey(getKeys(r2,fdsInR2))
+			keysOfR1 = getKeys(r1,fdsInR1)
+			keysOfR2 = getKeys(r2,fdsInR2)
 
-			relations.append((r1, relations[i][1]+"1", keyOfR1))
-			relations.append((r2, relations[i][1]+"2", keyOfR2))
+			relations.append((r1, relations[i][1]+"1", keysOfR1))
+			relations.append((r2, relations[i][1]+"2", keysOfR2))
 
 			relationString = views.relationToString(relations[i][0], relations[i][1])
 
 
-			stepsStrings.append(views.wrapInPanel(relationString+"  nicht in "+targetNf, """<div class="row"><div class="col-md-6"><div class="panel panel-default"><div class="panel-heading">"""+currentfdString+" verletzt die "+targetNf+"""</div><div class="panel-body">In """+relationString+" gelten <br/><br/>"+ views.fdsToHtmlString(fdsInR, additionalFdsInR)+views.mvdsToHtmlString(mvdsInR) + " <br/>Die " + targetNf + " wird durch "+currentfdString+""" verletzt.</div></div></div><div class="col-md-6"><div class="panel panel-default"><div class="panel-heading">"""+relationString+"""  aufspalten</div><div class="panel-body">"""+relationString+"  aufspalten anhand "+currentfdString+ "<br/><br/>"+views.relationToString(r1, relations[i][1]+"1", keyOfR1)+"<br/>"+views.relationToString(r2, relations[i][1]+"2", keyOfR2)+"</div></div></div></div>", 1))
+			stepsStrings.append(views.wrapInPanel(relationString+"  nicht in "+targetNf, """<div class="row"><div class="col-md-6"><div class="panel panel-default"><div class="panel-heading">"""+currentfdString+" verletzt die "+targetNf+"""</div><div class="panel-body">In """+relationString+" gelten <br/><br/>"+ views.fdsToHtmlString(fdsInR, additionalFdsInR)+views.mvdsToHtmlString(mvdsInR) + " <br/>Die " + targetNf + " wird durch "+currentfdString+""" verletzt.</div></div></div><div class="col-md-6"><div class="panel panel-default"><div class="panel-heading">"""+relationString+"""  aufspalten</div><div class="panel-body">"""+relationString+"  aufspalten anhand "+currentfdString+ "<br/><br/>"+views.relationToString(r1, relations[i][1]+"1", keysOfR1)+"<br/>"+views.relationToString(r2, relations[i][1]+"2", keysOfR2)+"</div></div></div></div>", 1))
 
 			del relations[i]
 			

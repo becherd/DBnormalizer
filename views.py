@@ -56,10 +56,23 @@ def underlineString(string, underline):
 		return string
 
 	
-def relationToString(relation, i, key = None):
-	relationString="R<sub>"+i+"</sub>:={"
-	relationString=relationString+setOfAttributesToString(relation, key)
+def relationToString(relation, i, candidateKeys = None):
+
+	if candidateKeys is not None:
+		primaryKey = DBnormalizer.getFirstKey(candidateKeys)
+		tooltiptext = "Alle Kandidatenschlüssel dieser Relation:<br/>"+ keysToString(candidateKeys)
+        else:
+		primaryKey = None
+		tooltiptext = ""
+
+
+
+	relationString="R<sub>"+str(i)+"</sub>:={"
+	relationString=relationString+setOfAttributesToString(relation, primaryKey)
 	relationString = relationString + "}"
+
+	relationString =  addTooltipText(relationString, tooltiptext)
+	
 	return relationString
 	
 	
@@ -69,7 +82,7 @@ def fdsToString(fds):
 	
 def fdsToHtmlString(fds, additionalFds = []):
 	string =  fdsToString([fd for fd in fds if fd not in additionalFds]).replace("\n", "<br/>")
-	string = string + fdsToString(additionalFds).replace("\n", "<a data-toggle=\"tooltip\" data-placement=\"right\" title=\"Unter anderem diese FD kann mithilfe der Armstrong-Axiome zusätzlich hergeleitet werden\">*</a><br/>")
+	string = string + fdsToString(additionalFds).replace("\n", addTooltipText("*<br/>", "Unter anderem diese FD kann mithilfe der Armstrong-Axiome zusätzlich hergeleitet werden"))
 	return string
 	
 
@@ -128,12 +141,16 @@ def schemaToString(schema, keys=None):
 	i=0
 	for relation in schema:
 		i=i+1
-		if keys is not None:
-			key = DBnormalizer.getFirstKey(keys[i-1])
-		else:
-			key = None
-		schemaString = schemaString + relationToString(relation, str(i), key) + "<br/>"
+		schemaString = schemaString + relationToString(relation, i, keys[i-1])+"<br/>"
+
 	return schemaString	
+
+
+def addTooltipText(string, tooltip):
+	if tooltip == "":
+		return string
+	else:
+		return "<span data-toggle=\"tooltip\" data-placement=\"right\"  data-html=\"true\" title=\""+tooltip+"\">"+string+"</span>"
 
 
 def numberOfAttributesOptions(x):
