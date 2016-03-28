@@ -67,8 +67,10 @@ def fdsToString(fds):
 	return fdsMvdsToString(fds, True)
 
 	
-def fdsToHtmlString(fds):
-	return fdsToString(fds).replace("\n", "<br/>")
+def fdsToHtmlString(fds, additionalFds = []):
+	string =  fdsToString([fd for fd in fds if fd not in additionalFds]).replace("\n", "<br/>")
+	string = string + fdsToString(additionalFds).replace("\n", "<a data-toggle=\"tooltip\" data-placement=\"right\" title=\"Unter anderem diese FD kann mithilfe der Armstrong-Axiome zusätzlich hergeleitet werden\">*</a><br/>")
+	return string
 	
 
 

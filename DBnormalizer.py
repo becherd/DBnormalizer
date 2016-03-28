@@ -376,6 +376,20 @@ def getFirstNon4NFRelation(relations, fds, mvds):
 
 
 def decompositionAlgorithm(fds, relation, mvds=None):
+	fds = fds[:]
+	cCover = canonicalCover(fds)[-1]
+	
+	additionalFds = []
+	for addfd in cCover:
+		add = True
+		for fd in fds:
+			if addfd[0] == fd[0] and addfd[1] <= fd[1]:
+				add = False
+				break
+		if add:
+			additionalFds.append(addfd)
+			fds.append(addfd)
+
 	if mvds is None:
 		to4NF=False
 		targetNf="BCNF"
@@ -389,7 +403,6 @@ def decompositionAlgorithm(fds, relation, mvds=None):
 	relations = [(relation, "", keyOfRelation)]
 
 	stepsStrings = []
-
 	
 	targetNfReached = False
 
@@ -401,6 +414,7 @@ def decompositionAlgorithm(fds, relation, mvds=None):
 				targetNfReached=True
 			else:
 				fdsInR = fdsInRelation(fds, r)
+				additionalFdsInR = fdsInRelation(additionalFds, r)
 				mvdsInR = []
 				currentfd = getFirstNonBCNFfd(r, fdsInR)
 				currentfdString = views.fdsMvdsToString([currentfd], True)
@@ -411,6 +425,7 @@ def decompositionAlgorithm(fds, relation, mvds=None):
 				targetNfReached=True
 			else:
 				fdsInR = fdsInRelation(fds, r)
+				additionalFdsInR = fdsInRelation(additionalFds, r)
 				mvdsInR = mvdsInRelation(mvds, r)
 				currentfd = getFirstNonBCNFfd(r, fdsInR)
 				if currentfd is ():
@@ -433,7 +448,7 @@ def decompositionAlgorithm(fds, relation, mvds=None):
 			relationString = views.relationToString(relations[i][0], relations[i][1])
 
 
-			stepsStrings.append(views.wrapInPanel(relationString+"  nicht in "+targetNf, """<div class="row"><div class="col-md-6"><div class="panel panel-default"><div class="panel-heading">"""+currentfdString+" verletzt die "+targetNf+"""</div><div class="panel-body">In """+relationString+" gelten <br/><br/>"+ views.fdsToHtmlString(fdsInR)+views.mvdsToHtmlString(mvdsInR) + " <br/>Die " + targetNf + " wird durch "+currentfdString+""" verletzt.</div></div></div><div class="col-md-6"><div class="panel panel-default"><div class="panel-heading">"""+relationString+"""  aufspalten</div><div class="panel-body">"""+relationString+"  aufspalten anhand "+currentfdString+ "<br/><br/>"+views.relationToString(r1, relations[i][1]+"1", keyOfR1)+"<br/>"+views.relationToString(r2, relations[i][1]+"2", keyOfR2)+"</div></div></div></div>", 1))
+			stepsStrings.append(views.wrapInPanel(relationString+"  nicht in "+targetNf, """<div class="row"><div class="col-md-6"><div class="panel panel-default"><div class="panel-heading">"""+currentfdString+" verletzt die "+targetNf+"""</div><div class="panel-body">In """+relationString+" gelten <br/><br/>"+ views.fdsToHtmlString(fdsInR, additionalFdsInR)+views.mvdsToHtmlString(mvdsInR) + " <br/>Die " + targetNf + " wird durch "+currentfdString+""" verletzt.</div></div></div><div class="col-md-6"><div class="panel panel-default"><div class="panel-heading">"""+relationString+"""  aufspalten</div><div class="panel-body">"""+relationString+"  aufspalten anhand "+currentfdString+ "<br/><br/>"+views.relationToString(r1, relations[i][1]+"1", keyOfR1)+"<br/>"+views.relationToString(r2, relations[i][1]+"2", keyOfR2)+"</div></div></div></div>", 1))
 
 			del relations[i]
 			
