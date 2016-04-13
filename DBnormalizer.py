@@ -298,22 +298,22 @@ def synthesealgorithm(canonicalCover, keys):
 	#canonical cover
 	step1 = canonicalCover[-1]
 	step2 = generateNewRelations(step1[:])
-	step2Keys = getKeysOfRelations(step2, step1)
+	step2KeysAndFDs = getKeysAndFDsOfRelations(step2, step1)
 	step3 = addRelationWithKey(step2[:], keys)
-	step3Keys = getKeysOfRelations(step3, step1)
+	step3KeysAndFDs = getKeysAndFDsOfRelations(step3, step1)
 	step4 = removeRedundantSchemas(step3[:])
-	step4Keys = getKeysOfRelations(step4, step1)
+	step4KeysAndFDs = getKeysAndFDsOfRelations(step4, step1)
 	#return result relations for each step together with their keys. For step 1, we return the canonical cover
-	return (step1,(step2,step2Keys),(step3,step3Keys),(step4,step4Keys))
+	return (step1,(step2,step2KeysAndFDs),(step3,step3KeysAndFDs),(step4,step4KeysAndFDs))
 	
 
-def getKeysOfRelations(relations, fds):
-	keysOfRelations = []
+def getKeysAndFDsOfRelations(relations, fds):
+	keysAndFDsOfRelations = []
 	for r in relations:
 		fdsInR = fdsInRelation(fds, r)
 		keys = getKeys(r, fdsInR)
-		keysOfRelations.append(keys)
-	return keysOfRelations
+		keysAndFDsOfRelations.append({"keys": keys, "FDs":fdsInR})
+	return keysAndFDsOfRelations
 
 
 def getFirstNonBCNFfd(relation, fds):
@@ -400,7 +400,7 @@ def decompositionAlgorithm(fds, relation, mvds=None):
 	keysOfRelation = getKeys(relation,fdsInRelation(fds, relation))
 
 	#relation, key of relation, relation name
-	relations = [(relation, "", keysOfRelation)]
+	relations = [(relation, "", keysOfRelation, fds)]
 
 	stepsStrings = []
 	
@@ -442,19 +442,19 @@ def decompositionAlgorithm(fds, relation, mvds=None):
 			keysOfR1 = getKeys(r1,fdsInR1)
 			keysOfR2 = getKeys(r2,fdsInR2)
 
-			relations.append((r1, relations[i][1]+"1", keysOfR1))
-			relations.append((r2, relations[i][1]+"2", keysOfR2))
+			relations.append((r1, relations[i][1]+"1", keysOfR1, fdsInR1))
+			relations.append((r2, relations[i][1]+"2", keysOfR2, fdsInR2))
 
-			relationString = views.relationToString(relations[i][0], relations[i][1])
+			relationString = views.relationToString(relations[i][0], relations[i][1], getKeys(r, fdsInR), fdsInR)
 
 
-			stepsStrings.append(views.wrapInPanel(relationString+"  nicht in "+targetNf, """<div class="row"><div class="col-md-6"><div class="panel panel-default"><div class="panel-heading">"""+currentfdString+" verletzt die "+targetNf+"""</div><div class="panel-body">In """+relationString+" gelten <br/><br/>"+ views.fdsToHtmlString(fdsInR, additionalFdsInR)+views.mvdsToHtmlString(mvdsInR) + " <br/>Die " + targetNf + " wird durch "+currentfdString+""" verletzt.</div></div></div><div class="col-md-6"><div class="panel panel-default"><div class="panel-heading">"""+relationString+"""  aufspalten</div><div class="panel-body">"""+relationString+"  aufspalten anhand "+currentfdString+ "<br/><br/>"+views.relationToString(r1, relations[i][1]+"1", keysOfR1)+"<br/>"+views.relationToString(r2, relations[i][1]+"2", keysOfR2)+"</div></div></div></div>", 1))
+			stepsStrings.append(views.wrapInPanel(relationString+"  nicht in "+targetNf, """<div class="row"><div class="col-md-6"><div class="panel panel-default"><div class="panel-heading">"""+currentfdString+" verletzt die "+targetNf+"""</div><div class="panel-body">In """+relationString+" gelten <br/><br/>"+ views.fdsToHtmlString(fdsInR, additionalFdsInR)+views.mvdsToHtmlString(mvdsInR) + " <br/>Die " + targetNf + " wird durch "+currentfdString+""" verletzt.</div></div></div><div class="col-md-6"><div class="panel panel-default"><div class="panel-heading">"""+relationString+"""  aufspalten</div><div class="panel-body">"""+relationString+"  aufspalten anhand "+currentfdString+ "<br/><br/>"+views.relationToString(r1, relations[i][1]+"1", keysOfR1, fdsInR1)+"<br/>"+views.relationToString(r2, relations[i][1]+"2", keysOfR2, fdsInR2)+"</div></div></div></div>", 1))
 
 			del relations[i]
 			
 	resultString = ""
 	for r in relations:
-		resultString = resultString + views.relationToString(r[0], r[1], r[2])+"<br/>"
+		resultString = resultString + views.relationToString(r[0], r[1], r[2], r[3])+"<br/>"
 	resultString =  views.wrapInPanel(heading, resultString, 1, "info")  
 	stepsString = ""
 	for r in stepsStrings:

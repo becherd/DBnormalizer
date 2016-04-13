@@ -3,8 +3,9 @@
 
 import DBnormalizer 
 import random
-
 EMPTY_SET_HTML="&empty;"
+
+
 
 def keysToString(keys):
 	keyString=""
@@ -56,11 +57,14 @@ def underlineString(string, underline):
 		return string
 
 	
-def relationToString(relation, i, candidateKeys = None):
-
-	if candidateKeys is not None:
+def relationToString(relation, i, candidateKeys = None, fds=None):
+	if candidateKeys is not None and fds is not None:
 		primaryKey = DBnormalizer.getFirstKey(candidateKeys)
-		tooltiptext = "Alle Kandidatenschlüssel dieser Relation:<br/>"+ keysToString(candidateKeys)
+		if not fds:
+			tooltiptext = "In dieser Relation gelten keine FDs.<br/>"
+		else:
+			tooltiptext = "In dieser Relation gelten folgende FDs:<br/>"+fdsToHtmlString(fds)
+		tooltiptext = tooltiptext + "<br/> Alle Kandidatenschlüssel dieser Relation sind somit:<br/>"+ keysToString(candidateKeys)
         else:
 		primaryKey = None
 		tooltiptext = ""
@@ -71,7 +75,7 @@ def relationToString(relation, i, candidateKeys = None):
 	relationString=relationString+setOfAttributesToString(relation, primaryKey)
 	relationString = relationString + "}"
 
-	relationString =  addTooltipText(relationString, tooltiptext)
+	relationString =  addPopoverText(relationString, relationString, tooltiptext)
 	
 	return relationString
 	
@@ -136,12 +140,12 @@ def normalFormsToString(normalForms):
 
 
 #schema to string. Input is a list of relations (schema) and a list of candidate keys (one set of candicate keys for each relation in schema)
-def schemaToString(schema, keys=None):
+def schemaToString(schema, keysAndFDs=None):
 	schemaString=""
 	i=0
 	for relation in schema:
 		i=i+1
-		schemaString = schemaString + relationToString(relation, i, keys[i-1])+"<br/>"
+		schemaString = schemaString + relationToString(relation, i, keysAndFDs[i-1]["keys"], keysAndFDs[i-1]["FDs"])+"<br/>"
 
 	return schemaString	
 
@@ -151,6 +155,13 @@ def addTooltipText(string, tooltip):
 		return string
 	else:
 		return "<span data-toggle=\"tooltip\" data-placement=\"right\"  data-html=\"true\" title=\""+tooltip+"\">"+string+"</span>"
+
+
+def addPopoverText(string, title, tooltip):
+	if tooltip == "":
+		return string
+	else:
+		return "<span data-toggle=\"popover\" data-placement=\"right\"  data-html=\"true\" title=\""+title+"\" data-content=\""+tooltip+"\">"+string+"</span>"
 
 
 def numberOfAttributesOptions(x):
