@@ -451,7 +451,7 @@ def decompositionAlgorithm(fds, relation, mvds=[]):
 			relationString = views.relationToString(relations[i][0], relations[i][1], getKeys(r, fdsInR), fdsInR, mvdsInR, additionalFdsInR)
 
 
-			stepsStrings.append(views.wrapInPanel(relationString+"  nicht in "+targetNf, currentfdString+"verletzt die "+targetNf+".<br/>"+relationString+"  aufspalten in<br/><br/>"+views.relationToString(r1, relations[i][1]+"1", keysOfR1, fdsInR1, mvdsInR1)+"<br/>"+views.relationToString(r2, relations[i][1]+"2", keysOfR2, fdsInR2, mvdsInR2), 2))
+			stepsStrings.append(views.wrapInPanel(relationString+"  nicht in "+targetNf, currentfdString+"verletzt die "+targetNf+".<br/>"+relationString+"""  zerlegen in<br/><ul style="list-style-type:square;"><li>"""+views.relationToString(r1, relations[i][1]+"1", keysOfR1, fdsInR1, mvdsInR1)+"</li><li>"+views.relationToString(r2, relations[i][1]+"2", keysOfR2, fdsInR2, mvdsInR2), 2)+"""</li></ul>""")
 
 			del relations[i]
 			
@@ -463,14 +463,12 @@ def decompositionAlgorithm(fds, relation, mvds=[]):
 		numberOfColumns = 1
 	else:
 		numberOfColumns = 2
-	resultString =  views.wrapInPanel(heading, resultString, numberOfColumns, "info")  
+	resultString =  views.wrapInPanel(heading, resultString, numberOfColumns, "success")  
 	stepsString = ""
 	for r in stepsStrings:
 		stepsString = stepsString + r  
 	return (relations, stepsString, resultString)
 	
-
-
 
 
 #checks if all attributes in the fds and mvds are contained in the relation

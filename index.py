@@ -102,9 +102,12 @@ def html(relation, fds, numberOfAttributes, funMode):
 		</div>
 		<br/>"""
 
-htmlend="""	
+htmlend="""
 	</div>
 	</div>
+	<br/>
+	<br/>	
+	<br/>
 		<!-- Modal: help -->
 		<div id="helpModal" class="modal fade" role="dialog">
 			<div class="modal-dialog">
@@ -179,4 +182,4 @@ except KeyError:
 	except:
 		funMode=0
     	relation, fds, mvds = DBnormalizer.generateNewProblem(5, False, funMode)
-    	print html(views.setOfAttributesToString(relation), views.fdsToString(fds)+views.mvdsToString(mvds), 5, funMode)+htmlend
+    	print html(views.setOfAttributesToString(relation), views.fdsToString(fds)+views.mvdsToString(mvds), 5, funMode)+ """<div class="panel-body"><h2>Algorithmen</h2><div class="panel panel-default"><div class="panel-body">"""+views.getPanelHeading('canonicalCover')+  views.getPanelHeading('synthese') + views.getPanelHeading('decompositionBCNF') + views.getPanelHeading('decomposition4NF') + "</div></div></div>" +htmlend

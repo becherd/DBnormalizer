@@ -200,6 +200,22 @@ def getErrorMessageBox(message):
 		return """<div class="row"><div class="col-md-12"><div class="alert alert-danger" role="alert"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="exclamation"></span><span class="sr-only">Error:</span> """+message+"""</div></div></div>"""
 	
 
+def getPanelHeading(id, expanded=False, info=""):
+	if id=="canonicalCover":
+		heading = "Kanonische Überdeckung"
+	elif id=="synthese":
+		 heading = "Synthesealgorithmus (überführt R in 3NF)"
+	elif id=="decompositionBCNF":
+                 heading = "Dekompositionsalgorithmus (überführt R in BCNF)"
+	elif id=="decomposition4NF":
+                 heading = "Dekompositionsalgorithmus (überführt R in 4NF)"
+	else:
+		heading = id
+	if expanded:
+		collapse = "in"
+	else:
+		collapse = ""
+	return "<br/><span data-toggle=\"collapse\" href=\"#collapse"+id+"\"><div class=\"panel panel-default\"><div class=\"panel-heading\">"+info+"<h4>"+heading+"</h4></div></div></span><div class=\"panel-collapse collapse "+collapse+"\" id=\"collapse"+id+"\">"+getAlgorithmString(id)+"</div>"
 
 
 def canonicalCoverToString(algorithmResult):
@@ -207,11 +223,11 @@ def canonicalCoverToString(algorithmResult):
 		numberOfColumns = 2
 	else:
 		numberOfColumns = 4
-	resultString = """<br/><div class="panel panel-default"><div class="panel-heading"><h4>Kanonische Überdeckung</h4></div></div><div class="row">"""
+	resultString = getPanelHeading("canonicalCover",False)+"""<div class="row">"""
 	resultString =  resultString+wrapInPanel("&#x2460; Linksreduktion", fdsToHtmlString(algorithmResult[0]),numberOfColumns)
 	resultString =  resultString+wrapInPanel("&#x2461; Rechtsreduktion", fdsToHtmlString(algorithmResult[1]),numberOfColumns)
-	resultString =  resultString+wrapInPanel("&#x2462; a&rarr;&empty; entfernen", fdsToHtmlString(algorithmResult[2]),numberOfColumns)
-	resultString =  resultString+wrapInPanel("&#x2463; FDs zusammenfassen", fdsToHtmlString(algorithmResult[3]),numberOfColumns, "info")
+	resultString =  resultString+wrapInPanel("&#x2462; &#x3b1;&rarr;&empty; entfernen", fdsToHtmlString(algorithmResult[2]),numberOfColumns)
+	resultString =  resultString+wrapInPanel("&#x2463; FDs zusammenfassen", fdsToHtmlString(algorithmResult[3]),numberOfColumns, "success")
 	resultString =  resultString + """</div>"""
 	return resultString
 
@@ -233,11 +249,11 @@ def synthesealgorithmToString(algorithmResult, satisfiedNormalForms):
 	else:
 		info = ""
 
-	resultString = """<br/><div class="panel panel-default"><div class="panel-heading">"""+info+"""<h4>Synthesealgorithmus (überführt R in 3NF)</h4></div></div><div class="row">"""
+	resultString = getPanelHeading("synthese",False,info)+"""<div class="row">"""
 	resultString =  resultString+wrapInPanel("&#x2460; Kanonische Überdeckung", fdsToHtmlString(algorithmResult[0]),numberOfColumns)
 	resultString =  resultString+wrapInPanel("&#x2461; Relationsschemata formen", schemaToString(algorithmResult[1][0], algorithmResult[1][1]),numberOfColumns)
 	resultString =  resultString+wrapInPanel("&#x2462; Schlüssel hinzufügen", schemaToString(algorithmResult[2][0], algorithmResult[2][1]),numberOfColumns)
-	resultString =  resultString+wrapInPanel("&#x2463; Redundante Schemata eliminieren", schemaToString(algorithmResult[3][0], algorithmResult[3][1]),numberOfColumns, "info")
+	resultString =  resultString+wrapInPanel("&#x2463; Redundante Schemata eliminieren", schemaToString(algorithmResult[3][0], algorithmResult[3][1]),numberOfColumns, "success")
 	resultString =  resultString + """</div>"""
 	return resultString
 
@@ -258,7 +274,7 @@ def decompositionAlgorithmToString(algorithmResult, normalForm, satisfiedNormalF
 		algoResultString =  algorithmResult[1]+algorithmResult[2]#wrapInPanel("Schema in "+normalForm, schemaToString(algorithmResult),numberOfColumns)
 
 
-	resultString = """<br/><div class="panel panel-default"><div class="panel-heading">"""+info+"""<h4>Dekompositionsalgorithmus (überführt R in """+normalForm+""")</h4></div></div><div class="row">"""
+	resultString = getPanelHeading("decomposition"+normalForm, False, info)+"""<div class="row">"""
 	resultString = resultString+ algoResultString
 	resultString = resultString+ """</div>"""
 	return resultString
@@ -278,11 +294,56 @@ def resultToString(relation, fds, mvds, result) :
 	fdsPanel = wrapInPanel("FDs", fdsToHtmlString(fds),numberOfColumns)
 
 	numberOfColumns = 2
-	keysPanel = wrapInPanel("Kandidatenschlüssel", keysToString(result['keys']),numberOfColumns, "info")
-	normalformsPanel = wrapInPanel("Normalformen", normalFormsToString(result['normalForms']),numberOfColumns, "info")
+	keysPanel = wrapInPanel("Kandidatenschlüssel", keysToString(result['keys']),numberOfColumns, "success")
+	normalformsPanel = wrapInPanel("Normalformen", normalFormsToString(result['normalForms']),numberOfColumns, "success")
 	newschema3NFPanel = synthesealgorithmToString(result['schema3NF'], result['normalForms'])
 	canonicalCoverPanel = canonicalCoverToString(result['canonicalCover'])
 	newschemaBCNFPanel = decompositionAlgorithmToString(result['schemaBCNF'], "BCNF", result['normalForms'])
 	newschema4NFPanel = decompositionAlgorithmToString(result['schema4NF'], "4NF", result['normalForms'])
 
 	return """<div class="panel-body"><h2>Eingabe</h2><div class="panel panel-default"><div class="panel-body"><div class="row">"""+relationPanel + fdsPanel + mvdsPanel + """</div></div></div><br/><h2>Ergebnis</h2><div class="panel panel-default"><div class="panel-body"><div class="row">"""+ keysPanel  + normalformsPanel+ """</div>"""+canonicalCoverPanel+newschema3NFPanel+newschemaBCNFPanel+newschema4NFPanel+ """</div></div></div>"""
+
+
+
+
+def getAlgorithmString(algorithm):
+	resultString = ""
+	if algorithm == 'canonicalCover':
+		resultString = """<div class="row">"""
+		resultString =  resultString+wrapInPanel("&#x2460; Linksreduktion", "Was kann ich links weglassen?", 4, "info")
+		resultString =  resultString+wrapInPanel("&#x2461; Rechtsreduktion", "Was kann ich rechts weglassen?", 4, "info")
+		resultString =  resultString+wrapInPanel("&#x2462; &#x3b1;&rarr;&empty; entfernen", "FDs mit leerer rechter Seite entfernen", 4, "info")
+		resultString =  resultString+wrapInPanel("&#x2463; FDs zusammenfassen", "FDs mit gleichen linken Seiten zusammenfassen", 4, "info")
+		resultString =  resultString + """</div>"""
+	elif algorithm == 'synthese':
+		resultString = """<div class="row">"""
+		resultString =  resultString+wrapInPanel("&#x2460; Kanonische Überdeckung", "Bestimme die kanonische Überdeckung (s. oben)", 4, "info")
+		resultString =  resultString+wrapInPanel("&#x2461; Relationsschemata formen", "Aus jeder FD der kanonischen Überdeckung entsteht eine neue Relation", 4, "info")
+		resultString =  resultString+wrapInPanel("&#x2462; Schlüssel hinzufügen", "Füge ein neues Relationsschema mit einem Kandidatenschlüssel hinzu, falls keiner der Kandidatenschlüssel vollständig in einem Schema enthalten ist", 4, "info")
+		resultString =  resultString+wrapInPanel("&#x2463; Redundante Schemata eliminieren", "Eliminiere R<sub>a</sub>, wenn R<sub>a</sub> &#x2286; R<sub>a'</sub>", 4, "info")
+		resultString =  resultString + """</div>"""
+	elif algorithm == 'decompositionBCNF' or algorithm == 'decomposition4NF':
+		if algorithm == 'decompositionBCNF':
+			targetNF = "BCNF"
+			consider="FD"
+		else:
+			targetNF = "4NF"
+			consider="MVD"
+		resultString = """<div class="row">"""
+		resultString =  resultString+wrapInPanel("Initialisierung", "Starte mit Z={R}", 1, "info")
+		resultString =  resultString+wrapInPanel("Solange es noch eine "+consider+" in einem Schema R<sub>i</sub> &#x2208; Z gibt, die die "+targetNF+" verletzt","""
+				<ul style="list-style-type:square;">
+					<li>Zerlege R<sub>i</sub> in
+						<ul style="list-style-type:square;">
+							<li>R<sub>i1</sub> = &#x3b1; &#x222a; &#x3b2;  </li>
+							<li>R<sub>i2</sub> = R<sub>i</sub> - &#x3b2; </li>
+						</ul>
+					</li>
+					<li>
+						Entferne R<sub>i</sub> aus Z und füge R<sub>i1</sub> und R<sub>i2</sub> ein
+					</li>
+				</ul>
+				""", 1, "info")
+		resultString =  resultString + """</div>"""
+	return resultString
+
