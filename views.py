@@ -57,15 +57,24 @@ def underlineString(string, underline):
 		return string
 
 	
-def relationToString(relation, i, candidateKeys = None, fds=None):
-	if candidateKeys is not None and fds is not None:
-		primaryKey = DBnormalizer.getFirstKey(candidateKeys)
-		if not fds:
-			tooltiptext = "In dieser Relation gelten keine FDs.<br/>"
+def relationToString(relation, i, candidateKeys = None, fds = [], mvds = [], additionalFds = []):
+	if candidateKeys is not None:
+		if mvds:
+			show = "FDs/MVDs"
 		else:
-			tooltiptext = "In dieser Relation gelten folgende FDs:<br/>"+fdsToHtmlString(fds)
-		tooltiptext = tooltiptext + "<br/> Alle Kandidatenschlüssel dieser Relation sind somit:<br/>"+ keysToString(candidateKeys)
+			show = "FDs"
+
+		primaryKey = DBnormalizer.getFirstKey(candidateKeys)
+		tooltiptext = "<div class='panel panel-primary'><div class='panel-heading'><h5 class='panel-title'>"+show+"</h5></div><div class='panel-body'>"
+		if not fds:
+			tooltiptext = tooltiptext + "In dieser Relation gelten keine nicht-trivialen Abhängigkeiten."
+		else:
+			tooltiptext = tooltiptext + fdsToHtmlString(fds, additionalFds)+mvdsToHtmlString(mvds)
+		tooltiptext = tooltiptext + "</div></div><div class='panel panel-primary'><div class='panel-heading'><h3 class='panel-title'>Kandidatenschlüssel</h3></div><div class='panel-body'>"+ keysToString(candidateKeys)+"</div></div>"
+		if "*" in tooltiptext:
+			tooltiptext = tooltiptext + "<h6><small>* Unter anderem diese FD kann mithilfe der Armstrong-Axiome zusätzlich hergeleitet werden</small></h6>"
         else:
+		#Do not show tooltip, only blank relation
 		primaryKey = None
 		tooltiptext = ""
 
@@ -86,7 +95,7 @@ def fdsToString(fds):
 	
 def fdsToHtmlString(fds, additionalFds = []):
 	string =  fdsToString([fd for fd in fds if fd not in additionalFds]).replace("\n", "<br/>")
-	string = string + fdsToString(additionalFds).replace("\n", addTooltipText("*<br/>", "Unter anderem diese FD kann mithilfe der Armstrong-Axiome zusätzlich hergeleitet werden"))
+	string = string + fdsToString(additionalFds).replace("\n", "*<br/>")
 	return string
 	
 
