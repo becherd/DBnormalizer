@@ -375,7 +375,7 @@ def getFirstNon4NFRelation(relations, fds, mvds):
 
 
 
-def decompositionAlgorithm(fds, relation, mvds=[]):
+def decompositionAlgorithm(targetNf, fds, relation, mvds=[]):
 	fds = fds[:]
 	cCover = canonicalCover(fds)[-1]
 	
@@ -390,12 +390,11 @@ def decompositionAlgorithm(fds, relation, mvds=[]):
 			additionalFds.append(addfd)
 			fds.append(addfd)
 
-	if not mvds:
+	if targetNf == "BCNF":
 		to4NF=False
-		targetNf="BCNF"
 	else:
 		to4NF=True
-		targetNf="4NF"
+
 	heading = "Schema in "+targetNf
 	keysOfRelation = getKeys(relation,fdsInRelation(fds, relation))
 
@@ -407,6 +406,7 @@ def decompositionAlgorithm(fds, relation, mvds=[]):
 	targetNfReached = False
 
 	while not targetNfReached:
+		additionalFdsInR = []
 		if not to4NF:
 			#BCNF
 			i,r=getFirstNonBCNFRelation([x[0] for x in relations], fds)
@@ -414,7 +414,9 @@ def decompositionAlgorithm(fds, relation, mvds=[]):
 				targetNfReached=True
 			else:
 				fdsInR = fdsInRelation(fds, r)
-				additionalFdsInR = fdsInRelation(additionalFds, r)
+				if len(relations) == 1:
+					#show alert for additional FDs only in the first step
+					additionalFdsInR = fdsInRelation(additionalFds, r)
 				mvdsInR = []
 				currentfd = getFirstNonBCNFfd(r, fdsInR)
 				currentfdString = views.fdsMvdsToString([currentfd], True)
@@ -425,7 +427,9 @@ def decompositionAlgorithm(fds, relation, mvds=[]):
 				targetNfReached=True
 			else:
 				fdsInR = fdsInRelation(fds, r)
-				additionalFdsInR = fdsInRelation(additionalFds, r)
+				if len(relations) == 1:
+					#show alert for additional FDs only in the first step
+					additionalFdsInR = fdsInRelation(additionalFds, r)
 				mvdsInR = mvdsInRelation(mvds, r)
 				currentfd = getFirstNonBCNFfd(r, fdsInR)
 				if currentfd is ():
@@ -447,7 +451,8 @@ def decompositionAlgorithm(fds, relation, mvds=[]):
 
 			relations.append((r1, relations[i][1]+"1", keysOfR1, fdsInR1, mvdsInR1))
 			relations.append((r2, relations[i][1]+"2", keysOfR2, fdsInR2, mvdsInR2))
-
+			
+			
 			relationString = views.relationToString(relations[i][0], relations[i][1], getKeys(r, fdsInR), fdsInR, mvdsInR, additionalFdsInR)
 
 
@@ -722,7 +727,7 @@ def computeEverything(relation, fds, mvds):
 	normalForms = getNormalForms(relation, fds, mvds)
 	cCover = canonicalCover(fds[:])
 	schema3NF = synthesealgorithm(cCover, keys)
-	schemaBCNF = decompositionAlgorithm(fds, relation)
-	schema4NF = decompositionAlgorithm(fds, relation, mvds)
+	schemaBCNF = decompositionAlgorithm("BCNF", fds, relation)
+	schema4NF = decompositionAlgorithm("4NF", fds, relation, mvds)
 	result = {"keys":keys, "normalForms":normalForms, "canonicalCover":cCover, "schema3NF":schema3NF, "schemaBCNF":schemaBCNF, "schema4NF":schema4NF}
 	return result
