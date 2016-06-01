@@ -166,10 +166,10 @@ try:
 		funMode=0
 	if mode=='generateFds':
 		 relation, fds, mvds = DBnormalizer.generateNewProblem(numberOfAttributes, False, funMode)
-		 print html(views.setOfAttributesToString(relation), views.fdsToString(fds)+views.mvdsToString(mvds), numberOfAttributes, funMode)+htmlend
+		 print html(views.setOfAttributesToString(relation), views.fdsToString(fds)+views.mvdsToString(mvds), numberOfAttributes, funMode)+views.getAlgorithmTutorial() + htmlend
 	elif mode=='generateMvds':
 		 relation, fds, mvds = DBnormalizer.generateNewProblem(numberOfAttributes, True, funMode)
-		 print html(views.setOfAttributesToString(relation), views.fdsToString(fds)+views.mvdsToString(mvds), numberOfAttributes, funMode)+htmlend
+		 print html(views.setOfAttributesToString(relation), views.fdsToString(fds)+views.mvdsToString(mvds), numberOfAttributes, funMode)+views.getAlgorithmTutorial()+htmlend
 	else:
 		#Mode is showResults
 		relation = str(form['relation'].value)
@@ -182,4 +182,4 @@ except KeyError:
 	except:
 		funMode=0
     	relation, fds, mvds = DBnormalizer.generateNewProblem(5, False, funMode)
-    	print html(views.setOfAttributesToString(relation), views.fdsToString(fds)+views.mvdsToString(mvds), 5, funMode)+ """<div class="panel-body"><h2>Algorithmen</h2><div class="panel panel-default"><div class="panel-body">"""+views.getPanelHeading('canonicalCover')+  views.getPanelHeading('synthese') + views.getPanelHeading('decompositionBCNF') + views.getPanelHeading('decomposition4NF') + "</div></div></div>" +htmlend
+    	print html(views.setOfAttributesToString(relation), views.fdsToString(fds)+views.mvdsToString(mvds), 5, funMode)+ views.getAlgorithmTutorial() +htmlend

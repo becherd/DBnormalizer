@@ -347,3 +347,8 @@ def getAlgorithmString(algorithm):
 		resultString =  resultString + """</div>"""
 	return resultString
 
+
+def getAlgorithmTutorial():
+	return """<div class="panel-body"><h2>Algorithmen</h2><div class="panel panel-default"><div class="panel-body">"""+getPanelHeading('canonicalCover')+  getPanelHeading('synthese') + getPanelHeading('decompositionBCNF') + getPanelHeading('decomposition4NF') + "</div></div></div>"
+
+
