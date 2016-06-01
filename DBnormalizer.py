@@ -468,7 +468,7 @@ def decompositionAlgorithm(targetNf, fds, relation, mvds=[]):
 		numberOfColumns = 1
 	else:
 		numberOfColumns = 2
-	resultString =  views.wrapInPanel(heading, resultString, numberOfColumns, "success")  
+	resultString =  views.wrapInPanel(heading, "<strong>"+resultString+"</strong>", numberOfColumns)  
 	stepsString = ""
 	for r in stepsStrings:
 		stepsString = stepsString + r  

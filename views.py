@@ -227,7 +227,7 @@ def canonicalCoverToString(algorithmResult):
 	resultString =  resultString+wrapInPanel("&#x2460; Linksreduktion", fdsToHtmlString(algorithmResult[0]),numberOfColumns)
 	resultString =  resultString+wrapInPanel("&#x2461; Rechtsreduktion", fdsToHtmlString(algorithmResult[1]),numberOfColumns)
 	resultString =  resultString+wrapInPanel("&#x2462; &#x3b1;&rarr;&empty; entfernen", fdsToHtmlString(algorithmResult[2]),numberOfColumns)
-	resultString =  resultString+wrapInPanel("&#x2463; FDs zusammenfassen", fdsToHtmlString(algorithmResult[3]),numberOfColumns, "success")
+	resultString =  resultString+wrapInPanel("&#x2463; FDs zusammenfassen", "<strong>"+fdsToHtmlString(algorithmResult[3])+"</strong>",numberOfColumns)
 	resultString =  resultString + """</div>"""
 	return resultString
 
@@ -253,7 +253,7 @@ def synthesealgorithmToString(algorithmResult, satisfiedNormalForms):
 	resultString =  resultString+wrapInPanel("&#x2460; Kanonische Überdeckung", fdsToHtmlString(algorithmResult[0]),numberOfColumns)
 	resultString =  resultString+wrapInPanel("&#x2461; Relationsschemata formen", schemaToString(algorithmResult[1][0], algorithmResult[1][1]),numberOfColumns)
 	resultString =  resultString+wrapInPanel("&#x2462; Schlüssel hinzufügen", schemaToString(algorithmResult[2][0], algorithmResult[2][1]),numberOfColumns)
-	resultString =  resultString+wrapInPanel("&#x2463; Redundante Schemata eliminieren", schemaToString(algorithmResult[3][0], algorithmResult[3][1]),numberOfColumns, "success")
+	resultString =  resultString+wrapInPanel("&#x2463; Redundante Schemata eliminieren",  "<strong>"+schemaToString(algorithmResult[3][0], algorithmResult[3][1])+"</strong>",numberOfColumns)
 	resultString =  resultString + """</div>"""
 	return resultString
 
@@ -285,17 +285,17 @@ def resultToString(relation, fds, mvds, result) :
 	if mvds != []:
 		#MVDs available
 		numberOfColumns = 3
-		mvdsPanel = wrapInPanel("MVDs", mvdsToHtmlString(mvds),numberOfColumns)
+		mvdsPanel = wrapInPanel("MVDs", "<strong>"+mvdsToHtmlString(mvds)+"</strong>",numberOfColumns)
 	else:
 		#no MVDs, just FDs
 		numberOfColumns = 2
 		mvdsPanel= ""
-	relationPanel = wrapInPanel("Relation", relationToString(relation,""),numberOfColumns)
-	fdsPanel = wrapInPanel("FDs", fdsToHtmlString(fds),numberOfColumns)
+	relationPanel = wrapInPanel("Relation", "<strong>"+relationToString(relation,"")+"</strong>",numberOfColumns)
+	fdsPanel = wrapInPanel("FDs", "<strong>"+fdsToHtmlString(fds)+"</strong>",numberOfColumns)
 
 	numberOfColumns = 2
-	keysPanel = wrapInPanel("Kandidatenschlüssel", keysToString(result['keys']),numberOfColumns, "success")
-	normalformsPanel = wrapInPanel("Normalformen", normalFormsToString(result['normalForms']),numberOfColumns, "success")
+	keysPanel = wrapInPanel("Kandidatenschlüssel", "<strong>"+keysToString(result['keys'])+"</strong>",numberOfColumns)
+	normalformsPanel = wrapInPanel("Normalformen", normalFormsToString(result['normalForms']),numberOfColumns)
 	newschema3NFPanel = synthesealgorithmToString(result['schema3NF'], result['normalForms'])
 	canonicalCoverPanel = canonicalCoverToString(result['canonicalCover'])
 	newschemaBCNFPanel = decompositionAlgorithmToString(result['schemaBCNF'], "BCNF", result['normalForms'])
