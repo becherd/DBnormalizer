@@ -215,7 +215,25 @@ def getPanelHeading(id, expanded=False, info=""):
 		collapse = "in"
 	else:
 		collapse = ""
-	return "<br/><span data-toggle=\"collapse\" href=\"#collapse"+id+"\"><div class=\"panel panel-default\"><div class=\"panel-heading\">"+info+"<h4>"+heading+"</h4></div></div></span><div class=\"panel-collapse collapse "+collapse+"\" id=\"collapse"+id+"\">"+getAlgorithmString(id)+"</div>"
+	return """<br/><span id=\"collapse"""+id+"""\" data-toggle=\"collapse\" href=\"#container"""+id+"""\">
+		<div class=\"panel panel-default\">
+			<div class=\"panel-heading\">"""+info+"""<h4><span name=\"menuicon\" class=\"glyphicon glyphicon-menu-right\" aria-hidden\"true\"></span> """+heading+"""</h4></div>
+		</div>
+		</span>
+		<div class=\"panel-collapse collapse """+collapse+"""\" id=\"container"""+id+"""\">"""+getAlgorithmString(id)+"""</div>
+		<script>
+			$('#collapse"""+id+"""').on('click', function () {
+			if($('#container"""+id+"""').is(':visible')){
+    			$('#collapse"""+id+"""').find('span[name="menuicon"]').removeClass().addClass('glyphicon glyphicon-menu-right'); 
+			}
+			else{      
+    			 $('#collapse"""+id+"""').find('span[name="menuicon"]').removeClass().addClass('glyphicon glyphicon-menu-down');
+			}
+			});
+		</script>
+
+
+		"""
 
 
 def canonicalCoverToString(algorithmResult):
