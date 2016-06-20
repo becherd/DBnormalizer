@@ -242,10 +242,10 @@ def canonicalCoverToString(algorithmResult):
 	else:
 		numberOfColumns = 4
 	resultString = getPanelHeading("canonicalCover",False)+"""<div class="row">"""
-	resultString =  resultString+wrapInPanel("&#x2460; Linksreduktion", fdsToHtmlString(algorithmResult[0]),numberOfColumns)
-	resultString =  resultString+wrapInPanel("&#x2461; Rechtsreduktion", fdsToHtmlString(algorithmResult[1]),numberOfColumns)
-	resultString =  resultString+wrapInPanel("&#x2462; &#x3b1;&rarr;&empty; entfernen", fdsToHtmlString(algorithmResult[2]),numberOfColumns)
-	resultString =  resultString+wrapInPanel("&#x2463; FDs zusammenfassen", "<strong>"+fdsToHtmlString(algorithmResult[3])+"</strong>",numberOfColumns)
+	resultString =  resultString+wrapInPanel("<span class='badge'>1</span> Linksreduktion", fdsToHtmlString(algorithmResult[0]),numberOfColumns)
+	resultString =  resultString+wrapInPanel("<span class='badge'>2</span> Rechtsreduktion", fdsToHtmlString(algorithmResult[1]),numberOfColumns)
+	resultString =  resultString+wrapInPanel("<span class='badge'>3</span> &#x3b1;&rarr;&empty; entfernen", fdsToHtmlString(algorithmResult[2]),numberOfColumns)
+	resultString =  resultString+wrapInPanel("<span class='badge'>4</span> FDs zusammenfassen", "<strong>"+fdsToHtmlString(algorithmResult[3])+"</strong>",numberOfColumns)
 	resultString =  resultString + """</div>"""
 	return resultString
 
@@ -268,10 +268,10 @@ def synthesealgorithmToString(algorithmResult, satisfiedNormalForms):
 		info = ""
 
 	resultString = getPanelHeading("synthese",False,info)+"""<div class="row">"""
-	resultString =  resultString+wrapInPanel("&#x2460; Kanonische Überdeckung", fdsToHtmlString(algorithmResult[0]),numberOfColumns)
-	resultString =  resultString+wrapInPanel("&#x2461; Relationsschemata formen", schemaToString(algorithmResult[1][0], algorithmResult[1][1]),numberOfColumns)
-	resultString =  resultString+wrapInPanel("&#x2462; Schlüssel hinzufügen", schemaToString(algorithmResult[2][0], algorithmResult[2][1]),numberOfColumns)
-	resultString =  resultString+wrapInPanel("&#x2463; Redundante Schemata eliminieren",  "<strong>"+schemaToString(algorithmResult[3][0], algorithmResult[3][1])+"</strong>",numberOfColumns)
+	resultString =  resultString+wrapInPanel("<span class='badge'>1</span> Kanonische Überdeckung", fdsToHtmlString(algorithmResult[0]),numberOfColumns)
+	resultString =  resultString+wrapInPanel("<span class='badge'>2</span> Relationsschemata formen", schemaToString(algorithmResult[1][0], algorithmResult[1][1]),numberOfColumns)
+	resultString =  resultString+wrapInPanel("<span class='badge'>3</span> Schlüssel hinzufügen", schemaToString(algorithmResult[2][0], algorithmResult[2][1]),numberOfColumns)
+	resultString =  resultString+wrapInPanel("<span class='badge'>4</span> Redundante Schemata eliminieren",  "<strong>"+schemaToString(algorithmResult[3][0], algorithmResult[3][1])+"</strong>",numberOfColumns)
 	resultString =  resultString + """</div>"""
 	return resultString
 
@@ -328,17 +328,17 @@ def getAlgorithmString(algorithm):
 	resultString = ""
 	if algorithm == 'canonicalCover':
 		resultString = """<div class="row">"""
-		resultString =  resultString+wrapInPanel("&#x2460; Linksreduktion", "Was kann ich links weglassen?", 4, "info")
-		resultString =  resultString+wrapInPanel("&#x2461; Rechtsreduktion", "Was kann ich rechts weglassen?", 4, "info")
-		resultString =  resultString+wrapInPanel("&#x2462; &#x3b1;&rarr;&empty; entfernen", "FDs mit leerer rechter Seite entfernen", 4, "info")
-		resultString =  resultString+wrapInPanel("&#x2463; FDs zusammenfassen", "FDs mit gleichen linken Seiten zusammenfassen", 4, "info")
+		resultString =  resultString+wrapInPanel("<span class='badge'>1</span> Linksreduktion", "Was kann ich links weglassen?", 4, "info")
+		resultString =  resultString+wrapInPanel("<span class='badge'>2</span> Rechtsreduktion", "Was kann ich rechts weglassen?", 4, "info")
+		resultString =  resultString+wrapInPanel("<span class='badge'>3</span> &#x3b1;&rarr;&empty; entfernen", "FDs mit leerer rechter Seite entfernen", 4, "info")
+		resultString =  resultString+wrapInPanel("<span class='badge'>4</span> FDs zusammenfassen", "FDs mit gleichen linken Seiten zusammenfassen", 4, "info")
 		resultString =  resultString + """</div>"""
 	elif algorithm == 'synthese':
 		resultString = """<div class="row">"""
-		resultString =  resultString+wrapInPanel("&#x2460; Kanonische Überdeckung", "Bestimme die kanonische Überdeckung (s. oben)", 4, "info")
-		resultString =  resultString+wrapInPanel("&#x2461; Relationsschemata formen", "Aus jeder FD der kanonischen Überdeckung entsteht eine neue Relation", 4, "info")
-		resultString =  resultString+wrapInPanel("&#x2462; Schlüssel hinzufügen", "Füge ein neues Relationsschema mit einem Kandidatenschlüssel hinzu, falls keiner der Kandidatenschlüssel vollständig in einem Schema enthalten ist", 4, "info")
-		resultString =  resultString+wrapInPanel("&#x2463; Redundante Schemata eliminieren", "Eliminiere R<sub>a</sub>, wenn R<sub>a</sub> &#x2286; R<sub>a'</sub>", 4, "info")
+		resultString =  resultString+wrapInPanel("<span class='badge'>1</span> Kanonische Überdeckung", "Bestimme die kanonische Überdeckung (s. oben)", 4, "info")
+		resultString =  resultString+wrapInPanel("<span class='badge'>2</span> Relationsschemata formen", "Aus jeder FD der kanonischen Überdeckung entsteht eine neue Relation", 4, "info")
+		resultString =  resultString+wrapInPanel("<span class='badge'>3</span> Schlüssel hinzufügen", "Füge ein neues Relationsschema mit einem Kandidatenschlüssel hinzu, falls keiner der Kandidatenschlüssel vollständig in einem Schema enthalten ist", 4, "info")
+		resultString =  resultString+wrapInPanel("<span class='badge'>4</span> Redundante Schemata eliminieren", "Eliminiere R<sub>a</sub>, wenn R<sub>a</sub> &#x2286; R<sub>a'</sub>", 4, "info")
 		resultString =  resultString + """</div>"""
 	elif algorithm == 'decompositionBCNF' or algorithm == 'decomposition4NF':
 		if algorithm == 'decompositionBCNF':

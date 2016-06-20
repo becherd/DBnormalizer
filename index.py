@@ -45,7 +45,7 @@ def html(relation, fds, numberOfAttributes, funMode):
   	<div class="panel-body">
 		<div class="row">
 			<div class="col-md-6">
-				<h1><big>DB->normalizer</big><sub><small>beta</small></sub></h1>
+				<h1><big>DB->normalizer</big></h1>
 			</div>
 			<div class="col-md-6">
 				<p class="text-right"><button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#helpModal">
@@ -61,11 +61,6 @@ def html(relation, fds, numberOfAttributes, funMode):
 			</div>
 		</div>
 		<br/>
-		<div class="panel panel-default">
-			<div class="panel-body">
-				Längere Attributnamen möglich, einfach durch Komma trennen: <code>AttributA,AttributB,AttributC</code>, <code>AttributA,AttributB->AttributC</code>
-			</div>
-		</div>
 		<form class="form" action="index.py"""+funModeURL+"""" method="POST"> 
 				<div class="form-group">
 					<h4>Relation eingeben</h4>
