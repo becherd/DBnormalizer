@@ -190,7 +190,7 @@ try:
 		#validate addition of relation with key
 		try:
 			addkeyrelation = form.getvalue('addkeyrelation')
-			keyrelation = str(form['newrelation'].value)
+			keyrelation = str(form['newrelation'].value).replace(" ", "")
 		except KeyError:
 			keyrelation = ""
 		relations = DBnormalizer.generateNewRelations(currentfds)
@@ -213,11 +213,13 @@ try:
 				removeindices = [removeindices]
 		except KeyError:
 			removeindices = []
+		print currentfds
 		relations = DBnormalizer.generateNewRelations(currentfds)
 		try:
 			keyrelationstring = str(form['keyrelation'].value).replace("\r", "").replace("\n", "")
-			keyrelation = set(keyrelationstring)|set(EMPTY_SET)
-			relations.append(keyrelation)
+			if keyrelationstring != "":
+				keyrelation = set(keyrelationstring)|set(EMPTY_SET)
+				relations.append(keyrelation)
 		except KeyError:
 			print "ke"
 		newrelations = inputValidation.validateRemoveRelations(relations, removeindices)
@@ -235,8 +237,9 @@ try:
 		relations = DBnormalizer.generateNewRelations(currentfds)
 		try:
 			keyrelationstring = str(form['keyrelation'].value).replace("\r", "").replace("\n", "")
-			keyrelation = set(keyrelationstring)|set(EMPTY_SET)
-			relations.append(keyrelation)
+			if keyrelationstring != "":
+				keyrelation = set(keyrelationstring)|set(EMPTY_SET)
+				relations.append(keyrelation)
 		except KeyError:
 			print "ke"
 		relations = DBnormalizer.removeRedundantSchemas(relations[:])

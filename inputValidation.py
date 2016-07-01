@@ -112,7 +112,7 @@ def validateRemoveRelations(relations, removeindices):
 	newrelations = DBnormalizer.removeRedundantSchemas(relations)
 	for i, relation in enumerate(relations):
 		if relation not in newrelations:
-			redundantindices.append[i]
+			redundantindices.append(str(i))
 	if set(removeindices[:]) == set(redundantindices[:]):
 		return newrelations
 	else:
