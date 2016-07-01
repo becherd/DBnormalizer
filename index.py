@@ -61,12 +61,11 @@ def html(relation, fds, numberOfAttributes, funMode):
 			</div>
 		</div>
 		<br/>
-		<form class="form" action="index.py"""+funModeURL+"""" method="POST"> 
+		<form id="inputform" class="form" action="index.py"""+funModeURL+"""" method="POST"> 
 				<div class="form-group">
 					<h4>Relation eingeben</h4>
 					<input type="text" class="form-control" name="relation" value="
-""" + relation+ """
-"></input>
+""" + relation+ """"></input>
 					<h4>FDs/MVDs eingeben</h4>
 					<textarea type="text" class="form-control" rows="6" name="fds">
 """+ fds + """
@@ -77,10 +76,19 @@ def html(relation, fds, numberOfAttributes, funMode):
 					<input type="hidden" value="
 """+str(numberOfAttributes)+"""
 " name="numberOfAttributes"></input>
+					<input type="hidden" value="1" name="step"></input>
 				</div>
 				<div class="form-group">
-						<button id="submitbutton" type="submit" class="btn btn-primary" value="send">Absenden</button>
+						<button id="submitbutton" type="submit" class="btn btn-default" value="send">Absenden</button>
+						<button id="quizButton" class="btn btn-primary">Quiz</button>
 				</div>			
+				<script>
+					$('#quizButton').on('click', function(){
+						var form = document.getElementById('inputform');
+						form.action="quiz.py";
+						form.submit();
+					});
+				</script>
 		</form>
 		<form class="form-inline" action="index.py"""+funModeURL+"""" method="POST">
 				<div class="form-group">

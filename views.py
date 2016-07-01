@@ -4,7 +4,7 @@
 import DBnormalizer 
 import random
 EMPTY_SET_HTML="&empty;"
-
+EMPTY_SET = "$"
 
 
 def keysToString(keys):
@@ -57,14 +57,14 @@ def underlineString(string, underline):
 		return string
 
 	
-def relationToString(relation, i, candidateKeys = None, fds = [], mvds = [], additionalFds = []):
+def relationToString(relation, i, candidateKeys = None, fds = [], mvds = [], additionalFds = [], primaryKey=None):
 	if candidateKeys is not None:
 		if mvds:
 			show = "FDs/MVDs"
 		else:
 			show = "FDs"
-
-		primaryKey = DBnormalizer.getFirstKey(candidateKeys)
+		if primaryKey is None:
+			primaryKey = DBnormalizer.getFirstKey(candidateKeys)
 		tooltiptext = "<div class='panel panel-primary'><div class='panel-heading'><h5 class='panel-title'>"+show+"</h5></div><div class='panel-body'>"
 		if not fds:
 			tooltiptext = tooltiptext + "In dieser Relation gelten keine nicht-trivialen Abhängigkeiten."
@@ -96,6 +96,7 @@ def fdsToString(fds):
 def fdsToHtmlString(fds, additionalFds = []):
 	string =  fdsToString([fd for fd in fds if fd not in additionalFds]).replace("\n", "<br/>")
 	string = string + fdsToString(additionalFds).replace("\n", "*<br/>")
+	string = string.replace(EMPTY_SET, EMPTY_SET_HTML)
 	return string
 	
 
@@ -104,7 +105,7 @@ def mvdsToString(mvds):
 	return fdsMvdsToString(mvds, False)
 
 def mvdsToHtmlString(mvds):
-        return mvdsToString(mvds).replace("\n", "<br/>")
+        return mvdsToString(mvds).replace("\n", "<br/>").replace(EMPTY_SET, EMPTY_SET_HTML)
 
 
 
@@ -118,20 +119,45 @@ def fdsMvdsToString(fdMvds, isFds):
 		left = setOfAttributesToString(fdMvd[0])
 		right = setOfAttributesToString(fdMvd[1])
 		if left == "":
-			left = EMPTY_SET_HTML
+			left = EMPTY_SET
 		if right == "":
-			right = EMPTY_SET_HTML
+			right = EMPTY_SET
 		fdMvdString = fdMvdString + left
 		fdMvdString = fdMvdString + delimiter
 		fdMvdString = fdMvdString + right
 		fdMvdString = fdMvdString + "\n"
 	return fdMvdString
 
+def fdToHtmlString(fd):
+	return fdsToHtmlString([fd]).replace("<br/>", "")
 
+def mvdToHtmlString(mvd):
+	return mvdsToHtmlString([mvd]).replace("<br/>", "")
 
 	
+def inputToString(relation, fds, mvds,panelType="primary", keys=[]):
+	if mvds != []:
+		#MVDs available
+		numberOfColumns = 3
+		mvdsPanel = wrapInPanel("MVDs", "<strong>"+mvdsToHtmlString(mvds)+"</strong>",numberOfColumns,panelType)
+	else:
+		#no MVDs, just FDs
+		numberOfColumns = 2
+		mvdsPanel= ""
+	keysPanel = ""
+	if keys:
+		numberOfColumns = numberOfColumns + 1
+		keysPanel = wrapInPanel("Kandidatenschlüssel", "<strong>"+keysToString(keys)+"</strong>",numberOfColumns, panelType)
+	relationPanel = wrapInPanel("Relation", "<strong>"+relationToString(relation,"")+"</strong>",numberOfColumns, panelType)
+	fdsPanel = wrapInPanel("FDs", "<strong>"+fdsToHtmlString(fds)+"</strong>",numberOfColumns, panelType)
+	return "<div class=\"row\">"+relationPanel+keysPanel+fdsPanel+mvdsPanel+"</div>"
 
-
+def getJumbotron(heading, content):
+	html = "<div class=\"jumbotron\" style=\"background-size: auto 100%;\">"
+	html = html + "<h1>"+heading+"</h1>"+content
+	html = html + "</div>"
+	return html
+	
 	
 def normalFormsToString(normalForms):
 	allNormalForms = ["1NF", "2NF", "3NF", "BCNF", "4NF"]
@@ -149,13 +175,19 @@ def normalFormsToString(normalForms):
 
 
 #schema to string. Input is a list of relations (schema) and a list of candidate keys (one set of candicate keys for each relation in schema)
-def schemaToString(schema, keysAndFDs=None):
+def schemaToString(schema, keysAndFDs=None, primaryKeys=[]):
 	schemaString=""
 	i=0
 	for relation in schema:
 		i=i+1
-		schemaString = schemaString + relationToString(relation, i, keysAndFDs[i-1]["keys"], keysAndFDs[i-1]["FDs"])+"<br/>"
-
+		if keysAndFDs is None:
+			schemaString = schemaString + relationToString(relation, i)
+		else:
+			if primaryKeys:
+				schemaString = schemaString + relationToString(relation, i, keysAndFDs[i-1]["keys"], keysAndFDs[i-1]["FDs"], [], [], primaryKeys[i-1])
+			else:
+				schemaString = schemaString + relationToString(relation, i, keysAndFDs[i-1]["keys"], keysAndFDs[i-1]["FDs"])
+		schemaString = schemaString + "<br/>"
 	return schemaString	
 
 
@@ -198,6 +230,8 @@ def wrapInPanel(heading, content, numberOfColumns, panelType="primary"):
 	
 def getErrorMessageBox(message):
 		return """<div class="row"><div class="col-md-12"><div class="alert alert-danger" role="alert"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="exclamation"></span><span class="sr-only">Error:</span> """+message+"""</div></div></div>"""
+def getSuccessMessageBox(message):
+		return """<div class="row"><div class="col-md-12"><div class="alert alert-success" role="alert"><span class="glyphicon glyphicon-thumbs-up" aria-hidden="thumbsup"></span>"""+message+"""</div></div></div>"""
 	
 
 def getPanelHeading(id, expanded=False, info=""):
@@ -300,16 +334,7 @@ def decompositionAlgorithmToString(algorithmResult, normalForm, satisfiedNormalF
 
 	
 def resultToString(relation, fds, mvds, result) :
-	if mvds != []:
-		#MVDs available
-		numberOfColumns = 3
-		mvdsPanel = wrapInPanel("MVDs", "<strong>"+mvdsToHtmlString(mvds)+"</strong>",numberOfColumns)
-	else:
-		#no MVDs, just FDs
-		numberOfColumns = 2
-		mvdsPanel= ""
-	relationPanel = wrapInPanel("Relation", "<strong>"+relationToString(relation,"")+"</strong>",numberOfColumns)
-	fdsPanel = wrapInPanel("FDs", "<strong>"+fdsToHtmlString(fds)+"</strong>",numberOfColumns)
+	inputpanel = inputToString(relation, fds, mvds)
 
 	numberOfColumns = 2
 	keysPanel = wrapInPanel("Kandidatenschlüssel", "<strong>"+keysToString(result['keys'])+"</strong>",numberOfColumns)
@@ -319,7 +344,7 @@ def resultToString(relation, fds, mvds, result) :
 	newschemaBCNFPanel = decompositionAlgorithmToString(result['schemaBCNF'], "BCNF", result['normalForms'])
 	newschema4NFPanel = decompositionAlgorithmToString(result['schema4NF'], "4NF", result['normalForms'])
 
-	return """<div class="panel-body"><h2>Eingabe</h2><div class="panel panel-default"><div class="panel-body"><div class="row">"""+relationPanel + fdsPanel + mvdsPanel + """</div></div></div><br/><h2>Ergebnis</h2><div class="panel panel-default"><div class="panel-body"><div class="row">"""+ keysPanel  + normalformsPanel+ """</div>"""+canonicalCoverPanel+newschema3NFPanel+newschemaBCNFPanel+newschema4NFPanel+ """</div></div></div>"""
+	return """<div class="panel-body"><h2>Eingabe</h2><div class="panel panel-default"><div class="panel-body">"""+inputpanel+ """</div></div><br/><h2>Ergebnis</h2><div class="panel panel-default"><div class="panel-body"><div class="row">"""+ keysPanel  + normalformsPanel+ """</div>"""+canonicalCoverPanel+newschema3NFPanel+newschemaBCNFPanel+newschema4NFPanel+ """</div></div></div>"""
 
 
 

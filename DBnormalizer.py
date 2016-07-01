@@ -419,7 +419,7 @@ def decompositionAlgorithm(targetNf, fds, relation, mvds=[]):
 					additionalFdsInR = fdsInRelation(additionalFds, r)
 				mvdsInR = []
 				currentfd = getFirstNonBCNFfd(r, fdsInR)
-				currentfdString = views.fdsMvdsToString([currentfd], True)
+				currentfdString = views.fdToHtmlString(currentfd)
 		else:
 			#4NF
 			i,r=getFirstNon4NFRelation([x[0] for x in relations], fds, mvds)
@@ -434,7 +434,7 @@ def decompositionAlgorithm(targetNf, fds, relation, mvds=[]):
 				currentfd = getFirstNonBCNFfd(r, fdsInR)
 				if currentfd is ():
 					currentfd = getFirstNon4NFmvd(r, fdsInR, mvdsInR)
-				currentfdString = views.fdsMvdsToString([currentfd], False)
+				currentfdString = views.mvdToHtmlString(currentfd)
 
 		if not targetNfReached:
 			r1 = currentfd[0]|currentfd[1]
@@ -456,7 +456,7 @@ def decompositionAlgorithm(targetNf, fds, relation, mvds=[]):
 			relationString = views.relationToString(relations[i][0], relations[i][1], getKeys(r, fdsInR), fdsInR, mvdsInR, additionalFdsInR)
 
 
-			stepsStrings.append(views.wrapInPanel(relationString+"  nicht in "+targetNf, currentfdString+"verletzt die "+targetNf+".<br/>"+relationString+"""  zerlegen in<br/><ul style="list-style-type:square;"><li>"""+views.relationToString(r1, relations[i][1]+"1", keysOfR1, fdsInR1, mvdsInR1)+"</li><li>"+views.relationToString(r2, relations[i][1]+"2", keysOfR2, fdsInR2, mvdsInR2), 2)+"""</li></ul>""")
+			stepsStrings.append(views.wrapInPanel(relationString+"  nicht in "+targetNf, currentfdString+" verletzt die "+targetNf+".<br/>"+relationString+"""  zerlegen in<br/><ul style="list-style-type:square;"><li>"""+views.relationToString(r1, relations[i][1]+"1", keysOfR1, fdsInR1, mvdsInR1)+"</li><li>"+views.relationToString(r2, relations[i][1]+"2", keysOfR2, fdsInR2, mvdsInR2), 2)+"""</li></ul>""")
 
 			del relations[i]
 			
@@ -488,20 +488,33 @@ def checkIfAllAttributesAreInRelation(fds, mvds, relation):
 	
 
 def getNormalForms(relation, fds, mvds):
-	normalForms = ()
+	normalFormsBool = [False for i in range(5)]
+	normalForms = ("1NF", "2NF", "3NF", "BCNF", "4NF")
+	highestNF = getHighestNormalForm(relation, fds, mvds)
+	for i, nf in enumerate(normalForms):
+		if nf != highestNF:
+			normalFormsBool[i] = True
+		else:
+			normalFormsBool[i] = True
+			break
+	return normalFormsBool
+
+def getHighestNormalForm(relation, fds, mvds):
+	normalForm = ""
 	if isFourNF(relation, fds, mvds):
-		normalForms = (True,True,True,True,True)
+		normalForm = "4NF"
 	elif isBCNF(relation, fds):
-		normalForms = (True,True,True,True,False)
+		normalForm = "BCNF"
 	elif isThreeNF(relation, fds):
-		normalForms = (True,True,True,False,False)
+		normalForm = "3NF"
 	elif isTwoNF(relation, fds):
-		normalForms = (True,True,False,False,False)
+		normalForm = "2NF"
 	elif isOneNF(relation, fds):
-		normalForms = (True,False,False,False,False)
+		normalForm = "1NF"
 	else:
-		normalForms = (True,False,False,False,False)
-	return normalForms
+		normalForm = "1NF"
+	return normalForm
+
 	
 def generateNewDependency(relation, numberOfAttributes, generateTrivialParts=False):
 		numberOfAttributesLeft = random.randint(1, min(4, numberOfAttributes-1))
