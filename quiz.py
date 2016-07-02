@@ -213,7 +213,6 @@ try:
 				removeindices = [removeindices]
 		except KeyError:
 			removeindices = []
-		print currentfds
 		relations = DBnormalizer.generateNewRelations(currentfds)
 		try:
 			keyrelationstring = str(form['keyrelation'].value).replace("\r", "").replace("\n", "")

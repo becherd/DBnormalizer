@@ -136,17 +136,16 @@ def mvdToHtmlString(mvd):
 
 	
 def inputToString(relation, fds, mvds,panelType="primary", keys=[]):
-	if mvds != []:
-		#MVDs available
-		numberOfColumns = 3
+	numberOfColumns = 2
+	if mvds:
+		numberOfColumns = numberOfColumns+1
+	if keys:
+		numberOfColumns = numberOfColumns+1
+	mvdsPanel= ""
+	if mvds:
 		mvdsPanel = wrapInPanel("MVDs", "<strong>"+mvdsToHtmlString(mvds)+"</strong>",numberOfColumns,panelType)
-	else:
-		#no MVDs, just FDs
-		numberOfColumns = 2
-		mvdsPanel= ""
 	keysPanel = ""
 	if keys:
-		numberOfColumns = numberOfColumns + 1
 		keysPanel = wrapInPanel("Kandidatenschlüssel", "<strong>"+keysToString(keys)+"</strong>",numberOfColumns, panelType)
 	relationPanel = wrapInPanel("Relation", "<strong>"+relationToString(relation,"")+"</strong>",numberOfColumns, panelType)
 	fdsPanel = wrapInPanel("FDs", "<strong>"+fdsToHtmlString(fds)+"</strong>",numberOfColumns, panelType)
