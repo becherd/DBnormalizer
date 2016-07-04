@@ -87,14 +87,11 @@ def normalForm(relationString, fdsString):
 
 
 def canonicalCoverLeftReduction(relationString, fdsString, fds):
-	html = """<form class="form-inline" action="quiz.py" method="POST">
-		<div class="row">
-		<div class="col-sm-12">
+	html = """<form class="form" action="quiz.py" method="POST">
 """
 	for i, fd in enumerate(fds):
-		html = html + "<input type=\"text\" class=\"form-control input-lg\" id=\"fd"+str(i)+"\" name=\"fd"+str(i)+"\" value=\""+views.setOfAttributesToString(fd[0])+"\"><h4 style=\"display:inline;\"> -> "+views.setOfAttributesToString(fd[1]) + "</h4><br/>"
-	html = html + """</div>
-		</div><input type="hidden" value="
+		html = html + "<div class=\"row\"><div class=\"col-md-2\"><input type=\"text\" class=\"form-control input-lg\" id=\"fd"+str(i)+"\" name=\"fd"+str(i)+"\" value=\""+views.setOfAttributesToString(fd[0])+"\" style=\"text-align:right;\"></div><div class=\"col-md-1 text-center\" style=\"max-width:80px;\"><br/><h2 style=\"display:inline;\"><sub>-></sub></h2></div> <div class=\"col-md-2\"><input type=\"text\" class=\"form-control input-lg\" value=\""+views.setOfAttributesToString(fd[1])+"\" disabled=\"disabled\"></div></div></br>"
+	html = html + """<input type="hidden" value="
 """+relationString+"""" name="relation"></input>
 		<input type="hidden" value="
 """+fdsString+"""" name="fds"></input>
@@ -111,14 +108,12 @@ def canonicalCoverLeftReduction(relationString, fdsString, fds):
 
 
 def canonicalCoverRightReduction(relationString, fdsString, fds):
-	html = """<form class="form-inline" action="quiz.py" method="POST">
-		<div class="row">
-		<div class="col-sm-12">
+	html = """<form class="form" action="quiz.py" method="POST">	
 """
 	for i, fd in enumerate(fds):
-		html = html + "<h4 style=\"display:inline;\">" + views.setOfAttributesToString(fd[0]) +" -> </h4><input type=\"text\" class=\"form-control input-lg\" id=\"fd"+str(i)+"\" name=\"fd"+str(i)+"\" value=\""+views.setOfAttributesToString(fd[1])+"\"><br/>"
-	html = html + """</div>
-		</div><input type="hidden" value="
+		#html = html + "<h4 style=\"display:inline;\">" + views.setOfAttributesToString(fd[0]) +" -> </h4><input type=\"text\" class=\"form-control input-lg\" id=\"fd"+str(i)+"\" name=\"fd"+str(i)+"\" value=\""+views.setOfAttributesToString(fd[1])+"\"><br/>"
+		html = html + "<div class=\"row\"><div class=\"col-md-2\"><input type=\"text\" class=\"form-control input-lg\" value=\""+views.setOfAttributesToString(fd[0])+"\" disabled=\"disabled\" style=\"text-align:right;\"></div><div class=\"col-md-1 text-center\" style=\"max-width:80px;\"><br/><h2 style=\"display:inline;\"><sub>-></sub></h2></div><div class=\"col-md-2\"><input type=\"text\" class=\"form-control input-lg\" id=\"fd"+str(i)+"\" name=\"fd"+str(i)+"\" value=\""+views.setOfAttributesToString(fd[1])+"\"></div></div><br/>"
+	html = html + """<input type="hidden" value="
 """+relationString+"""" name="relation"></input>
 		<input type="hidden" value="
 """+fdsString+"""" name="fds"></input>
@@ -274,14 +269,11 @@ def removeRedundantRelations(relationString, fdsString, fds, relations, keyrelat
 
 
 def choosePrimaryKeys(relationString, fdsString, fds, relations, keyrelation):
-	html = """<form class="form-inline" action="quiz.py" method="POST">
-		<div class="row">
-		<div class="col-sm-12">
+	html = """<form class="form" action="quiz.py" method="POST">
 """
 	for i, relation in enumerate(relations):
-		html = html + "<h4 style=\"display:inline;\">" + views.relationToString(relation, i+1) +" </h4><input type=\"text\" class=\"form-control input-lg\" id=\"pk"+str(i)+"\" name=\"pk"+str(i)+"\"><br/>"
-	html = html + """</div>
-		</div><input type="hidden" value="
+		html = html + "<div class=\"row\"><div class=\"col-md-1\"><br/><h4 style=\"display:inline;\">" + views.relationToString(relation, i+1) +" </h4></div><div class=\"col-md-2\"><input type=\"text\" class=\"form-control input-lg\" id=\"pk"+str(i)+"\" name=\"pk"+str(i)+"\"></div></div><br/>"
+	html = html + """<input type="hidden" value="
 """+relationString+"""" name="relation"></input>
 		<input type="hidden" value="
 """+fdsString+"""" name="fds"></input>
