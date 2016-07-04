@@ -677,8 +677,8 @@ dictionaryReplToName = {}
 dictionaryNameToRepl = {}
 
 def resetDictionaries():
-	dictionaryReplToName = {}
-	dictionaryNameToRepl = {}
+	dictionaryReplToName.clear()
+	dictionaryNameToRepl.clear()
 
 #returns whether long attribute names are used or not
 def longAttributeNamesUsed():

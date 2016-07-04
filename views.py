@@ -230,7 +230,7 @@ def wrapInPanel(heading, content, numberOfColumns, panelType="primary"):
 def getErrorMessageBox(message):
 		return """<div class="row"><div class="col-md-12"><div class="alert alert-danger" role="alert"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="exclamation"></span><span class="sr-only">Error:</span> """+message+"""</div></div></div>"""
 def getSuccessMessageBox(message):
-		return """<div class="row"><div class="col-md-12"><div class="alert alert-success" role="alert"><span class="glyphicon glyphicon-thumbs-up" aria-hidden="thumbsup"></span>"""+message+"""</div></div></div>"""
+		return """<div class="row"><div class="col-md-12"><div class="alert alert-success" role="alert"><span class="glyphicon glyphicon-thumbs-up" aria-hidden="thumbsup"></span> """+message+"""</div></div></div>"""
 	
 
 def getPanelHeading(id, expanded=False, info=""):

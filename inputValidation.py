@@ -9,11 +9,12 @@ EMPTY_SET = "$"
 
 def validateCandidateKeys(relation, fds, inputKeysString):
 	keys = DBnormalizer.getKeys(relation, fds)
-	inputKeysArray = inputKeysString.split("\n")
+	inputKeysArray = inputKeysString.split()
 	inputKeys = set("")
-	
 	for k in inputKeysArray:
-		inputKeys.add(frozenset(k.replace(" ", ""))|frozenset(EMPTY_SET))
+		inputKeys.add(frozenset(k)|frozenset(EMPTY_SET))
+	if not inputKeys:
+		inputKeys.add(frozenset(EMPTY_SET))
 	isCorrect = True
 	for k in keys:
 		if k not in inputKeys:

@@ -5,10 +5,33 @@ import DBnormalizer
 import random
 import views
 EMPTY_SET_HTML="&empty;"
+EMPTY_SET = "$"
 
 
-
-
+def formQuizStart(relation, fds, mvds):
+	inputString ="<div class=\"well\">Du hast folgendes eingegeben:</div>"
+	if DBnormalizer.longAttributeNamesUsed():
+		inputString = inputString = inputString + views.inputToString(relation, fds,mvds, "default")
+		inputString = inputString + "<div class=\"well\">Dass du gleich nicht so viel tippen musst, machen wir daraus mal das hier:</div>"
+	DBnormalizer.resetDictionaries()
+	inputString = inputString +  views.inputToString(relation, fds,mvds, "default")
+	relationString = views.setOfAttributesToString(relation)
+	fdsString = views.fdsToString(fds)+views.mvdsToString(mvds)
+	html = """<form class="form" action="quiz.py" method="POST">"""
+	html = html + "<p>Willkommen beim Quiz.</p>" 
+	html = html + """<input type="hidden" value="
+"""+relationString+"""" name="relation"></input>
+		<input type="hidden" value="
+"""+fdsString+"""" name="fds"></input>
+		<div class="row">
+		<div class="col-xs-2 pull-right">
+		<br/>
+		<button id="step" name="step" type="submit" class="btn btn-primary" value="1">Weiter</button>
+		</div>
+		</div>
+		</form>
+	"""
+	return  views.getJumbotron("Hallo.", html ) + inputString
 
 def candidateKeys(relationString, fdsString):
 	html = """<form class="form" action="quiz.py" method="POST">
@@ -141,7 +164,7 @@ def canonicalCoverCollapse(relationString, fdsString, fds):
 	html = """<form class="form" action="quiz.py" method="POST">
 		<div class="row">
 		<div class="col-sm-12">
-		<textarea class="form-control input-lg" name="finalfds" id="finalfds" rows="5">"""+views.fdsToString(fds)+"""</textarea>
+		<textarea class="form-control input-lg" name="finalfds" id="finalfds" rows="5">"""+views.fdsToString(fds).replace(EMPTY_SET, "")+"""</textarea>
 		</div>
 		</div>
 		<input type="hidden" value="

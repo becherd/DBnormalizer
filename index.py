@@ -3,6 +3,7 @@ import cgi
 import cgitb; cgitb.enable()
 import views
 import DBnormalizer
+import quizForms
 form = cgi.FieldStorage()
 
 
@@ -18,6 +19,19 @@ def printResults(string):
 		numberOfAttributes = x[3]
 		result = DBnormalizer.computeEverything(relation, fds, mvds)
 		return views.resultToString(relation, x[1], x[2], result) 
+
+
+def printQuizStart(string):
+	x = DBnormalizer.parseInput(string)
+	if len(x)<3:
+		return x[0]
+	else:
+		relation = x[0]
+		fds = x[1][:]
+		mvds = x[2][:]
+		return quizForms.formQuizStart(relation, fds, mvds)
+
+
 	
 print """
 	<html>
@@ -29,6 +43,8 @@ print """
 			<script src="http://home.in.tum.de/~becher/static/js/bootstrap.min.js"></script>
 		</head>"""
 
+
+
 def html(relation, fds, numberOfAttributes, funMode):
 	attributesOptions = views.numberOfAttributesOptions(numberOfAttributes)
 	if funMode==1:
@@ -39,8 +55,46 @@ def html(relation, fds, numberOfAttributes, funMode):
 	else:
 		funModeURL=""
 		funModeAlert=""
-	return  """
-	<body>
+	return  htmlstart(funModeAlert) + """
+		<form id="inputform" class="form" action="index.py"""+funModeURL+"""" method="POST"> 
+				<div class="form-group">
+					<h4>Relation eingeben</h4>
+					<input type="text" class="form-control" name="relation" value="
+""" + relation+ """"></input>
+					<h4>FDs/MVDs eingeben</h4>
+					<textarea type="text" class="form-control" rows="6" name="fds">
+"""+ fds + """
+</textarea>
+					<input type="hidden" value="
+"""+str(funMode)+"""" name="fun"></input>
+					<input type="hidden" value="
+"""+str(numberOfAttributes)+"""
+" name="numberOfAttributes"></input>
+					<input type="hidden" value="1" name="step"></input>
+				</div>
+				<div class="form-group">
+						<button id="submitbutton" name="mode" type="submit" class="btn btn-default" value="showResults">Absenden</button>
+						<button id="quizButton" name="mode" type="submit" class="btn btn-primary" value="quiz">Quiz</button>
+				</div>			
+		</form>
+		<form class="form-inline" action="index.py"""+funModeURL+"""" method="POST">
+				<div class="form-group">
+				<h4>Neues Schema generieren</h4>
+				Generiere neues Schema mit
+				<select class="form-control input-sm" name="numberOfAttributes">
+"""+attributesOptions+"""
+</select> <input type="hidden" value="
+"""+str(funMode)+"""" name="fun"></input>Attributen
+			<button id="mode" name="mode" type="submit" class="btn btn-default btn-sm" value="generateFds">nur mit FDs</button>
+			<button id="mode" name="mode"  type="submit" class="btn btn-default btn-sm" value="generateMvds">auch mit MVDs</button>	
+		</div>
+                </form>
+		</div>
+		<br/>"""
+
+
+def htmlstart(funModeAlert = ""):
+	return """<body>
 	<div class="panel panel-default">
   	<div class="panel-body">
 		<div class="row">
@@ -61,49 +115,8 @@ def html(relation, fds, numberOfAttributes, funMode):
 			</div>
 		</div>
 		<br/>
-		<form id="inputform" class="form" action="index.py"""+funModeURL+"""" method="POST"> 
-				<div class="form-group">
-					<h4>Relation eingeben</h4>
-					<input type="text" class="form-control" name="relation" value="
-""" + relation+ """"></input>
-					<h4>FDs/MVDs eingeben</h4>
-					<textarea type="text" class="form-control" rows="6" name="fds">
-"""+ fds + """
-</textarea>
-					<input type="hidden" value="showResults" name="mode"></input>
-					<input type="hidden" value="
-"""+str(funMode)+"""" name="fun"></input>
-					<input type="hidden" value="
-"""+str(numberOfAttributes)+"""
-" name="numberOfAttributes"></input>
-					<input type="hidden" value="1" name="step"></input>
-				</div>
-				<div class="form-group">
-						<button id="submitbutton" type="submit" class="btn btn-default" value="send">Absenden</button>
-						<button id="quizButton" class="btn btn-primary">Quiz</button>
-				</div>			
-				<script>
-					$('#quizButton').on('click', function(){
-						var form = document.getElementById('inputform');
-						form.action="quiz.py";
-						form.submit();
-					});
-				</script>
-		</form>
-		<form class="form-inline" action="index.py"""+funModeURL+"""" method="POST">
-				<div class="form-group">
-				<h4>Neues Schema generieren</h4>
-				Generiere neues Schema mit
-				<select class="form-control input-sm" name="numberOfAttributes">
-"""+attributesOptions+"""
-</select> <input type="hidden" value="
-"""+str(funMode)+"""" name="fun"></input>Attributen
-			<button id="mode" name="mode" type="submit" class="btn btn-default btn-sm" value="generateFds">nur mit FDs</button>
-			<button id="mode" name="mode"  type="submit" class="btn btn-default btn-sm" value="generateMvds">auch mit MVDs</button>	
-		</div>
-                </form>
-		</div>
-		<br/>"""
+"""
+
 
 htmlend="""
 	</div>
@@ -158,8 +171,6 @@ htmlend="""
 
 
 
-
-
 try:
 	mode = form['mode'].value
 	numberOfAttributes = form['numberOfAttributes'].value
@@ -174,15 +185,22 @@ try:
 		 relation, fds, mvds = DBnormalizer.generateNewProblem(numberOfAttributes, True, funMode)
 		 print html(views.setOfAttributesToString(relation), views.fdsToString(fds)+views.mvdsToString(mvds), numberOfAttributes, funMode)+views.getAlgorithmTutorial()+htmlend
 	else:
-		#Mode is showResults
+		#Mode is showResults or Quiz
 		relation = str(form['relation'].value)
-        	fds = str(form['fds'].value)
+		fds = str(form['fds'].value)
 		input = "["+relation+"]["+fds+"]["+str(int(numberOfAttributes))+"]"
-		print html(relation, fds, numberOfAttributes, funMode) + printResults(input) + htmlend
+		if mode=='quiz':
+			x = DBnormalizer.parseInput(input)
+			if len(x)<3:
+				print html(relation, fds, numberOfAttributes, funMode) +  printResults(input) + htmlend
+			else:
+				print htmlstart() + printQuizStart(input)+ htmlend
+		else:
+			print html(relation, fds, numberOfAttributes, funMode) + printResults(input) + htmlend
 except KeyError:
 	try:
 		funMode=int(form['fun'].value)
 	except:
 		funMode=0
-    	relation, fds, mvds = DBnormalizer.generateNewProblem(5, False, funMode)
-    	print html(views.setOfAttributesToString(relation), views.fdsToString(fds)+views.mvdsToString(mvds), 5, funMode)+ views.getAlgorithmTutorial() +htmlend
+	relation, fds, mvds = DBnormalizer.generateNewProblem(5, False, funMode)
+	print html(views.setOfAttributesToString(relation), views.fdsToString(fds)+views.mvdsToString(mvds), 5, funMode)+ views.getAlgorithmTutorial() +htmlend

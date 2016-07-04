@@ -78,14 +78,13 @@ try:
 	alert = ""
 	inputpanel = views.inputToString(relation, fds,mvds, "default")
 	quizform = ""
-
 	if (step=='1'):
 		#candidate keys
 		quizform = quizForms.candidateKeys(relationString, fdsString) + htmlend()
 	if (step=='2'):
 		#validate candidate keys
 		try:
-			inputCandidateKeys= str(form['candidatekeys'].value).replace("\r", "")
+			inputCandidateKeys= str(form['candidatekeys'].value).replace(" ", "")
 		except KeyError:
 			inputCandidateKeys = ""
 		if inputValidation.validateCandidateKeys(relation, fds, inputCandidateKeys):
