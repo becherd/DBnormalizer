@@ -316,22 +316,43 @@ def getKeysAndFDsOfRelations(relations, fds):
 	return keysAndFDsOfRelations
 
 
-def getFirstNonBCNFfd(relation, fds):
+
+def getAllNonBCNFfds(relation, fds):
 	keys = getKeys(relation, fds)
+	nonBCNFfds = []
 	for fd in fds:
 		if not isTrivial(fd) and not isSuperKey(fd[0], keys):
 			#just return the non-trivial part of this fd
-			return (fd[0], (fd[1]-fd[0])|set(EMPTY_SET))
-	return ()
+			nonBCNFfds.append((fd[0], (fd[1]-fd[0])|set(EMPTY_SET)))
+	return nonBCNFfds
+
+
+def getFirstNonBCNFfd(relation, fds):
+	nonBCNFfds = getAllNonBCNFfds(relation, fds)
+	if nonBCNFfds:
+		return nonBCNFfds[0]
+	else:
+		return ()
+
+
+def getAllNon4NFmvds(relation, fds, mvds):
+	keys = getKeys(relation, fds)
+	non4NFmvds = []
+	for mvd in mvds:
+		if not isTrivial4NF(mvd, relation) and not isSuperKey(mvd[0], keys):
+			#just return the non-trivial part of this mvd
+			non4NFmvds.append((mvd[0], (mvd[1]-mvd[0])|set(EMPTY_SET)))
+	return non4NFmvds
+
 	
 	
 def getFirstNon4NFmvd(relation, fds, mvds):
 	keys = getKeys(relation, fds)
-	for mvd in mvds:
-		if not isTrivial4NF(mvd, relation) and not isSuperKey(mvd[0], keys):
-			#just return the non-trivial part of this mvd
-			return (mvd[0], (mvd[1]-mvd[0])|set(EMPTY_SET))
-	return ()
+	non4NFmvds = getAllNon4NFmvds(relation, fds, mvds)
+	if non4NFmvds:
+		return non4NFmvds[0]
+	else:
+		return ()
 	
 	
 def fdsInRelation(fds, relation):
@@ -373,6 +394,10 @@ def getFirstNon4NFRelation(relations, fds, mvds):
 			return (i,r)
 	return (-1,None)
 
+def splitRelationAtFdMvd(relation, fdmvd):
+	r1 = fdmvd[0]|fdmvd[1]
+	r2 = (relation - fdmvd[1]) | set(EMPTY_SET)
+	return (r1,r2)
 
 
 def decompositionAlgorithm(targetNf, fds, relation, mvds=[]):
@@ -437,8 +462,7 @@ def decompositionAlgorithm(targetNf, fds, relation, mvds=[]):
 				currentfdString = views.mvdToHtmlString(currentfd)
 
 		if not targetNfReached:
-			r1 = currentfd[0]|currentfd[1]
-			r2 = (r - currentfd[1]) | set(EMPTY_SET)
+			r1, r2 = splitRelationAtFdMvd(r, currentfd)
 
 			fdsInR1 = fdsInRelation(fds, r1)
 			fdsInR2 = fdsInRelation(fds, r2)

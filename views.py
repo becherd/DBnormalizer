@@ -56,7 +56,11 @@ def underlineString(string, underline):
 	else:
 		return string
 
-	
+
+def stringToRelation(relationString):
+	relationString = relationString.replace("\n", "").replace("\r", "").replace(" ", "")
+	return set(relationString) | set(EMPTY_SET)
+
 def relationToString(relation, i, candidateKeys = None, fds = [], mvds = [], additionalFds = [], primaryKey=None):
 	if candidateKeys is not None:
 		if mvds:

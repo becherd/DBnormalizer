@@ -170,10 +170,12 @@ htmlend="""
 """
 
 
-
+try:
+	numberOfAttributes = form['numberOfAttributes'].value
+except KeyError:
+	numberOfAttributes = 5
 try:
 	mode = form['mode'].value
-	numberOfAttributes = form['numberOfAttributes'].value
 	try:
 		funMode=int(form['fun'].value)
 	except:
@@ -202,5 +204,5 @@ except KeyError:
 		funMode=int(form['fun'].value)
 	except:
 		funMode=0
-	relation, fds, mvds = DBnormalizer.generateNewProblem(5, False, funMode)
+	relation, fds, mvds = DBnormalizer.generateNewProblem(numberOfAttributes, False, funMode)
 	print html(views.setOfAttributesToString(relation), views.fdsToString(fds)+views.mvdsToString(mvds), 5, funMode)+ views.getAlgorithmTutorial() +htmlend

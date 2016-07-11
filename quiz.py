@@ -5,6 +5,7 @@ import views
 import DBnormalizer
 import quizForms
 import inputValidation
+import re
 form = cgi.FieldStorage()
 
 
@@ -71,9 +72,9 @@ def htmlend():
 try:
 	relationString = str(form['relation'].value).replace(" ", "").replace("\n", "").replace("\r", "")
 	relation = set(relationString)|set(EMPTY_SET)
-	fdsString = str(form['fds'].value)
+	fdsString = re.sub("(\r\n)*", "", str(form['fds'].value), 1)
 	fds,mvds = DBnormalizer.parseInputFDsMVDs(fdsString)
-	step = str(form['step'].value)
+	step = str(form['step'].value).replace(" ", "").replace("\n", "").replace("\r", "")
 	candidatekeys = DBnormalizer.getKeys(relation, fds)
 	alert = ""
 	inputpanel = views.inputToString(relation, fds,mvds, "default")
@@ -223,7 +224,7 @@ try:
 		newrelations = inputValidation.validateRemoveRelations(relations, removeindices)
 		if newrelations:
 			alert =  views.getSuccessMessageBox("Richtig!")
-			quizform = quizForms.choosePrimaryKeys(relationString, fdsString, currentfds, newrelations, keyrelationstring)
+			quizform = quizForms.choosePrimaryKeys(relationString, fdsString, currentfds, newrelations)
 		else:
 			alert =  views.getErrorMessageBox("Leider falsch!")
 			quizform = quizForms.removeRedundantRelations(relationString, fdsString, currentfds, relations, keyrelationstring)
@@ -232,12 +233,11 @@ try:
 		currentfds, currentmvds = DBnormalizer.parseInputFDsMVDs(str(form['currentfds'].value))
 		#validate relation primary keys
 		primarykeys = []
-		relations = DBnormalizer.generateNewRelations(currentfds)
+		relations = []
 		try:
-			keyrelationstring = str(form['keyrelation'].value).replace("\r", "").replace("\n", "")
-			if keyrelationstring != "":
-				keyrelation = set(keyrelationstring)|set(EMPTY_SET)
-				relations.append(keyrelation)
+			currentrelationsStrings = str(form['currentrelations'].value).split(",")
+			for r in currentrelationsStrings:
+				relations.append(views.stringToRelation(r))
 		except KeyError:
 			print "ke"
 		relations = DBnormalizer.removeRedundantSchemas(relations[:])
@@ -251,13 +251,88 @@ try:
 			alert =  views.getSuccessMessageBox("Richtig!")
 			keysAndFDs = DBnormalizer.getKeysAndFDsOfRelations(relations, currentfds)
 			quizform = quizForms.formResultSyntheseAlgorithm(relationString, fdsString, currentfds, relations, keysAndFDs, primarykeys)
-			inputpanel = views.inputToString(relation, currentfds, mvds, "default", candidatekeys)
 		else:
 			alert =  views.getErrorMessageBox("Leider falsch!")
-			quizform = quizForms.choosePrimaryKeys(relationString, fdsString, currentfds, relations, keyrelationstring)
-			inputpanel = views.inputToString(relation, currentfds, mvds, "default", candidatekeys)
-
-
+			quizform = quizForms.choosePrimaryKeys(relationString, fdsString, currentfds, relations)
+		inputpanel = views.inputToString(relation, currentfds, mvds, "default", candidatekeys)
+	if (step=='9'):
+		try:
+			targetnf = str(form['targetnf'].value).replace(" ", "").replace("\r", "").replace("\n", "")
+		except KeyError:
+			targetnf = "BCNF"
+		try:
+			splitrelationIndex = int(form['splitrelation'].value)
+			relationnumbers = str(form['relationnumbers'].value).split(",")
+			currentrelationsStrings = str(form['currentrelations'].value).split(",")
+			currentrelations = []
+			for r in currentrelationsStrings:
+				currentrelations.append(views.stringToRelation(r))
+			if splitrelationIndex == -1:
+				if inputValidation.validateDecompositionEnd(currentrelations, fds, mvds, targetnf):
+					alert =  views.getSuccessMessageBox("Richtig!")
+					quizform =  quizForms.choosePrimaryKeys(relationString, fdsString, fds, currentrelations, targetnf, relationnumbers)
+				else:
+					alert =  views.getErrorMessageBox("Leider falsch!")
+					quizform =  quizForms.decompositionAlgorithm(relationString, fdsString, currentrelations, relationnumbers, targetnf)
+			else:
+				try:
+					newfirstrelation = views.stringToRelation(str(form['first'+str(splitrelationIndex)].value))
+					newsecondrelation = views.stringToRelation(str(form['second'+str(splitrelationIndex)].value))
+					splitrelation = currentrelations[splitrelationIndex]
+					if inputValidation.validateDecompositionSplit(fds, mvds, splitrelation, newfirstrelation, newsecondrelation, targetnf):
+						splitrelationnumber = relationnumbers[splitrelationIndex].strip()
+						del(currentrelations[splitrelationIndex])
+						del(relationnumbers[splitrelationIndex])
+						currentrelations.append(newfirstrelation)
+						currentrelations.append(newsecondrelation)
+						relationnumbers.append(splitrelationnumber+"1")
+						relationnumbers.append(splitrelationnumber+"2")
+						alert =  views.getSuccessMessageBox("Richtig!")
+						quizform =  quizForms.decompositionAlgorithm(relationString, fdsString, currentrelations, relationnumbers, targetnf)
+					else:
+						alert =  views.getErrorMessageBox("Leider falsch!")
+						quizform =  quizForms.decompositionAlgorithm(relationString, fdsString, currentrelations, relationnumbers, targetnf)
+				except KeyError:
+					alert =  views.getErrorMessageBox("Du musst neue Relationen eingeben!")
+					quizform =  quizForms.decompositionAlgorithm(relationString, fdsString, currentrelations, relationnumbers, targetnf)
+		except KeyError:
+			#init
+			relations = [set(relationString)|set(EMPTY_SET)]
+			relationnumbers = ['']
+			quizform =  quizForms.decompositionAlgorithm(relationString, fdsString, relations, relationnumbers, targetnf)
+		inputpanel = views.inputToString(relation, fds,mvds, "default", candidatekeys)
+	if (step=='10'):
+		try:
+			targetnf = str(form['targetnf'].value).replace(" ", "").replace("\r", "").replace("\n", "")
+		except KeyError:
+			targetnf = "BCNF"
+		#validate relation primary keys
+		primarykeys = []
+		relations = []
+		try:
+			currentrelationsStrings = str(form['currentrelations'].value).split(",")
+			relationnumbers = str(form['relationnumbers'].value).replace(" ", "").split(",")
+			for r in currentrelationsStrings:
+				relations.append(views.stringToRelation(r))
+		except KeyError:
+			print "ke"
+		for i in range(len(relations)):
+			try:
+				primarykey = set(str(form['pk'+str(i)].value))|set(EMPTY_SET)
+			except KeyError:
+				primarykey = set(EMPTY_SET)
+			primarykeys.append(primarykey)
+		if inputValidation.validatePrimaryKeys(relations, fds, primarykeys):
+			alert =  views.getSuccessMessageBox("Richtig!")
+			keysAndFDs = DBnormalizer.getKeysAndFDsOfRelations(relations, fds)
+			quizform = quizForms.formResultDecompositionAlgorithm(relationString, fdsString, relations, relationnumbers, keysAndFDs, primarykeys, targetnf)
+		else:
+			alert =  views.getErrorMessageBox("Leider falsch!")
+			quizform = quizForms.choosePrimaryKeys(relationString, fdsString, fds, relations, targetnf, relationnumbers)
+		inputpanel = views.inputToString(relation, fds, mvds, "default", candidatekeys)
+	if (step=='11'):
+		quizform = quizForms.quizFinal(relationString, fdsString)
+		inputpanel = ""
 	print alert
 	print inputpanel
 	print quizform

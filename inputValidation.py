@@ -109,12 +109,12 @@ def validateAddKeyRelation(originrelation, fds, relations, keyrelationstring):
 
 def validateRemoveRelations(relations, removeindices):
 	redundantindices=[]
-
 	newrelations = DBnormalizer.removeRedundantSchemas(relations)
+	newrelationsuser = []
 	for i, relation in enumerate(relations):
-		if relation not in newrelations:
-			redundantindices.append(str(i))
-	if set(removeindices[:]) == set(redundantindices[:]):
+		if str(i) not in removeindices:
+			newrelationsuser.append(relation)
+	if sorted(newrelations[:]) == sorted(newrelationsuser[:]):
 		return newrelations
 	else:
 		return []
@@ -126,6 +126,45 @@ def validatePrimaryKeys(relations, fds, primarykeys):
 		if pk not in keysAndFds[i]['keys']:
 			valid=False
 	return valid
+
+
+def validateDecompositionEnd(relations, fds, mvds, targetnf):
+	if targetnf == "BCNF":
+		i,r = DBnormalizer.getFirstNonBCNFRelation(relations, fds)
+	else:
+		i,r = DBnormalizer.getFirstNon4NFRelation(relations, fds, mvds)
+	if i==-1:
+		return True
+	else:
+		return False
+
+
+def validateDecompositionSplit(fds, mvds, splitrelation, newfirstrelation, newsecondrelation, targetnf):
+	fdsInR = DBnormalizer.fdsInRelation(fds, splitrelation)
+	mvdsInR = DBnormalizer.mvdsInRelation(mvds, splitrelation)
+	normalforms = DBnormalizer.getNormalForms(splitrelation, fdsInR, mvdsInR)
+	if targetnf == "BCNF":
+		i=3
+	else:
+		i=4
+	if not normalforms[i]:
+		#splitrelation not in BCNF/4NF, user is correct so far
+		return validateDecompositionSplitNewRelations(fdsInR, mvdsInR, splitrelation, newfirstrelation, newsecondrelation, targetnf)
+	else:
+		#splitrelation already in BCNF/4NF, user is wrong, relation must not be splitted
+		return False
+
+
+def validateDecompositionSplitNewRelations(fdsInR, mvdsInR, splitrelation, newfirstrelation, newsecondrelation, targetnf):
+	possibleSplitFdsMvds = DBnormalizer.getAllNonBCNFfds(splitrelation, fdsInR)
+	if targetnf == "4NF":
+		possibleSplitFdsMvds.extend(DBnormalizer.getAllNon4NFmvds(splitrelation, fdsInR, mvdsInR))
+	for fdmvd in possibleSplitFdsMvds:
+		r1,r2 = DBnormalizer.splitRelationAtFdMvd(splitrelation, fdmvd)
+		if r1 == newfirstrelation and r2 == newsecondrelation:
+			return True
+	return False
+
 
 
 

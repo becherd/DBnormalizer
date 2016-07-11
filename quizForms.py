@@ -52,7 +52,7 @@ def candidateKeys(relationString, fdsString):
 		</div>
 		</form>
 	"""
-	return views.getJumbotron("Kandidatenschlüssel.", "<p>Gib ALLE Kandidatenschlüssel an. Schreibe dazu alle Attribute eines Schlüssels in das Textfeld und verwende für jeden Schlüssel eine neue Zeile.</p><p>" + html +"</p>")
+	return views.getJumbotron("Kandidatenschlüssel.", "<p>Gib <b>alle</b> Kandidatenschlüssel an. Schreibe dazu alle Attribute eines Schlüssels in das Textfeld und verwende für jeden Schlüssel eine neue Zeile.</p><p>" + html +"</p>")
 
 
 
@@ -111,7 +111,6 @@ def canonicalCoverRightReduction(relationString, fdsString, fds):
 	html = """<form class="form" action="quiz.py" method="POST">	
 """
 	for i, fd in enumerate(fds):
-		#html = html + "<h4 style=\"display:inline;\">" + views.setOfAttributesToString(fd[0]) +" -> </h4><input type=\"text\" class=\"form-control input-lg\" id=\"fd"+str(i)+"\" name=\"fd"+str(i)+"\" value=\""+views.setOfAttributesToString(fd[1])+"\"><br/>"
 		html = html + "<div class=\"row\"><div class=\"col-md-2\"><input type=\"text\" class=\"form-control input-lg\" value=\""+views.setOfAttributesToString(fd[0])+"\" disabled=\"disabled\" style=\"text-align:right;\"></div><div class=\"col-md-1 text-center\" style=\"max-width:80px;\"><br/><h2 style=\"display:inline;\"><sub>-></sub></h2></div><div class=\"col-md-2\"><input type=\"text\" class=\"form-control input-lg\" id=\"fd"+str(i)+"\" name=\"fd"+str(i)+"\" value=\""+views.setOfAttributesToString(fd[1])+"\"></div></div><br/>"
 	html = html + """<input type="hidden" value="
 """+relationString+"""" name="relation"></input>
@@ -268,11 +267,27 @@ def removeRedundantRelations(relationString, fdsString, fds, relations, keyrelat
 
 
 
-def choosePrimaryKeys(relationString, fdsString, fds, relations, keyrelation):
+def choosePrimaryKeys(relationString, fdsString, fds, relations, targetnf = "3NF", relationnumbers=[]):
 	html = """<form class="form" action="quiz.py" method="POST">
 """
+	currentRelations = []
 	for i, relation in enumerate(relations):
-		html = html + "<div class=\"row\"><div class=\"col-md-1\"><br/><h4 style=\"display:inline;\">" + views.relationToString(relation, i+1) +" </h4></div><div class=\"col-md-2\"><input type=\"text\" class=\"form-control input-lg\" id=\"pk"+str(i)+"\" name=\"pk"+str(i)+"\"></div></div><br/>"
+		currentRelations.append(views.setOfAttributesToString(relation))
+		if relationnumbers:
+			relationnumber = relationnumbers[i]
+		else:
+			relationnumber = i+1
+		if targetnf == "3NF":
+			algorithm = "Synthesealgorithmus"
+			nextstep = "8"
+		elif targetnf == "BCNF":
+			algorithm = "Dekompositionsalgorithmus für BCNF"
+			nextstep = "10"
+		else:
+			algorithm = "Dekompositionsalgorithmus für 4NF"
+			nextstep = "10"
+		html = html + "<div class=\"row\"><div class=\"col-md-1\"><br/><h4 style=\"display:inline;\">" + views.relationToString(relation, relationnumber) +" </h4></div><div class=\"col-md-2\"><input type=\"text\" class=\"form-control input-lg\" id=\"pk"+str(i)+"\" name=\"pk"+str(i)+"\"></div></div><br/>"
+	currentRelationsString = ",".join(currentRelations)
 	html = html + """<input type="hidden" value="
 """+relationString+"""" name="relation"></input>
 		<input type="hidden" value="
@@ -280,16 +295,21 @@ def choosePrimaryKeys(relationString, fdsString, fds, relations, keyrelation):
 		<input type="hidden" value="
 """+views.fdsToString(fds)+"""" name="currentfds"></input>
 		<input type="hidden" value="
-"""+keyrelation+"""" name="keyrelation"></input>
+"""+currentRelationsString+"""" name="currentrelations"></input>
+		<input type="hidden" value="
+"""+",".join(relationnumbers)+"""" name="relationnumbers"></input>
+		<input type="hidden" value="
+"""+str(targetnf)+"""" name="targetnf"></input>
 		<div class="row">
 		<div class="col-xs-2 pull-right">
 		<br/>
-		<button id="step" name="step" type="submit" class="btn btn-primary" value="8">Weiter</button>
+		<button id="step" name="step" type="submit" class="btn btn-primary" value="
+"""+nextstep+"""">Weiter</button>
 		</div>
 		</div>
 		</form>
 	"""
-	return views.getJumbotron("Synthesealgorithmus. Primärschlüssel.", "<p>Gib für jede Relation <b>einen</b> möglichen Primärschlüssel an.</p><p>" + html +"</p>")
+	return views.getJumbotron(algorithm+". Primärschlüssel.", "<p>Gib für jede Relation <b>einen</b> möglichen Primärschlüssel an.</p><p>" + html +"</p>")
 
 
 def formResultSyntheseAlgorithm(relationString, fdsString, fds, relations, keysAndFDs, primarykeys):
@@ -312,3 +332,96 @@ def formResultSyntheseAlgorithm(relationString, fdsString, fds, relations, keysA
 		</form>
 	"""
 	return views.getJumbotron("Glückwunsch.", "<p>Du hast die ursprüngliche Relation in die 3NF überführt.</p><p>" + html +"</p>")
+
+
+
+
+
+def decompositionAlgorithm(relationString, fdsString, relations, relationnumbers, targetnf = "BCNF"):
+	currentRelations = []
+	html = """<form class="form" action="quiz.py" method="POST">
+		<div class="row">
+		<div class="col-sm-12">
+"""
+	for i, r in enumerate(relations):
+		currentRelations.append(views.setOfAttributesToString(r))
+		html = html + "<div class=\"radio\"><label><h4 style=\"display:inline;\"><input type=\"radio\" name=\"splitrelation\" value=\""+str(i)+"\">"+views.relationToString(r, relationnumbers[i])+"</h4></label></div>"
+		html = html + "<div class=\"row\"><div class=\"col-md-1\" style=\"text-align:right;\"><br/><h4 style=\"display:inline;\">R<sub>"+ relationnumbers[i].strip() +"1:=</sub></h4></div><div class=\"col-md-2\"><input type=\"text\" class=\"form-control input-lg\" id=\"first"+str(i)+"\" name=\"first"+str(i)+"\" disabled=\"disabled\"></div><div class=\"col-md-1\" style=\"text-align:right;\"><br/><h4 style=\"display:inline;\">R<sub>"+ relationnumbers[i].strip() +"2:=</sub></h4></div><div class=\"col-md-2\"><input type=\"text\" class=\"form-control input-lg\" id=\"second"+str(i)+"\" name=\"second"+str(i)+"\" disabled=\"disabled\"></div></div><br/>"
+	html = html + "<div class=\"radio\"><label><h4 style=\"display:inline;\"><input type=\"radio\" name=\"splitrelation\" value=\"-1\">keine</h4></label></div>"
+	html = html + """<script>
+			$('[name="splitrelation"]').on('change', function(){
+				if($(this).prop('checked')){
+					$('[id^="first"]').prop('disabled', true);
+					$('[id^="second"]').prop('disabled', true);
+					$('#first'+$(this).val()).prop('disabled', false);
+					$('#second'+$(this).val()).prop('disabled', false);				
+				}
+			}).change();
+		</script>"""
+	currentRelationsString = ",".join(currentRelations)
+	html = html + """</div>
+		</div><input type="hidden" value="
+"""+relationString+"""" name="relation"></input>
+		<input type="hidden" value="
+"""+fdsString+"""" name="fds"></input>
+		<input type="hidden" value="
+"""+currentRelationsString+"""" name="currentrelations"></input>
+		<input type="hidden" value="
+"""+",".join(relationnumbers)+"""" name="relationnumbers"></input>
+		<input type="hidden" value="
+"""+str(targetnf)+"""" name="targetnf"></input>
+		<div class="row">
+		<div class="col-xs-2 pull-right">
+		<br/>
+		<button id="step" name="step" type="submit" class="btn btn-primary" value="9">Weiter</button>
+		</div>
+		</div>
+		</form>
+	"""
+	return views.getJumbotron("Dekompositionsalgorithmus. "+targetnf+".", "<p>Gib an, ob Relationen aufgespalten werden müssen und welche Relationen entstehen.</p><p>" + html +"</p>")
+
+
+
+
+def formResultDecompositionAlgorithm(relationString, fdsString, relations, relationnumbers, keysAndFDs, primarykeys, targetnf = "BCNF"):
+	if targetnf == "BCNF":
+		#decomposition algorithm 4NF
+		nextstep = "9"
+	else:
+		#end of quiz
+		nextstep = "11"
+	html = """<form class="form" action="quiz.py" method="POST">
+		"""
+	html = html + "<p>Folgende Relationen sind entstanden:</p>"
+	html = html + "<h4 style=\"display:inline;\">"+views.schemaToString(relations, keysAndFDs, primarykeys)+"</h4>"
+	html = html + """<input type="hidden" value="
+"""+relationString+"""" name="relation"></input>
+		<input type="hidden" value="
+"""+fdsString+"""" name="fds"></input>
+		<input type="hidden" value="4NF" name="targetnf"></input>
+		<div class="row">
+		<div class="col-xs-2 pull-right">
+		<br/>
+		<button id="step" name="step" type="submit" class="btn btn-primary" value="
+"""+nextstep+"""">Weiter</button>
+		</div>
+		</div>
+		</form>
+	"""
+	return views.getJumbotron("Glückwunsch.", "<p>Du hast die ursprüngliche Relation in die "+targetnf+" überführt.</p><p>" + html +"</p>")
+
+
+
+
+def quizFinal(relationString, fdsString):
+	html = """<form class="form" action="index.py" method="POST">"""
+	html = html + "<input type=\"hidden\" value=\""+relationString+"\" name=\"relation\"></input>"
+	html = html + "<input type=\"hidden\" value=\""+fdsString+"\" name=\"fds\"></input>"
+	html = html + """<div class="row">
+		<div class="col-xs-3 pull-right">
+		<br/>
+		<a href="index.py" class=\"btn btn-default" role="button">Neu</a>
+		<button id="submitbutton" name="mode" type="submit" class="btn btn-primary" value="showResults">Ergebnis anzeigen</button>
+		</div>
+		</div></form>"""
+	return views.getJumbotron("Glückwunsch.", "<p>Du hast das Quiz geschafft.</p><p>" + html +"</p>")
