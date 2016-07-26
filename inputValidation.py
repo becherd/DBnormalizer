@@ -120,7 +120,7 @@ def validateRemoveRelations(relations, removeindices):
 		return []
 
 def validatePrimaryKeys(relations, fds, primarykeys):
-	keysAndFds = DBnormalizer.getKeysAndFDsOfRelations(relations, fds)
+	keysAndFds = DBnormalizer.getKeysAndFDsMVDsOfRelations(relations, fds)
 	valid = True
 	for i, pk in enumerate(primarykeys):
 		if pk not in keysAndFds[i]['keys']:

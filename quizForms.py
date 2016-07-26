@@ -8,6 +8,8 @@ EMPTY_SET_HTML="&empty;"
 EMPTY_SET = "$"
 
 
+
+
 def formQuizStart(relation, fds, mvds):
 	inputString ="<div class=\"well\">Du hast folgendes eingegeben:</div>"
 	if DBnormalizer.longAttributeNamesUsed():
@@ -33,7 +35,7 @@ def formQuizStart(relation, fds, mvds):
 	"""
 	return  views.getJumbotron("Hallo.", html ) + inputString
 
-def candidateKeys(relationString, fdsString):
+def candidateKeys(numberOfTries, numberOfSteps, relationString, fdsString):
 	html = """<form class="form" action="quiz.py" method="POST">
 		<div class="row">
 		<div class="col-sm-12">
@@ -44,6 +46,10 @@ def candidateKeys(relationString, fdsString):
 """+relationString+"""" name="relation"></input>
 		<input type="hidden" value="
 """+fdsString+"""" name="fds"></input>
+		<input type="hidden" value="
+"""+str(numberOfTries)+"""" name="numberOfTries"></input>
+		<input type="hidden" value="
+"""+str(numberOfSteps)+"""" name="numberOfSteps"></input>
 		<div class="row">
 		<div class="col-xs-2 pull-right">
 		<br/>
@@ -56,7 +62,7 @@ def candidateKeys(relationString, fdsString):
 
 
 
-def normalForm(relationString, fdsString):
+def normalForm(numberOfTries, numberOfSteps, relationString, fdsString):
 	html = """<form class="form" action="quiz.py" method="POST">
 		<div class="row">
 		<div class="col-sm-12">
@@ -74,6 +80,10 @@ def normalForm(relationString, fdsString):
 """+relationString+"""" name="relation"></input>
 		<input type="hidden" value="
 """+fdsString+"""" name="fds"></input>
+		<input type="hidden" value="
+"""+str(numberOfTries)+"""" name="numberOfTries"></input>
+		<input type="hidden" value="
+"""+str(numberOfSteps)+"""" name="numberOfSteps"></input>
 		<div class="row">
 		<div class="col-xs-2 pull-right">
 		<br/>
@@ -82,11 +92,11 @@ def normalForm(relationString, fdsString):
 		</div>
 		</form>
 	"""
-	return views.getJumbotron("Normalform.", "<p>Wähle die Normalform aus, in der sich die Relation befindet.</p><p>" + html +"</p>")
+	return views.getJumbotron("Normalform.", "<p>Wähle die höchste Normalform aus, in der sich die Relation befindet.</p><p>" + html +"</p>")
 
 
 
-def canonicalCoverLeftReduction(relationString, fdsString, fds):
+def canonicalCoverLeftReduction(numberOfTries, numberOfSteps, relationString, fdsString, fds):
 	html = """<form class="form" action="quiz.py" method="POST">
 """
 	for i, fd in enumerate(fds):
@@ -95,6 +105,10 @@ def canonicalCoverLeftReduction(relationString, fdsString, fds):
 """+relationString+"""" name="relation"></input>
 		<input type="hidden" value="
 """+fdsString+"""" name="fds"></input>
+		<input type="hidden" value="
+"""+str(numberOfTries)+"""" name="numberOfTries"></input>
+		<input type="hidden" value="
+"""+str(numberOfSteps)+"""" name="numberOfSteps"></input>
 		<div class="row">
 		<div class="col-xs-2 pull-right">
 		<br/>
@@ -107,7 +121,7 @@ def canonicalCoverLeftReduction(relationString, fdsString, fds):
 
 
 
-def canonicalCoverRightReduction(relationString, fdsString, fds):
+def canonicalCoverRightReduction(numberOfTries, numberOfSteps, relationString, fdsString, fds):
 	html = """<form class="form" action="quiz.py" method="POST">	
 """
 	for i, fd in enumerate(fds):
@@ -118,6 +132,10 @@ def canonicalCoverRightReduction(relationString, fdsString, fds):
 """+fdsString+"""" name="fds"></input>
 		<input type="hidden" value="
 """+views.fdsToString(fds)+"""" name="currentfds"></input>
+		<input type="hidden" value="
+"""+str(numberOfTries)+"""" name="numberOfTries"></input>
+		<input type="hidden" value="
+"""+str(numberOfSteps)+"""" name="numberOfSteps"></input>
 		<div class="row">
 		<div class="col-xs-2 pull-right">
 		<br/>
@@ -129,7 +147,7 @@ def canonicalCoverRightReduction(relationString, fdsString, fds):
 	return views.getJumbotron("Kanonische Überdeckung. Rechtsreduktion.", "<p>Gib die neuen rechten Seiten der FDs an.</p><p>" + html +"</p>")
 
 
-def canonicalCoverRemoveEmptyRight(relationString, fdsString, fds):
+def canonicalCoverRemoveEmptyRight(numberOfTries, numberOfSteps, relationString, fdsString, fds):
 	html = """<form class="form" action="quiz.py" method="POST">
 		<div class="row">
 		<div class="col-sm-12">
@@ -143,6 +161,10 @@ def canonicalCoverRemoveEmptyRight(relationString, fdsString, fds):
 """+fdsString+"""" name="fds"></input>
 		<input type="hidden" value="
 """+views.fdsToString(fds)+"""" name="currentfds"></input>
+		<input type="hidden" value="
+"""+str(numberOfTries)+"""" name="numberOfTries"></input>
+		<input type="hidden" value="
+"""+str(numberOfSteps)+"""" name="numberOfSteps"></input>
 		<div class="row">
 		<div class="col-xs-2 pull-right">
 		<br/>
@@ -154,7 +176,7 @@ def canonicalCoverRemoveEmptyRight(relationString, fdsString, fds):
 	return views.getJumbotron("Kanonische Überdeckung. FDs entfernen.", "<p>Möglicherweise musst du FDs entfernen. Markiere alle FDs, die entfernt werden sollen.</p><p>" + html +"</p>")
 
 
-def canonicalCoverCollapse(relationString, fdsString, fds):
+def canonicalCoverCollapse(numberOfTries, numberOfSteps, relationString, fdsString, fds):
 	html = """<form class="form" action="quiz.py" method="POST">
 		<div class="row">
 		<div class="col-sm-12">
@@ -167,6 +189,10 @@ def canonicalCoverCollapse(relationString, fdsString, fds):
 """+fdsString+"""" name="fds"></input>
 		<input type="hidden" value="
 """+views.fdsToString(fds)+"""" name="currentfds"></input>
+		<input type="hidden" value="
+"""+str(numberOfTries)+"""" name="numberOfTries"></input>
+		<input type="hidden" value="
+"""+str(numberOfSteps)+"""" name="numberOfSteps"></input>
 		<div class="row">
 		<div class="col-xs-2 pull-right">
 		<br/>
@@ -178,7 +204,7 @@ def canonicalCoverCollapse(relationString, fdsString, fds):
 	return views.getJumbotron("Kanonische Überdeckung. FDs zusammenfassen.", "<p>Möglicherweise musst du FDs zusammenfassen. Gib hier alle FDs an, die übrig bleiben.</p><p>" + html +"</p>")
 
 
-def formRelationSchemas(relationString, fdsString, fds, relations):
+def formRelationSchemas(numberOfTries, numberOfSteps, relationString, fdsString, fds, relations):
 	html = """<form class="form" action="quiz.py" method="POST">
 		"""
 	html = html + "<p>Du hast die kanonische Überdeckung gefunden:</p>" 
@@ -191,6 +217,10 @@ def formRelationSchemas(relationString, fdsString, fds, relations):
 """+fdsString+"""" name="fds"></input>
 		<input type="hidden" value="
 """+views.fdsToString(fds)+"""" name="currentfds"></input>
+		<input type="hidden" value="
+"""+str(numberOfTries)+"""" name="numberOfTries"></input>
+		<input type="hidden" value="
+"""+str(numberOfSteps)+"""" name="numberOfSteps"></input>
 		<div class="row">
 		<div class="col-xs-2 pull-right">
 		<br/>
@@ -202,7 +232,7 @@ def formRelationSchemas(relationString, fdsString, fds, relations):
 	return views.getJumbotron("Glückwunsch.", html )
 
 
-def addKeyRelation(relationString, fdsString, fds, relations):
+def addKeyRelation(numberOfTries, numberOfSteps, relationString, fdsString, fds, relations):
 	html = """<form class="form" action="quiz.py" method="POST">"""
 	html = html + views.schemaToString(relations)
 	html = html + """<div class="row">
@@ -216,6 +246,10 @@ def addKeyRelation(relationString, fdsString, fds, relations):
 """+fdsString+"""" name="fds"></input>
 		<input type="hidden" value="
 """+views.fdsToString(fds)+"""" name="currentfds"></input>
+		<input type="hidden" value="
+"""+str(numberOfTries)+"""" name="numberOfTries"></input>
+		<input type="hidden" value="
+"""+str(numberOfSteps)+"""" name="numberOfSteps"></input>
 		<div class="row">
 		<div class="col-xs-2 pull-right">
 		<br/>
@@ -240,7 +274,7 @@ def addKeyRelation(relationString, fdsString, fds, relations):
 
 
 
-def removeRedundantRelations(relationString, fdsString, fds, relations, keyrelation):
+def removeRedundantRelations(numberOfTries, numberOfSteps, relationString, fdsString, fds, relations, keyrelation):
 	html = """<form class="form" action="quiz.py" method="POST">
 		<div class="row">
 		<div class="col-sm-12">"""
@@ -255,6 +289,10 @@ def removeRedundantRelations(relationString, fdsString, fds, relations, keyrelat
 """+views.fdsToString(fds)+"""" name="currentfds"></input>
 		<input type="hidden" value="
 """+keyrelation+"""" name="keyrelation"></input>
+		<input type="hidden" value="
+"""+str(numberOfTries)+"""" name="numberOfTries"></input>
+		<input type="hidden" value="
+"""+str(numberOfSteps)+"""" name="numberOfSteps"></input>
 		<div class="row">
 		<div class="col-xs-2 pull-right">
 		<br/>
@@ -267,7 +305,7 @@ def removeRedundantRelations(relationString, fdsString, fds, relations, keyrelat
 
 
 
-def choosePrimaryKeys(relationString, fdsString, fds, relations, targetnf = "3NF", relationnumbers=[]):
+def choosePrimaryKeys(numberOfTries, numberOfSteps, relationString, fdsString, fds, relations, targetnf = "3NF", relationnumbers=[]):
 	html = """<form class="form" action="quiz.py" method="POST">
 """
 	currentRelations = []
@@ -300,6 +338,10 @@ def choosePrimaryKeys(relationString, fdsString, fds, relations, targetnf = "3NF
 """+",".join(relationnumbers)+"""" name="relationnumbers"></input>
 		<input type="hidden" value="
 """+str(targetnf)+"""" name="targetnf"></input>
+		<input type="hidden" value="
+"""+str(numberOfTries)+"""" name="numberOfTries"></input>
+		<input type="hidden" value="
+"""+str(numberOfSteps)+"""" name="numberOfSteps"></input>
 		<div class="row">
 		<div class="col-xs-2 pull-right">
 		<br/>
@@ -312,7 +354,7 @@ def choosePrimaryKeys(relationString, fdsString, fds, relations, targetnf = "3NF
 	return views.getJumbotron(algorithm+". Primärschlüssel.", "<p>Gib für jede Relation <b>einen</b> möglichen Primärschlüssel an.</p><p>" + html +"</p>")
 
 
-def formResultSyntheseAlgorithm(relationString, fdsString, fds, relations, keysAndFDs, primarykeys):
+def formResultSyntheseAlgorithm(numberOfTries, numberOfSteps, relationString, fdsString, fds, relations, keysAndFDs, primarykeys):
 	html = """<form class="form" action="quiz.py" method="POST">
 		"""
 	html = html + "<p>Folgende Relationen sind entstanden:</p>"
@@ -323,6 +365,10 @@ def formResultSyntheseAlgorithm(relationString, fdsString, fds, relations, keysA
 """+fdsString+"""" name="fds"></input>
 		<input type="hidden" value="
 """+views.fdsToString(fds)+"""" name="currentfds"></input>
+		<input type="hidden" value="
+"""+str(numberOfTries)+"""" name="numberOfTries"></input>
+		<input type="hidden" value="
+"""+str(numberOfSteps)+"""" name="numberOfSteps"></input>
 		<div class="row">
 		<div class="col-xs-2 pull-right">
 		<br/>
@@ -337,7 +383,7 @@ def formResultSyntheseAlgorithm(relationString, fdsString, fds, relations, keysA
 
 
 
-def decompositionAlgorithm(relationString, fdsString, relations, relationnumbers, targetnf = "BCNF"):
+def decompositionAlgorithm(numberOfTries, numberOfSteps, relationString, fdsString, relations, relationnumbers, targetnf = "BCNF"):
 	currentRelations = []
 	html = """<form class="form" action="quiz.py" method="POST">
 		<div class="row">
@@ -370,6 +416,10 @@ def decompositionAlgorithm(relationString, fdsString, relations, relationnumbers
 """+",".join(relationnumbers)+"""" name="relationnumbers"></input>
 		<input type="hidden" value="
 """+str(targetnf)+"""" name="targetnf"></input>
+		<input type="hidden" value="
+"""+str(numberOfTries)+"""" name="numberOfTries"></input>
+		<input type="hidden" value="
+"""+str(numberOfSteps)+"""" name="numberOfSteps"></input>
 		<div class="row">
 		<div class="col-xs-2 pull-right">
 		<br/>
@@ -383,7 +433,7 @@ def decompositionAlgorithm(relationString, fdsString, relations, relationnumbers
 
 
 
-def formResultDecompositionAlgorithm(relationString, fdsString, relations, relationnumbers, keysAndFDs, primarykeys, targetnf = "BCNF"):
+def formResultDecompositionAlgorithm(numberOfTries, numberOfSteps, relationString, fdsString, relations, relationnumbers, keysAndFDsMVDs, primarykeys, targetnf = "BCNF"):
 	if targetnf == "BCNF":
 		#decomposition algorithm 4NF
 		nextstep = "9"
@@ -393,12 +443,16 @@ def formResultDecompositionAlgorithm(relationString, fdsString, relations, relat
 	html = """<form class="form" action="quiz.py" method="POST">
 		"""
 	html = html + "<p>Folgende Relationen sind entstanden:</p>"
-	html = html + "<h4 style=\"display:inline;\">"+views.schemaToString(relations, keysAndFDs, primarykeys)+"</h4>"
+	html = html + "<h4 style=\"display:inline;\">"+views.schemaToString(relations, keysAndFDsMVDs, primarykeys)+"</h4>"
 	html = html + """<input type="hidden" value="
 """+relationString+"""" name="relation"></input>
 		<input type="hidden" value="
 """+fdsString+"""" name="fds"></input>
 		<input type="hidden" value="4NF" name="targetnf"></input>
+		<input type="hidden" value="
+"""+str(numberOfTries)+"""" name="numberOfTries"></input>
+		<input type="hidden" value="
+"""+str(numberOfSteps)+"""" name="numberOfSteps"></input>
 		<div class="row">
 		<div class="col-xs-2 pull-right">
 		<br/>
@@ -413,7 +467,40 @@ def formResultDecompositionAlgorithm(relationString, fdsString, relations, relat
 
 
 
-def quizFinal(relationString, fdsString):
+def quizFinal(numberOfTries, numberOfSteps, relationString, fdsString):
+	score = numberOfSteps*100 / numberOfTries
+	foodScore = scoreToFood(score)
+	headings = """
+		<div id="heading1" style="visibility:hidden">Geschafft.</div>
+		<div id="heading2" style="visibility:hidden">Deine Skills sind wie """ + foodScore[0] + """.</div>
+""" 
+	contents = """
+		<div id="content1" style="visibility:hidden">Du hast für 
+"""+str(numberOfSteps) + """ Schritte 
+""" + str(numberOfTries) + """ Versuche gebraucht und somit einen Score von 
+""" + str(score) + """% erreicht.</div>
+		<div id="content2" style="visibility:hidden">
+""" + str(score) + """% Fett.</div>
+		<script>
+		$(document).ready(function(){
+			$('#content').html($('#content1').html());
+			$('#heading').html($('#heading1').html());
+		$('#dasquiz').on('click', function () {
+			if ($('#heading').html() == $('#heading1').html()){
+				$('#heading').html($('#heading2').html());
+				$('#content').html($('#content2').html());
+			}
+			else{
+				$('#heading').html($('#heading1').html());
+				$('#content').html($('#content1').html());
+			}
+		}).change();
+		}).change();
+		</script>
+""" 
+
+
+
 	html = """<form class="form" action="index.py" method="POST">"""
 	html = html + "<input type=\"hidden\" value=\""+relationString+"\" name=\"relation\"></input>"
 	html = html + "<input type=\"hidden\" value=\""+fdsString+"\" name=\"fds\"></input>"
@@ -424,4 +511,26 @@ def quizFinal(relationString, fdsString):
 		<button id="submitbutton" name="mode" type="submit" class="btn btn-primary" value="showResults">Ergebnis anzeigen</button>
 		</div>
 		</div></form>"""
-	return views.getJumbotron("Glückwunsch.", "<p>Du hast das Quiz geschafft.</p><p>" + html +"</p>")
+	return views.getJumbotron("<span id=\"heading\"></span>", "<p><span id=\"content\"></span></p><p>" + html +"</p>") + headings + contents
+
+
+def getFoodsFat():
+	foodsFat = {
+	"Butterschmalz": 100,
+	"Speck": 89,
+	"Butter": 83,
+	"Nüsse": 71,
+	"Weichkäse": 67,
+	"Cheddar": 48,
+	"Frischkäse": 44
+	}
+	return foodsFat
+
+def scoreToFood(score):
+	foodsFat = getFoodsFat()
+	result = ("x",1000)
+	for food, fat in foodsFat.iteritems():
+		if score <= fat and fat-score < result[1]-score:
+			result = (food, fat)
+	return result
+

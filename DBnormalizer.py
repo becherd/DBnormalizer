@@ -298,22 +298,23 @@ def synthesealgorithm(canonicalCover, keys):
 	#canonical cover
 	step1 = canonicalCover[-1]
 	step2 = generateNewRelations(step1[:])
-	step2KeysAndFDs = getKeysAndFDsOfRelations(step2, step1)
+	step2KeysAndFDs = getKeysAndFDsMVDsOfRelations(step2, step1)
 	step3 = addRelationWithKey(step2[:], keys)
-	step3KeysAndFDs = getKeysAndFDsOfRelations(step3, step1)
+	step3KeysAndFDs = getKeysAndFDsMVDsOfRelations(step3, step1)
 	step4 = removeRedundantSchemas(step3[:])
-	step4KeysAndFDs = getKeysAndFDsOfRelations(step4, step1)
+	step4KeysAndFDs = getKeysAndFDsMVDsOfRelations(step4, step1)
 	#return result relations for each step together with their keys. For step 1, we return the canonical cover
 	return (step1,(step2,step2KeysAndFDs),(step3,step3KeysAndFDs),(step4,step4KeysAndFDs))
 	
 
-def getKeysAndFDsOfRelations(relations, fds):
-	keysAndFDsOfRelations = []
+def getKeysAndFDsMVDsOfRelations(relations, fds, mvds=[]):
+	keysAndFDsMVDsOfRelations = []
 	for r in relations:
 		fdsInR = fdsInRelation(fds, r)
+		mvdsInR = mvdsInRelation(mvds, r)
 		keys = getKeys(r, fdsInR)
-		keysAndFDsOfRelations.append({"keys": keys, "FDs":fdsInR})
-	return keysAndFDsOfRelations
+		keysAndFDsMVDsOfRelations.append({"keys": keys, "FDs":fdsInR, "MVDs": mvdsInR})
+	return keysAndFDsMVDsOfRelations
 
 
 

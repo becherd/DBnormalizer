@@ -70,7 +70,7 @@ def relationToString(relation, i, candidateKeys = None, fds = [], mvds = [], add
 		if primaryKey is None:
 			primaryKey = DBnormalizer.getFirstKey(candidateKeys)
 		tooltiptext = "<div class='panel panel-primary'><div class='panel-heading'><h5 class='panel-title'>"+show+"</h5></div><div class='panel-body'>"
-		if not fds:
+		if not fds and not mvds:
 			tooltiptext = tooltiptext + "In dieser Relation gelten keine nicht-trivialen Abhängigkeiten."
 		else:
 			tooltiptext = tooltiptext + fdsToHtmlString(fds, additionalFds)+mvdsToHtmlString(mvds)
@@ -178,18 +178,17 @@ def normalFormsToString(normalForms):
 
 
 #schema to string. Input is a list of relations (schema) and a list of candidate keys (one set of candicate keys for each relation in schema)
-def schemaToString(schema, keysAndFDs=None, primaryKeys=[]):
+def schemaToString(schema, keysAndFDsMVDs=None, primaryKeys=[]):
 	schemaString=""
-	i=0
-	for relation in schema:
+	for i, relation in enumerate(schema):
 		i=i+1
-		if keysAndFDs is None:
+		if keysAndFDsMVDs is None:
 			schemaString = schemaString + relationToString(relation, i)
 		else:
 			if primaryKeys:
-				schemaString = schemaString + relationToString(relation, i, keysAndFDs[i-1]["keys"], keysAndFDs[i-1]["FDs"], [], [], primaryKeys[i-1])
+				schemaString = schemaString + relationToString(relation, i, keysAndFDsMVDs[i-1]["keys"], keysAndFDsMVDs[i-1]["FDs"], keysAndFDsMVDs[i-1]["MVDs"], [], primaryKeys[i-1])
 			else:
-				schemaString = schemaString + relationToString(relation, i, keysAndFDs[i-1]["keys"], keysAndFDs[i-1]["FDs"])
+				schemaString = schemaString + relationToString(relation, i, keysAndFDsMVDs[i-1]["keys"], keysAndFDsMVDs[i-1]["FDs"], keysAndFDsMVDs[i-1]["MVDs"])
 		schemaString = schemaString + "<br/>"
 	return schemaString	
 
@@ -396,5 +395,4 @@ def getAlgorithmString(algorithm):
 
 def getAlgorithmTutorial():
 	return """<div class="panel-body"><h2>Algorithmen</h2><div class="panel panel-default"><div class="panel-body">"""+getPanelHeading('canonicalCover')+  getPanelHeading('synthese') + getPanelHeading('decompositionBCNF') + getPanelHeading('decomposition4NF') + "</div></div></div>"
-
 

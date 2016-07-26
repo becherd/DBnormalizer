@@ -25,7 +25,7 @@ print """
   	<div class="panel-body">
 		<div class="row">
 			<div class="col-md-6">
-				<h1><big>DB->normalizer</big><small>Das Quiz</small></h1>
+				<h1><big>DB->normalizer</big><small id="dasquiz">Das Quiz</small></h1>
 			</div>
 			<div class="col-md-6">
 				<p class="text-right"><button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#helpModal">
@@ -79,9 +79,18 @@ try:
 	alert = ""
 	inputpanel = views.inputToString(relation, fds,mvds, "default")
 	quizform = ""
+	
+	try:
+		numberOfTries = int(form['numberOfTries'].value)
+		numberOfSteps = int(form['numberOfSteps'].value)
+	except KeyError:
+		numberOfTries = 0
+		numberOfSteps = 0
+	numberOfTries = numberOfTries + 1
 	if (step=='1'):
 		#candidate keys
-		quizform = quizForms.candidateKeys(relationString, fdsString) + htmlend()
+		numberOfSteps = numberOfSteps + 1
+		quizform = quizForms.candidateKeys(numberOfTries, numberOfSteps, relationString, fdsString) + htmlend()
 	if (step=='2'):
 		#validate candidate keys
 		try:
@@ -91,19 +100,21 @@ try:
 		if inputValidation.validateCandidateKeys(relation, fds, inputCandidateKeys):
 			alert =  views.getSuccessMessageBox("Richtig!")
 			inputpanel = views.inputToString(relation, fds,mvds, "default", candidatekeys)
-			quizform = quizForms.normalForm(relationString, fdsString) + htmlend()
+			numberOfSteps = numberOfSteps + 1
+			quizform = quizForms.normalForm(numberOfTries, numberOfSteps, relationString, fdsString) + htmlend()
 		else:
 			alert =  views.getErrorMessageBox("Leider falsch!")
-			quizform = quizForms.candidateKeys(relationString, fdsString) + htmlend()
+			quizform = quizForms.candidateKeys(numberOfTries, numberOfSteps, relationString, fdsString) + htmlend()
 	if (step=='3-1'):
 		#validate normal form
 		selectedNF = str(form['normalform'].value)
 		if DBnormalizer.getHighestNormalForm(relation, fds, mvds) == selectedNF:
 			alert =  views.getSuccessMessageBox("Richtig!")
-			quizform = quizForms.canonicalCoverLeftReduction(relationString, fdsString, fds)
+			numberOfSteps = numberOfSteps + 1
+			quizform = quizForms.canonicalCoverLeftReduction(numberOfTries, numberOfSteps, relationString, fdsString, fds)
 		else:
 			alert =  views.getErrorMessageBox("Leider falsch!")
-			quizform = quizForms.normalForm(relationString, fdsString) + htmlend()
+			quizform = quizForms.normalForm(numberOfTries, numberOfSteps, relationString, fdsString) + htmlend()
 		inputpanel = views.inputToString(relation, fds,mvds, "default", candidatekeys)
 	if (step=='3-2'):
 		#validate left reduction
@@ -118,10 +129,11 @@ try:
 		if leftReduction:
 			alert =  views.getSuccessMessageBox("Richtig!")
 			inputpanel = views.inputToString(relation, leftReduction,mvds, "default", candidatekeys)
-			quizform = quizForms.canonicalCoverRightReduction(relationString, fdsString, leftReduction)
+			numberOfSteps = numberOfSteps + 1
+			quizform = quizForms.canonicalCoverRightReduction(numberOfTries, numberOfSteps, relationString, fdsString, leftReduction)
 		else:
 			alert =  views.getErrorMessageBox("Leider falsch!")
-			quizform = quizForms.canonicalCoverLeftReduction(relationString, fdsString, fds)
+			quizform = quizForms.canonicalCoverLeftReduction(numberOfTries, numberOfSteps, relationString, fdsString, fds)
 			inputpanel = views.inputToString(relation, fds,mvds, "default", candidatekeys)
 	if (step=='3-3'):
 		currentfds, currentmvds = DBnormalizer.parseInputFDsMVDs(str(form['currentfds'].value))
@@ -137,10 +149,11 @@ try:
 		if rightReduction:
 			alert =  views.getSuccessMessageBox("Richtig!")
 			inputpanel = views.inputToString(relation, rightReduction,mvds, "default", candidatekeys)
-			quizform = quizForms.canonicalCoverRemoveEmptyRight(relationString, fdsString, rightReduction)
+			numberOfSteps = numberOfSteps + 1
+			quizform = quizForms.canonicalCoverRemoveEmptyRight(numberOfTries, numberOfSteps, relationString, fdsString, rightReduction)
 		else:
 			alert =  views.getErrorMessageBox("Leider falsch!")
-			quizform = quizForms.canonicalCoverRightReduction(relationString, fdsString, currentfds)
+			quizform = quizForms.canonicalCoverRightReduction(numberOfTries, numberOfSteps, relationString, fdsString, currentfds)
 			inputpanel = views.inputToString(relation, currentfds,mvds, "default", candidatekeys)
 
 	if (step=='3-4'):
@@ -157,11 +170,12 @@ try:
 		newfds = inputValidation.validateRemoveEmptyRight(currentfds, removeindices)
 		if newfds:
 			alert =  views.getSuccessMessageBox("Richtig!")
-			quizform = quizForms.canonicalCoverCollapse(relationString, fdsString, newfds)
+			numberOfSteps = numberOfSteps + 1
+			quizform = quizForms.canonicalCoverCollapse(numberOfTries, numberOfSteps, relationString, fdsString, newfds)
 			inputpanel = views.inputToString(relation, newfds,mvds, "default", candidatekeys)
 		else:
 			alert =  views.getErrorMessageBox("Leider falsch!")
-			quizform = quizForms.canonicalCoverRemoveEmptyRight(relationString, fdsString, currentfds)
+			quizform = quizForms.canonicalCoverRemoveEmptyRight(numberOfTries, numberOfSteps, relationString, fdsString, currentfds)
 			inputpanel = views.inputToString(relation, currentfds,mvds, "default", candidatekeys)
 	if (step=='4'):
 		currentfds, currentmvds = DBnormalizer.parseInputFDsMVDs(str(form['currentfds'].value))
@@ -174,16 +188,18 @@ try:
 		if canonicalcover:
 			alert =  views.getSuccessMessageBox("Richtig!")
 			relations = DBnormalizer.generateNewRelations(canonicalcover)
-			quizform = quizForms.formRelationSchemas(relationString, fdsString, canonicalcover, relations)
+			numberOfTries = numberOfTries - 1
+			quizform = quizForms.formRelationSchemas(numberOfTries, numberOfSteps, relationString, fdsString, canonicalcover, relations)
 			inputpanel = views.inputToString(relation, canonicalcover,mvds, "default", candidatekeys)
 		else:
 			alert =  views.getErrorMessageBox("Leider falsch!")
-			quizform = quizForms.canonicalCoverCollapse(relationString, fdsString, currentfds)
+			quizform = quizForms.canonicalCoverCollapse(numberOfTries, numberOfSteps, relationString, fdsString, currentfds)
 			inputpanel = views.inputToString(relation, currentfds,mvds, "default", candidatekeys)
 	if (step=='5'):
 		currentfds, currentmvds = DBnormalizer.parseInputFDsMVDs(str(form['currentfds'].value))
 		relations = DBnormalizer.generateNewRelations(currentfds)
-		quizform = quizForms.addKeyRelation(relationString, fdsString, currentfds, relations)
+		numberOfSteps = numberOfSteps + 1
+		quizform = quizForms.addKeyRelation(numberOfTries, numberOfSteps, relationString, fdsString, currentfds, relations)
 		inputpanel = views.inputToString(relation, currentfds,mvds, "default", candidatekeys)
 	if (step=='6'):
 		currentfds, currentmvds = DBnormalizer.parseInputFDsMVDs(str(form['currentfds'].value))
@@ -197,10 +213,11 @@ try:
 		newrelations = inputValidation.validateAddKeyRelation(relation, fds, relations, keyrelation)
 		if newrelations:
 			alert =  views.getSuccessMessageBox("Richtig!")
-			quizform = quizForms.removeRedundantRelations(relationString, fdsString, currentfds, newrelations, keyrelation)
+			numberOfSteps = numberOfSteps + 1
+			quizform = quizForms.removeRedundantRelations(numberOfTries, numberOfSteps, relationString, fdsString, currentfds, newrelations, keyrelation)
 		else:
 			alert =  views.getErrorMessageBox("Leider falsch!")
-			quizform = quizForms.addKeyRelation(relationString, fdsString, currentfds, relations)
+			quizform = quizForms.addKeyRelation(numberOfTries, numberOfSteps, relationString, fdsString, currentfds, relations)
 		inputpanel = views.inputToString(relation, currentfds,mvds, "default", candidatekeys)
 	if (step=='7'):
 		currentfds, currentmvds = DBnormalizer.parseInputFDsMVDs(str(form['currentfds'].value))
@@ -214,32 +231,27 @@ try:
 		except KeyError:
 			removeindices = []
 		relations = DBnormalizer.generateNewRelations(currentfds)
-		try:
-			keyrelationstring = str(form['keyrelation'].value).replace("\r", "").replace("\n", "")
-			if keyrelationstring != "":
-				keyrelation = set(keyrelationstring)|set(EMPTY_SET)
-				relations.append(keyrelation)
-		except KeyError:
-			print "ke"
+		keyrelationstring = str(form['keyrelation'].value).replace("\r", "").replace("\n", "")
+		if keyrelationstring != "":
+			keyrelation = set(keyrelationstring)|set(EMPTY_SET)
+			relations.append(keyrelation)
 		newrelations = inputValidation.validateRemoveRelations(relations, removeindices)
 		if newrelations:
 			alert =  views.getSuccessMessageBox("Richtig!")
-			quizform = quizForms.choosePrimaryKeys(relationString, fdsString, currentfds, newrelations)
+			numberOfSteps = numberOfSteps + 1
+			quizform = quizForms.choosePrimaryKeys(numberOfTries, numberOfSteps, relationString, fdsString, currentfds, newrelations)
 		else:
 			alert =  views.getErrorMessageBox("Leider falsch!")
-			quizform = quizForms.removeRedundantRelations(relationString, fdsString, currentfds, relations, keyrelationstring)
+			quizform = quizForms.removeRedundantRelations(numberOfTries, numberOfSteps, relationString, fdsString, currentfds, relations, keyrelationstring)
 		inputpanel = views.inputToString(relation, currentfds, mvds, "default", candidatekeys)
 	if (step=='8'):
 		currentfds, currentmvds = DBnormalizer.parseInputFDsMVDs(str(form['currentfds'].value))
 		#validate relation primary keys
 		primarykeys = []
 		relations = []
-		try:
-			currentrelationsStrings = str(form['currentrelations'].value).split(",")
-			for r in currentrelationsStrings:
-				relations.append(views.stringToRelation(r))
-		except KeyError:
-			print "ke"
+		currentrelationsStrings = str(form['currentrelations'].value).split(",")
+		for r in currentrelationsStrings:
+			relations.append(views.stringToRelation(r))
 		relations = DBnormalizer.removeRedundantSchemas(relations[:])
 		for i in range(len(relations)):
 			try:
@@ -249,11 +261,12 @@ try:
 			primarykeys.append(primarykey)
 		if inputValidation.validatePrimaryKeys(relations, currentfds, primarykeys):
 			alert =  views.getSuccessMessageBox("Richtig!")
-			keysAndFDs = DBnormalizer.getKeysAndFDsOfRelations(relations, currentfds)
-			quizform = quizForms.formResultSyntheseAlgorithm(relationString, fdsString, currentfds, relations, keysAndFDs, primarykeys)
+			keysAndFDs = DBnormalizer.getKeysAndFDsMVDsOfRelations(relations, currentfds)
+			numberOfTries = numberOfTries - 1
+			quizform = quizForms.formResultSyntheseAlgorithm(numberOfTries, numberOfSteps, relationString, fdsString, currentfds, relations, keysAndFDs, primarykeys)
 		else:
 			alert =  views.getErrorMessageBox("Leider falsch!")
-			quizform = quizForms.choosePrimaryKeys(relationString, fdsString, currentfds, relations)
+			quizform = quizForms.choosePrimaryKeys(numberOfTries, numberOfSteps, relationString, fdsString, currentfds, relations)
 		inputpanel = views.inputToString(relation, currentfds, mvds, "default", candidatekeys)
 	if (step=='9'):
 		try:
@@ -270,10 +283,11 @@ try:
 			if splitrelationIndex == -1:
 				if inputValidation.validateDecompositionEnd(currentrelations, fds, mvds, targetnf):
 					alert =  views.getSuccessMessageBox("Richtig!")
-					quizform =  quizForms.choosePrimaryKeys(relationString, fdsString, fds, currentrelations, targetnf, relationnumbers)
+					numberOfSteps = numberOfSteps + 1
+					quizform =  quizForms.choosePrimaryKeys(numberOfTries, numberOfSteps, relationString, fdsString, fds, currentrelations, targetnf, relationnumbers)
 				else:
 					alert =  views.getErrorMessageBox("Leider falsch!")
-					quizform =  quizForms.decompositionAlgorithm(relationString, fdsString, currentrelations, relationnumbers, targetnf)
+					quizform =  quizForms.decompositionAlgorithm(numberOfTries, numberOfSteps, relationString, fdsString, currentrelations, relationnumbers, targetnf)
 			else:
 				try:
 					newfirstrelation = views.stringToRelation(str(form['first'+str(splitrelationIndex)].value))
@@ -288,18 +302,21 @@ try:
 						relationnumbers.append(splitrelationnumber+"1")
 						relationnumbers.append(splitrelationnumber+"2")
 						alert =  views.getSuccessMessageBox("Richtig!")
-						quizform =  quizForms.decompositionAlgorithm(relationString, fdsString, currentrelations, relationnumbers, targetnf)
+						numberOfSteps = numberOfSteps + 1
+						quizform =  quizForms.decompositionAlgorithm(numberOfTries, numberOfSteps, relationString, fdsString, currentrelations, relationnumbers, targetnf)
 					else:
 						alert =  views.getErrorMessageBox("Leider falsch!")
-						quizform =  quizForms.decompositionAlgorithm(relationString, fdsString, currentrelations, relationnumbers, targetnf)
+						quizform =  quizForms.decompositionAlgorithm(numberOfTries, numberOfSteps, relationString, fdsString, currentrelations, relationnumbers, targetnf)
 				except KeyError:
 					alert =  views.getErrorMessageBox("Du musst neue Relationen eingeben!")
-					quizform =  quizForms.decompositionAlgorithm(relationString, fdsString, currentrelations, relationnumbers, targetnf)
+					numberOfTries = numberOfTries - 1
+					quizform =  quizForms.decompositionAlgorithm(numberOfTries, numberOfSteps, relationString, fdsString, currentrelations, relationnumbers, targetnf)
 		except KeyError:
 			#init
 			relations = [set(relationString)|set(EMPTY_SET)]
 			relationnumbers = ['']
-			quizform =  quizForms.decompositionAlgorithm(relationString, fdsString, relations, relationnumbers, targetnf)
+			numberOfSteps = numberOfSteps + 1
+			quizform =  quizForms.decompositionAlgorithm(numberOfTries, numberOfSteps, relationString, fdsString, relations, relationnumbers, targetnf)
 		inputpanel = views.inputToString(relation, fds,mvds, "default", candidatekeys)
 	if (step=='10'):
 		try:
@@ -309,13 +326,10 @@ try:
 		#validate relation primary keys
 		primarykeys = []
 		relations = []
-		try:
-			currentrelationsStrings = str(form['currentrelations'].value).split(",")
-			relationnumbers = str(form['relationnumbers'].value).replace(" ", "").split(",")
-			for r in currentrelationsStrings:
-				relations.append(views.stringToRelation(r))
-		except KeyError:
-			print "ke"
+		currentrelationsStrings = str(form['currentrelations'].value).split(",")
+		relationnumbers = str(form['relationnumbers'].value).replace(" ", "").split(",")
+		for r in currentrelationsStrings:
+			relations.append(views.stringToRelation(r))
 		for i in range(len(relations)):
 			try:
 				primarykey = set(str(form['pk'+str(i)].value))|set(EMPTY_SET)
@@ -324,14 +338,16 @@ try:
 			primarykeys.append(primarykey)
 		if inputValidation.validatePrimaryKeys(relations, fds, primarykeys):
 			alert =  views.getSuccessMessageBox("Richtig!")
-			keysAndFDs = DBnormalizer.getKeysAndFDsOfRelations(relations, fds)
-			quizform = quizForms.formResultDecompositionAlgorithm(relationString, fdsString, relations, relationnumbers, keysAndFDs, primarykeys, targetnf)
+			numberOfTries = numberOfTries - 1
+			keysAndFDsMVDs = DBnormalizer.getKeysAndFDsMVDsOfRelations(relations, fds, mvds)
+			quizform = quizForms.formResultDecompositionAlgorithm(numberOfTries, numberOfSteps, relationString, fdsString, relations, relationnumbers, keysAndFDsMVDs, primarykeys, targetnf)
 		else:
 			alert =  views.getErrorMessageBox("Leider falsch!")
-			quizform = quizForms.choosePrimaryKeys(relationString, fdsString, fds, relations, targetnf, relationnumbers)
+			quizform = quizForms.choosePrimaryKeys(numberOfTries, numberOfSteps, relationString, fdsString, fds, relations, targetnf, relationnumbers)
 		inputpanel = views.inputToString(relation, fds, mvds, "default", candidatekeys)
 	if (step=='11'):
-		quizform = quizForms.quizFinal(relationString, fdsString)
+		numberOfTries = numberOfTries - 1
+		quizform = quizForms.quizFinal(numberOfTries, numberOfSteps, relationString, fdsString)
 		inputpanel = ""
 	print alert
 	print inputpanel
