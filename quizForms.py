@@ -13,10 +13,10 @@ EMPTY_SET = "$"
 def formQuizStart(relation, fds, mvds):
 	inputString ="<div class=\"well\">Du hast folgendes eingegeben:</div>"
 	if DBnormalizer.longAttributeNamesUsed():
-		inputString = inputString = inputString + views.inputToString(relation, fds,mvds, "default")
+		inputString = inputString = inputString + views.inputToString(relation, fds,mvds)
 		inputString = inputString + "<div class=\"well\">Dass du gleich nicht so viel tippen musst, machen wir daraus mal das hier:</div>"
 	DBnormalizer.resetDictionaries()
-	inputString = inputString +  views.inputToString(relation, fds,mvds, "default")
+	inputString = inputString +  views.inputToString(relation, fds,mvds)
 	relationString = views.setOfAttributesToString(relation)
 	fdsString = views.fdsToString(fds)+views.mvdsToString(mvds)
 	html = """<form class="form" action="quiz.py" method="POST">"""
