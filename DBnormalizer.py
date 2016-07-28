@@ -401,7 +401,7 @@ def splitRelationAtFdMvd(relation, fdmvd):
 	return (r1,r2)
 
 
-def decompositionAlgorithm(targetNf, fds, relation, mvds=[]):
+def getAdditionalFDs(fds):
 	fds = fds[:]
 	cCover = canonicalCover(fds)[-1]
 	
@@ -414,7 +414,13 @@ def decompositionAlgorithm(targetNf, fds, relation, mvds=[]):
 				break
 		if add:
 			additionalFds.append(addfd)
-			fds.append(addfd)
+	return additionalFds
+
+def decompositionAlgorithm(targetNf, fds, relation, mvds=[]):
+	fds = fds[:]
+
+	additionalFds = getAdditionalFDs(fds)
+	fds.extend(additionalFds)
 
 	if targetNf == "BCNF":
 		to4NF=False

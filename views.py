@@ -139,7 +139,7 @@ def mvdToHtmlString(mvd):
 	return mvdsToHtmlString([mvd]).replace("<br/>", "")
 
 	
-def inputToString(relation, fds, mvds,panelType="primary", keys=[]):
+def inputToString(relation, fds, mvds, additionalFds=[], panelType="primary", keys=[]):
 	numberOfColumns = 2
 	if mvds:
 		numberOfColumns = numberOfColumns+1
@@ -152,7 +152,10 @@ def inputToString(relation, fds, mvds,panelType="primary", keys=[]):
 	if keys:
 		keysPanel = wrapInPanel("Kandidatenschlüssel", "<strong>"+keysToString(keys)+"</strong>",numberOfColumns, panelType)
 	relationPanel = wrapInPanel("Relation", "<strong>"+relationToString(relation,"")+"</strong>",numberOfColumns, panelType)
-	fdsPanel = wrapInPanel("FDs", "<strong>"+fdsToHtmlString(fds)+"</strong>",numberOfColumns, panelType)
+	additionalFdsInfo = ""
+	if additionalFds:
+		additionalFdsInfo = "<h6><small>* Unter anderem diese FD kann mithilfe der Armstrong-Axiome zusätzlich hergeleitet werden</small></h6>"
+	fdsPanel = wrapInPanel("FDs", "<strong>"+fdsToHtmlString(fds, additionalFds)+"</strong>"+additionalFdsInfo,numberOfColumns, panelType)
 	return "<div class=\"row\">"+relationPanel+keysPanel+fdsPanel+mvdsPanel+"</div>"
 
 def getJumbotron(heading, content):
@@ -234,6 +237,8 @@ def getErrorMessageBox(message):
 		return """<div class="row"><div class="col-md-12"><div class="alert alert-danger" role="alert"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="exclamation"></span><span class="sr-only">Error:</span> """+message+"""</div></div></div>"""
 def getSuccessMessageBox(message):
 		return """<div class="row"><div class="col-md-12"><div class="alert alert-success" role="alert"><span class="glyphicon glyphicon-thumbs-up" aria-hidden="thumbsup"></span> """+message+"""</div></div></div>"""
+def getInfoMessageBox(message):
+		return """<div class="row"><div class="col-md-12"><div class="alert alert-info" role="alert"><span class="glyphicon glyphicon-info-sign" aria-hidden="info"></span> """+message+"""</div></div></div>"""
 	
 
 def getPanelHeading(id, expanded=False, info=""):

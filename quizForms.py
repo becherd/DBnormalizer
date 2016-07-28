@@ -393,7 +393,7 @@ def decompositionAlgorithm(numberOfTries, numberOfSteps, relationString, fdsStri
 		currentRelations.append(views.setOfAttributesToString(r))
 		html = html + "<div class=\"radio\"><label><h4 style=\"display:inline;\"><input type=\"radio\" name=\"splitrelation\" value=\""+str(i)+"\">"+views.relationToString(r, relationnumbers[i])+"</h4></label></div>"
 		html = html + "<div class=\"row\"><div class=\"col-md-1\" style=\"text-align:right;\"><br/><h4 style=\"display:inline;\">R<sub>"+ relationnumbers[i].strip() +"1:=</sub></h4></div><div class=\"col-md-2\"><input type=\"text\" class=\"form-control input-lg\" id=\"first"+str(i)+"\" name=\"first"+str(i)+"\" disabled=\"disabled\"></div><div class=\"col-md-1\" style=\"text-align:right;\"><br/><h4 style=\"display:inline;\">R<sub>"+ relationnumbers[i].strip() +"2:=</sub></h4></div><div class=\"col-md-2\"><input type=\"text\" class=\"form-control input-lg\" id=\"second"+str(i)+"\" name=\"second"+str(i)+"\" disabled=\"disabled\"></div></div><br/>"
-	html = html + "<div class=\"radio\"><label><h4 style=\"display:inline;\"><input type=\"radio\" name=\"splitrelation\" value=\"-1\">keine</h4></label></div>"
+	html = html + "<div class=\"radio\"><label><h4 style=\"display:inline;\"><input type=\"radio\" name=\"splitrelation\" value=\"-1\" checked>keine Relation aufspalten</h4></label></div>"
 	html = html + """<script>
 			$('[name="splitrelation"]').on('change', function(){
 				if($(this).prop('checked')){
@@ -433,8 +433,8 @@ def decompositionAlgorithm(numberOfTries, numberOfSteps, relationString, fdsStri
 
 
 
-def formResultDecompositionAlgorithm(numberOfTries, numberOfSteps, relationString, fdsString, relations, relationnumbers, keysAndFDsMVDs, primarykeys, targetnf = "BCNF"):
-	if targetnf == "BCNF":
+def formResultDecompositionAlgorithm(numberOfTries, numberOfSteps, relationString, fdsString, mvds, relations, relationnumbers, keysAndFDsMVDs, primarykeys, targetnf = "BCNF"):
+	if targetnf == "BCNF" and mvds:
 		#decomposition algorithm 4NF
 		nextstep = "9"
 	else:
