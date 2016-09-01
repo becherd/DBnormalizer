@@ -25,12 +25,7 @@ print """
   	<div class="panel-body">
 		<div class="row">
 			<div class="col-md-6">
-				<h1><big>DB->normalizer</big><small id="dasquiz">Das Quiz</small></h1>
-			</div>
-			<div class="col-md-6">
-				<p class="text-right"><button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#helpModal">
-		 			<span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Hilfe</button>
-				</p>
+				<h1><big><a href="index.py" style="text-decoration:none;">DB->normalizer</a></big><small id="dasquiz">Das Quiz</small></h1>
 			</div>
 		</div>
 		<br/>

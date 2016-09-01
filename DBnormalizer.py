@@ -492,8 +492,11 @@ def decompositionAlgorithm(targetNf, fds, relation, mvds=[]):
 			del relations[i]
 			
 	resultString = ""
+	if len(relations) > 1:
+		#at least one relation has been split, thus additional fds have been displayed in this step (if there are any). We do not mark them again when displaying the result.
+		additionalFds = []
 	for r in relations:
-		resultString = resultString + views.relationToString(r[0], r[1], r[2], r[3], r[4])+"<br/>"
+		resultString = resultString + views.relationToString(r[0], r[1], r[2], r[3], r[4], additionalFds)+"<br/>"
 	
 	if len(stepsStrings) % 2 == 0:
 		numberOfColumns = 1

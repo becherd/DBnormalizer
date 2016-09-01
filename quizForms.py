@@ -28,7 +28,7 @@ def formQuizStart(relation, fds, mvds):
 		<div class="row">
 		<div class="col-xs-2 pull-right">
 		<br/>
-		<button id="step" name="step" type="submit" class="btn btn-primary" value="1">Weiter</button>
+		<button id="step" name="step" type="submit" class="btn btn-primary" value="1">Start</button>
 		</div>
 		</div>
 		</form>
@@ -58,7 +58,7 @@ def candidateKeys(numberOfTries, numberOfSteps, relationString, fdsString):
 		</div>
 		</form>
 	"""
-	return views.getJumbotron("Kandidatenschlüssel.", "<p>Gib <b>alle</b> Kandidatenschlüssel an. Schreibe dazu alle Attribute eines Schlüssels in das Textfeld und verwende für jeden Schlüssel eine neue Zeile.</p><p>" + html +"</p>")
+	return views.getJumbotron("Kandidatenschlüssel.", "<p>Gib <b>alle</b> Kandidatenschlüssel an. Schreibe dazu jeweils alle Attribute eines Schlüssels in das Textfeld und verwende für jeden Schlüssel eine neue Zeile.</p><p>" + html +"</p>")
 
 
 
@@ -234,7 +234,7 @@ def formRelationSchemas(numberOfTries, numberOfSteps, relationString, fdsString,
 
 def addKeyRelation(numberOfTries, numberOfSteps, relationString, fdsString, fds, relations):
 	html = """<form class="form" action="quiz.py" method="POST">"""
-	html = html + views.schemaToString(relations)
+	html = html + "<h4 style=\"display:inline;\">"+views.schemaToString(relations)+"</h4>"
 	html = html + """<div class="row">
 			<div class="col-sm-12">"""
 	html = html + "<div class=\"checkbox\"><label><h4 style=\"display:inline;\"><input type=\"checkbox\" id=\"addkeyrelation\" name=\"addkeyrelation\" value=\"true\">neue Relation hinzufügen</h4></label></div>"
@@ -324,7 +324,7 @@ def choosePrimaryKeys(numberOfTries, numberOfSteps, relationString, fdsString, f
 		else:
 			algorithm = "Dekompositionsalgorithmus für 4NF"
 			nextstep = "10"
-		html = html + "<div class=\"row\"><div class=\"col-md-1\"><br/><h4 style=\"display:inline;\">" + views.relationToString(relation, relationnumber) +" </h4></div><div class=\"col-md-2\"><input type=\"text\" class=\"form-control input-lg\" id=\"pk"+str(i)+"\" name=\"pk"+str(i)+"\"></div></div><br/>"
+		html = html + "<div class=\"row\"><div class=\"col-md-2\" style=\"text-align:right;\"><br/><h4 style=\"display:inline;\">" + views.relationToString(relation, relationnumber) +" </h4></div><div class=\"col-md-2\"><input type=\"text\" class=\"form-control input-lg\" id=\"pk"+str(i)+"\" name=\"pk"+str(i)+"\"></div></div><br/>"
 	currentRelationsString = ",".join(currentRelations)
 	html = html + """<input type="hidden" value="
 """+relationString+"""" name="relation"></input>
