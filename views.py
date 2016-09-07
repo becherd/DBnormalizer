@@ -209,6 +209,9 @@ def addPopoverText(string, title, tooltip):
 	else:
 		return "<span data-toggle=\"popover\" data-placement=\"right\"  data-html=\"true\" title=\""+title+"\" data-content=\""+tooltip+"\">"+string+"</span>"
 
+def getHintPopover(text):
+	return addPopoverText("<span class=\"glyphicon glyphicon-info-sign btn-xs\" aria-hidden=\"info\"></span>", "Hinweis", text)
+
 
 def numberOfAttributesOptions(x):
 	options=""

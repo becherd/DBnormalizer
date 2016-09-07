@@ -58,7 +58,7 @@ def candidateKeys(numberOfTries, numberOfSteps, relationString, fdsString):
 		</div>
 		</form>
 	"""
-	return views.getJumbotron("Kandidatenschlüssel.", "<p>Gib <b>alle</b> Kandidatenschlüssel an. Schreibe dazu jeweils alle Attribute eines Schlüssels in das Textfeld und verwende für jeden Schlüssel eine neue Zeile.</p><p>" + html +"</p>")
+	return views.getJumbotron("Kandidatenschlüssel.", "<p>Gib <b>alle</b> Kandidatenschlüssel an. Schreibe dazu jeweils alle Attribute eines Schlüssels in das Textfeld und verwende für jeden Schlüssel eine neue Zeile."+views.getHintPopover("Gib z.B. für die Kandidatenschlüssel {ABC} und {DE} ein:<br/><br/><pre>ABC<br/>DE</pre>")+"</p><p>" + html +"</p>")
 
 
 
@@ -117,7 +117,7 @@ def canonicalCoverLeftReduction(numberOfTries, numberOfSteps, relationString, fd
 		</div>
 		</form>
 	"""
-	return views.getJumbotron("Kanonische Überdeckung. Linksreduktion.", "<p>Gib die neuen linken Seiten der FDs an.</p><p>" + html +"</p>")
+	return views.getJumbotron("Kanonische Überdeckung. Linksreduktion.", "<p>Gib die neuen linken Seiten der FDs an."+views.getHintPopover("Um die leere Menge &empty; einzugeben, lasse das Feld einfach leer.")+"</p><p>" + html +"</p>")
 
 
 
@@ -144,7 +144,7 @@ def canonicalCoverRightReduction(numberOfTries, numberOfSteps, relationString, f
 		</div>
 		</form>
 	"""
-	return views.getJumbotron("Kanonische Überdeckung. Rechtsreduktion.", "<p>Gib die neuen rechten Seiten der FDs an.</p><p>" + html +"</p>")
+	return views.getJumbotron("Kanonische Überdeckung. Rechtsreduktion.", "<p>Gib die neuen rechten Seiten der FDs an."+views.getHintPopover("Um die leere Menge &empty; einzugeben, lasse das Feld einfach leer.")+"</p><p>" + html +"</p>")
 
 
 def canonicalCoverRemoveEmptyRight(numberOfTries, numberOfSteps, relationString, fdsString, fds):
@@ -201,7 +201,7 @@ def canonicalCoverCollapse(numberOfTries, numberOfSteps, relationString, fdsStri
 		</div>
 		</form>
 	"""
-	return views.getJumbotron("Kanonische Überdeckung. FDs zusammenfassen.", "<p>Möglicherweise musst du FDs zusammenfassen. Gib hier alle FDs an, die übrig bleiben.</p><p>" + html +"</p>")
+	return views.getJumbotron("Kanonische Überdeckung. FDs zusammenfassen.", "<p>Möglicherweise musst du FDs zusammenfassen. Gib hier alle FDs an, die übrig bleiben."+views.getHintPopover("Editiere die FDs so, dass die finale kanonische Überdeckung im Eingabefeld steht.")+"</p><p>" + html +"</p>")
 
 
 def formRelationSchemas(numberOfTries, numberOfSteps, relationString, fdsString, fds, relations):
@@ -268,7 +268,7 @@ def addKeyRelation(numberOfTries, numberOfSteps, relationString, fdsString, fds,
 			}).change();
 		</script>
 	"""
-	return views.getJumbotron("Synthesealgorithmus. Relation hinzufügen.", "<p>Möglicherweise musst du eine neue Relation hinzufügen.</p><p>" + html +"</p>")
+	return views.getJumbotron("Synthesealgorithmus. Relation hinzufügen.", "<p>Möglicherweise musst du eine neue Relation hinzufügen."+views.getHintPopover("Wenn du eine neue Relation hinzufügen möchtest, markiere die Checkbox und gib die Attribute der neuen Relation in das Textfeld ein. Um z.B. die Relation R<sub>x</sub>:={ABCDE} hinzuzufügen, gib ein:<br/><br/><pre>ABCDE</pre>")+"</p><p>" + html +"</p>")
 
 
 
@@ -351,7 +351,7 @@ def choosePrimaryKeys(numberOfTries, numberOfSteps, relationString, fdsString, f
 		</div>
 		</form>
 	"""
-	return views.getJumbotron(algorithm+". Primärschlüssel.", "<p>Gib für jede Relation <b>einen</b> möglichen Primärschlüssel an.</p><p>" + html +"</p>")
+	return views.getJumbotron(algorithm+". Primärschlüssel.", "<p>Gib für jede Relation <b>einen</b> möglichen Primärschlüssel an."+views.getHintPopover("Schreibe dazu für jede Relation die Attribute des Primärschlüssels in das zugehörige Textfeld. Um z.B. für die erste Relation den Primärschlüssel {ABCDE} hinzuzufügen, gib in das erste Textfeld ein:<br/><br/><pre>ABCDE</pre>")+"</p><p>" + html +"</p>")
 
 
 def formResultSyntheseAlgorithm(numberOfTries, numberOfSteps, relationString, fdsString, fds, relations, keysAndFDs, primarykeys):
@@ -428,7 +428,7 @@ def decompositionAlgorithm(numberOfTries, numberOfSteps, relationString, fdsStri
 		</div>
 		</form>
 	"""
-	return views.getJumbotron("Dekompositionsalgorithmus. "+targetnf+".", "<p>Gib an, ob Relationen aufgespalten werden müssen und welche Relationen entstehen.</p><p>" + html +"</p>")
+	return views.getJumbotron("Dekompositionsalgorithmus. "+targetnf+".", "<p>Gib an, ob Relationen aufgespalten werden müssen und welche Relationen entstehen."+views.getHintPopover("Wähle zunächst die Relation aus, die du aufspalten willst, oder wähle <em>keine Relation aufspalten</em>. Wenn du eine Relation aufspalten willst, gib die Attribute der Relationen ein, die neu entstehen.")+"</p><p>" + html +"</p>")
 
 
 
