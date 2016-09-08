@@ -25,7 +25,7 @@ print """
   	<div class="panel-body">
 		<div class="row">
 			<div class="col-md-6">
-				<h1><big><a href="index.py" style="text-decoration:none;">DB->normalizer</a></big><small id="dasquiz">Das Quiz</small></h1>
+				<h1><big><a href="index.py" style="text-decoration:none;">DB->normalizer</a></big><small>Das Qui<span id="dasquiz">z</span></small></h1>
 			</div>
 		</div>
 		<br/>
@@ -365,6 +365,6 @@ try:
 	print inputpanel
 	print quizform
 except KeyError:
-    	print views.getErrorMessageBox("Upsi, da ist wohl irgendwas schiefgelaufen!")
+    	print views.getErrorMessageBox("Upsi, da ist wohl irgendwas schiefgelaufen! <a href=\"index.py\" class=\"alert-link\">Neues Schema generieren</a>!")
 
 print htmlend()

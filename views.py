@@ -200,17 +200,17 @@ def addTooltipText(string, tooltip):
 	if tooltip == "":
 		return string
 	else:
-		return "<span data-toggle=\"tooltip\" data-placement=\"right\"  data-html=\"true\" title=\""+tooltip+"\">"+string+"</span>"
+		return "<span data-toggle=\"tooltip\" data-placement=\"top\"  data-html=\"true\" title=\""+tooltip+"\">"+string+"</span>"
 
 
-def addPopoverText(string, title, tooltip):
+def addPopoverText(string, title, tooltip, placement="right"):
 	if tooltip == "":
 		return string
 	else:
-		return "<span data-toggle=\"popover\" data-placement=\"right\"  data-html=\"true\" title=\""+title+"\" data-content=\""+tooltip+"\">"+string+"</span>"
+		return "<span data-toggle=\"popover\" data-placement=\""+placement+"\"  data-html=\"true\" title=\""+title+"\" data-content=\""+tooltip+"\">"+string+"</span>"
 
 def getHintPopover(text):
-	return addPopoverText("<span class=\"glyphicon glyphicon-info-sign btn-xs\" aria-hidden=\"info\"></span>", "Hinweis", text)
+	return addPopoverText("<span class=\"glyphicon glyphicon-info-sign btn-xs\" aria-hidden=\"info\"></span>", "Hinweis", text, "top")
 
 
 def numberOfAttributesOptions(x):

@@ -507,7 +507,7 @@ def quizFinal(numberOfTries, numberOfSteps, relationString, fdsString):
 	html = html + """<div class="row">
 		<div class="col-xs-3 pull-right">
 		<br/>
-		<a href="index.py" class=\"btn btn-default" role="button">Neu</a>
+		<a href="index.py" class="btn btn-default" role="button">Neu</a>
 		<button id="submitbutton" name="mode" type="submit" class="btn btn-primary" value="showResults">Ergebnis anzeigen</button>
 		</div>
 		</div></form>"""
