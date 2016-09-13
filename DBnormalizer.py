@@ -402,18 +402,25 @@ def splitRelationAtFdMvd(relation, fdmvd):
 
 
 def getAdditionalFDs(fds):
+	#only unique left sides
 	fds = collapseEqualLeftSides(fds[:])
-	cCover = canonicalCover(fds)[-1]
+	newValidFds = []
+	for fd in fds:
+		#compute the closure for each left side. This left side plus the closure as right side produces a new valid FD
+		fdclosure = closure(fd[0], fds)
+		validFd = (fd[0], (fdclosure-fd[0])-fd[1] | set(EMPTY_SET))
+		newValidFds.append(validFd)
+	#compute the canonical cover of those new valid FDs to get a minimal set of FDs
+	newValidFds = canonicalCover(newValidFds)[-1]
+	newValidFds = collapseEqualLeftSides(newValidFds)
 	
 	additionalFds = []
-	for addfd in cCover:
-		add = True
+	for addfd in leftReduction(newValidFds + fds):
 		for fd in fds:
-			if addfd[0] == fd[0] and addfd[1] <= fd[1]:
-				add = False
+			if addfd not in fds and addfd[0] == fd[0] and not addfd[1] <= fd[1]:
+				additionalFds.append((addfd[0], addfd[1]-fd[1] | set(EMPTY_SET)))
 				break
-		if add:
-			additionalFds.append(addfd)
+	additionalFds = collapseEqualLeftSides(additionalFds)
 	return additionalFds
 
 def decompositionAlgorithm(targetNf, fds, relation, mvds=[]):
