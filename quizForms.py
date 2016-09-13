@@ -150,11 +150,11 @@ def canonicalCoverRightReduction(numberOfTries, numberOfSteps, relationString, f
 def canonicalCoverRemoveEmptyRight(numberOfTries, numberOfSteps, relationString, fdsString, fds):
 	html = """<form class="form" action="quiz.py" method="POST">
 		<div class="row">
-		<div class="col-sm-12">
+		<div class="col-sm-12"><pre>
 """
 	for i, fd in enumerate(fds):
 		html = html + "<div class=\"checkbox\"><label><h4 style=\"display:inline;\"><input type=\"checkbox\" name=\"removeindices\" value=\""+str(i)+"\">"+views.fdToHtmlString(fd)+"</h4></label></div>"
-	html = html + """</div>
+	html = html + """</pre></div>
 		</div><input type="hidden" value="
 """+relationString+"""" name="relation"></input>
 		<input type="hidden" value="
@@ -208,9 +208,9 @@ def formRelationSchemas(numberOfTries, numberOfSteps, relationString, fdsString,
 	html = """<form class="form" action="quiz.py" method="POST">
 		"""
 	html = html + "<p>Du hast die kanonische Überdeckung gefunden:</p>" 
-	html = html + "<h4 style=\"display:inline;\">"+views.fdsToHtmlString(fds)+"</h4></br/>"
+	html = html + "<pre><h4 style=\"display:inline;\">"+views.fdsToHtmlString(fds)+"</h4></pre><br/>"
 	html = html + "<p>Daraus entstehen diese Relationen:</p>"
-	html = html + "<h4 style=\"display:inline;\">"+views.schemaToString(relations)+"</h4>"
+	html = html + "<pre><h4 style=\"display:inline;\">"+views.schemaToString(relations)+"</h4></pre>"
 	html = html + """<input type="hidden" value="
 """+relationString+"""" name="relation"></input>
 		<input type="hidden" value="
@@ -234,7 +234,7 @@ def formRelationSchemas(numberOfTries, numberOfSteps, relationString, fdsString,
 
 def addKeyRelation(numberOfTries, numberOfSteps, relationString, fdsString, fds, relations):
 	html = """<form class="form" action="quiz.py" method="POST">"""
-	html = html + "<h4 style=\"display:inline;\">"+views.schemaToString(relations)+"</h4>"
+	html = html + "<pre><h4 style=\"display:inline;\">"+views.schemaToString(relations)+"</h4></pre>"
 	html = html + """<div class="row">
 			<div class="col-sm-12">"""
 	html = html + "<div class=\"checkbox\"><label><h4 style=\"display:inline;\"><input type=\"checkbox\" id=\"addkeyrelation\" name=\"addkeyrelation\" value=\"true\">neue Relation hinzufügen</h4></label></div>"
@@ -277,10 +277,10 @@ def addKeyRelation(numberOfTries, numberOfSteps, relationString, fdsString, fds,
 def removeRedundantRelations(numberOfTries, numberOfSteps, relationString, fdsString, fds, relations, keyrelation):
 	html = """<form class="form" action="quiz.py" method="POST">
 		<div class="row">
-		<div class="col-sm-12">"""
+		<div class="col-sm-12"><pre>"""
 	for i, relation in enumerate(relations):
 		html = html + "<div class=\"checkbox\"><label><h4 style=\"display:inline;\"><input type=\"checkbox\" name=\"removeindices\" value=\""+str(i)+"\">"+views.relationToString(relation, i+1)+"</h4></label></div>"
-	html = html + """</div>
+	html = html + """</pre></div>
 		</div><input type="hidden" value="
 """+relationString+"""" name="relation"></input>
 		<input type="hidden" value="
@@ -358,7 +358,7 @@ def formResultSyntheseAlgorithm(numberOfTries, numberOfSteps, relationString, fd
 	html = """<form class="form" action="quiz.py" method="POST">
 		"""
 	html = html + "<p>Folgende Relationen sind entstanden:</p>"
-	html = html + "<h4 style=\"display:inline;\">"+views.schemaToString(relations, keysAndFDs, primarykeys)+"</h4>"
+	html = html + "<pre><h4 style=\"display:inline;\">"+views.schemaToString(relations, keysAndFDs, primarykeys)+"</h4></pre>"
 	html = html + """<input type="hidden" value="
 """+relationString+"""" name="relation"></input>
 		<input type="hidden" value="
@@ -443,7 +443,7 @@ def formResultDecompositionAlgorithm(numberOfTries, numberOfSteps, relationStrin
 	html = """<form class="form" action="quiz.py" method="POST">
 		"""
 	html = html + "<p>Folgende Relationen sind entstanden:</p>"
-	html = html + "<h4 style=\"display:inline;\">"+views.schemaToString(relations, keysAndFDsMVDs, primarykeys)+"</h4>"
+	html = html + "<pre><h4 style=\"display:inline;\">"+views.schemaToString(relations, keysAndFDsMVDs, primarykeys)+"</h4></pre>"
 	html = html + """<input type="hidden" value="
 """+relationString+"""" name="relation"></input>
 		<input type="hidden" value="
