@@ -402,7 +402,7 @@ def splitRelationAtFdMvd(relation, fdmvd):
 
 
 def getAdditionalFDs(fds):
-	fds = fds[:]
+	fds = collapseEqualLeftSides(fds[:])
 	cCover = canonicalCover(fds)[-1]
 	
 	additionalFds = []
