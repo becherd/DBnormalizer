@@ -99,8 +99,7 @@ def htmlstart(funModeAlert = ""):
   	<div class="panel-body">
 		<div class="row">
 			<div class="col-md-6">
-				<h1><big><a href="index.py" style="text-decoration:none;">DB->normalizer</a></big></h1>
-			</div>
+"""+views.getHeading()+"""</div>
 			<div class="col-md-6">
 				<p class="text-right"><button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#helpModal">
 		 			<span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Hilfe</button>

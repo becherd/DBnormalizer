@@ -25,8 +25,7 @@ print """
   	<div class="panel-body">
 		<div class="row">
 			<div class="col-md-6">
-				<h1><big><a href="index.py" style="text-decoration:none;">DB->normalizer</a></big><small>Das Qui<span id="dasquiz">z</span></small></h1>
-			</div>
+"""+views.getHeading("Das Qui<span id=\"dasquiz\">z</span>")+"""</div>
 		</div>
 		<br/>
 		<div class="panel panel-default">

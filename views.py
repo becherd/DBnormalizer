@@ -404,3 +404,19 @@ def getAlgorithmString(algorithm):
 def getAlgorithmTutorial():
 	return """<div class="panel-body"><h2>Algorithmen</h2><div class="panel panel-default"><div class="panel-body">"""+getPanelHeading('canonicalCover')+  getPanelHeading('synthese') + getPanelHeading('decompositionBCNF') + getPanelHeading('decomposition4NF') + "</div></div></div>"
 
+def getHeading(sub=""):
+	return """<h1><big><a href="index.py" style="text-decoration:none;"><span class="text-muted">DB<span id="arrow" name="arrow" style="display:none;">-></span>normalizer</span></a></big><small>
+"""+sub+"""</small></h1>
+                        <script>
+                                var colors=["info", "warning", "primary", "success", "danger"];
+                                var index=0;
+                                function changeArrowColor(){
+                                    if (index == colors.length){
+                                                index=0;
+                                        }
+                                     $('#arrow').hide().removeClass().addClass("text-"+colors[index]).fadeIn(3000);
+                                     index++;
+                                }
+                                $(document).ready(changeArrowColor());
+                                setInterval(changeArrowColor,10000);
+                        </script>"""
