@@ -110,6 +110,9 @@ def canonicalCoverLeftReduction(numberOfTries, numberOfSteps, relationString, fd
 		<input type="hidden" value="
 """+str(numberOfSteps)+"""" name="numberOfSteps"></input>
 		<div class="row">
+		<div class="col-xs-2 pull-left">
+                <button class="btn btn-xs btn-default" type="reset"><span class="glyphicon glyphicon-repeat aria-hidden="true"></span> Eingabe zurücksetzen</button>
+                </div>
 		<div class="col-xs-2 pull-right">
 		<br/>
 		<button id="step" name="step" type="submit" class="btn btn-primary" value="3-2">Weiter</button>
@@ -137,6 +140,9 @@ def canonicalCoverRightReduction(numberOfTries, numberOfSteps, relationString, f
 		<input type="hidden" value="
 """+str(numberOfSteps)+"""" name="numberOfSteps"></input>
 		<div class="row">
+		<div class="col-xs-2 pull-left">
+                <button class="btn btn-xs btn-default" type="reset"><span class="glyphicon glyphicon-repeat aria-hidden="true"></span> Eingabe zurücksetzen</button>
+                </div>
 		<div class="col-xs-2 pull-right">
 		<br/>
 		<button id="step" name="step" type="submit" class="btn btn-primary" value="3-3">Weiter</button>
@@ -181,6 +187,7 @@ def canonicalCoverCollapse(numberOfTries, numberOfSteps, relationString, fdsStri
 		<div class="row">
 		<div class="col-sm-12">
 		<textarea class="form-control input-lg" name="finalfds" id="finalfds" rows="5">"""+views.fdsToString(fds).replace(EMPTY_SET, "")+"""</textarea>
+		<br/>
 		</div>
 		</div>
 		<input type="hidden" value="
@@ -194,6 +201,9 @@ def canonicalCoverCollapse(numberOfTries, numberOfSteps, relationString, fdsStri
 		<input type="hidden" value="
 """+str(numberOfSteps)+"""" name="numberOfSteps"></input>
 		<div class="row">
+		<div class="col-xs-2 pull-left">
+                <button class="btn btn-xs btn-default" type="reset"><span class="glyphicon glyphicon-repeat aria-hidden="true"></span> Eingabe zurücksetzen</button>
+                </div>
 		<div class="col-xs-2 pull-right">
 		<br/>
 		<button id="step" name="step" type="submit" class="btn btn-primary" value="4">Weiter</button>

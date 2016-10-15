@@ -84,7 +84,7 @@ def relationToString(relation, i, candidateKeys = None, fds = [], mvds = [], add
 
 
 
-	relationString="R<sub>"+str(i)+"</sub>:={"
+	relationString="R<sub>"+str(i).strip()+"</sub>:={"
 	relationString=relationString+setOfAttributesToString(relation, primaryKey)
 	relationString = relationString + "}"
 
