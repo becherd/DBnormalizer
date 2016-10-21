@@ -59,10 +59,10 @@ def html(relation, fds, numberOfAttributes, funMode):
 		<form id="inputform" class="form" action="index.py"""+funModeURL+"""" method="POST"> 
 				<div class="form-group">
 					<h4>Relation eingeben</h4>
-					<input type="text" class="form-control" name="relation" value="
+					<input type="text" class="form-control" id="relation" name="relation" value="
 """ + relation+ """"></input>
 					<h4>FDs/MVDs eingeben</h4>
-					<textarea type="text" class="form-control" rows="6" name="fds">
+					<textarea type="text" class="form-control" rows="6" id="fds" name="fds">
 """+ fds + """
 </textarea>
 					<input type="hidden" value="
@@ -75,6 +75,14 @@ def html(relation, fds, numberOfAttributes, funMode):
 				<div class="form-group">
 						<button id="submitbutton" name="mode" type="submit" class="btn btn-default" value="showResults">Absenden</button>
 						<button id="quizButton" name="mode" type="submit" class="btn btn-primary" value="quiz">Quiz</button>
+						<div class="btn-group pull-right">					
+						<a href="#" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" >
+							Schema laden
+							<span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu" id="schemaDropdown">
+						</ul>
+						</div>
 				</div>			
 		</form>
 		<form class="form-inline" action="index.py"""+funModeURL+"""" method="POST">
@@ -162,8 +170,23 @@ htmlend="""
 			);   
 		});
 	</script>
-
-
+	<script>
+		$(document).ready(function(){
+			$.get('predefinedSchemas.py', function(result) {
+				$('#schemaDropdown').html(result.trim());
+			});
+			
+		});
+	</script>
+	<script>
+		function setContent(r){
+			$.get('predefinedSchemas.py?schema='+r, function(result) {
+				var schema = result.trim().split(";");
+				$('#relation').val(schema[0]);
+				$('#fds').val(schema.slice(1).join("\\n"));
+			});
+		}
+	</script>
 	</body>
 </html>
 """
