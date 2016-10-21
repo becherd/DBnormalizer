@@ -76,10 +76,10 @@ def html(relation, fds, numberOfAttributes, funMode):
 						<button id="submitbutton" name="mode" type="submit" class="btn btn-default" value="showResults">Absenden</button>
 						<button id="quizButton" name="mode" type="submit" class="btn btn-primary" value="quiz">Quiz</button>
 						<div class="btn-group pull-right">					
-						<a href="#" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" >
+						<button href="#" class="btn btn-default btn-sm dropdown-toggle" data-loading-text="Lädt..." data-toggle="dropdown" id="schemaDropdownButton">
 							Schema laden
 							<span class="caret"></span>
-						</a>
+						</button>
 						<ul class="dropdown-menu" id="schemaDropdown">
 						</ul>
 						</div>
@@ -180,10 +180,12 @@ htmlend="""
 	</script>
 	<script>
 		function setContent(r){
+			var btn = $('#schemaDropdownButton').button('loading');
 			$.get('predefinedSchemas.py?schema='+r, function(result) {
 				var schema = result.trim().split(";");
 				$('#relation').val(schema[0]);
 				$('#fds').val(schema.slice(1).join("\\n"));
+				btn.button('reset');
 			});
 		}
 	</script>
