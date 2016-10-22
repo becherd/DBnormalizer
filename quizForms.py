@@ -507,9 +507,13 @@ def quizFinal(numberOfTries, numberOfSteps, relationString, fdsString):
 		}).change();
 		}).change();
 		</script>
-""" 
-
-
+"""
+	progressBar = """<div class="progress">
+  				<div class="progress-bar" role="progressbar" style="width: 
+"""+str(score)+"""%;">
+  				</div>	
+			</div>
+"""
 
 	html = """<form class="form" action="index.py" method="POST">"""
 	html = html + "<input type=\"hidden\" value=\""+relationString+"\" name=\"relation\"></input>"
@@ -521,7 +525,7 @@ def quizFinal(numberOfTries, numberOfSteps, relationString, fdsString):
 		<button id="submitbutton" name="mode" type="submit" class="btn btn-primary" value="showResults">Ergebnis anzeigen</button>
 		</div>
 		</div></form>"""
-	return views.getJumbotron("<span id=\"heading\"></span>", "<p><span id=\"content\"></span></p><p>" + html +"</p>") + headings + contents
+	return views.getJumbotron("<span id=\"heading\"></span>", "<p><span id=\"content\"></span></p><p>"+progressBar+"</p><p>" + html +"</p>") + headings + contents
 
 
 def getFoodsFat():
