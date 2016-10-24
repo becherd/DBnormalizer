@@ -41,6 +41,7 @@ print """
 			<link rel="stylesheet" type="text/css" href="http://home.in.tum.de/~becher/static/css/bootstrapcosmo.min.css" />
 			<script src="http://home.in.tum.de/~becher/static/js/jquery-1.11.3.min.js"></script>
 			<script src="http://home.in.tum.de/~becher/static/js/bootstrap.min.js"></script>
+			<script src="http://home.in.tum.de/~becher/static/js/js.cookie.js"></script>
 		</head>"""
 
 
@@ -75,7 +76,8 @@ def html(relation, fds, numberOfAttributes, funMode):
 				<div class="form-group">
 						<button id="submitbutton" name="mode" type="submit" class="btn btn-default" value="showResults">Absenden</button>
 						<button id="quizButton" name="mode" type="submit" class="btn btn-primary" value="quiz">Quiz</button>
-						<div class="btn-group pull-right">					
+						<div class="pull-right dropup">					
+						<a href="#" class="btn btn-default btn-sm" id="saveSchema" onclick="saveSchema();"><span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span> Schema speichern</a>
 						<button href="#" class="btn btn-default btn-sm dropdown-toggle" data-loading-text="Lädt..." data-toggle="dropdown" id="schemaDropdownButton">
 							Schema laden
 							<span class="caret"></span>
@@ -155,6 +157,9 @@ htmlend="""
 			</div>
 		</div>
 
+
+
+
 	<script>
 		$(document).ready(function(){
    		 $('[data-toggle="tooltip"]').tooltip();   
@@ -171,24 +176,87 @@ htmlend="""
 		});
 	</script>
 	<script>
+		function addSchemaToList(id){
+			$('#schemaDropdown').append("<li name='"+id+"'><a href='#'><span onclick='setContent(\\""+id+"\\")'>Schema "+id+"</span> <span class='glyphicon glyphicon-trash btn-xs' onclick='deleteSchema(\\""+id+"\\")'></span></a></li>");			
+		}
+		function appendDropdownHeader(){
+			 $('#schemaDropdown').append("<span id='dropdownHeader'><li role='separator' class='divider'></li><li class='dropdown-header'>Meine Schemata</li></span>");
+		}
+		function removeDropdownHeader(){
+			 $('#dropdownHeader').remove();
+		}
+
 		$(document).ready(function(){
+                       //saved user schemas
+                        savedSchemas = getSavedSchemas();
+			if(Object.keys(savedSchemas).length > 0){
+				appendDropdownHeader();
+                       	}
+			$.each(savedSchemas, function(id){
+				addSchemaToList(id);
+                       	});
+			//predefined schemas
 			$.get('predefinedSchemas.py', function(result) {
-				$('#schemaDropdown').html(result.trim());
+				$('#schemaDropdown').prepend(result.trim());
+				$('#schemaDropdown').prepend("<li class='dropdown-header'>GDB Schemata</li>");
 			});
-			
 		});
-	</script>
-	<script>
+
 		function setContent(r){
 			var btn = $('#schemaDropdownButton').button('loading');
-			$.get('predefinedSchemas.py?schema='+r, function(result) {
-				var schema = result.trim().split(";");
+                        if(r.match('^s.+')){
+                                //predefined
+                                $.get('predefinedSchemas.py?schema='+r, function(result) {
+					var schema = result.trim().split(";");
+					$('#relation').val(schema[0]);
+                        		$('#fds').val(schema.slice(1).join("\\n"));
+                        		btn.button('reset');
+                                });
+                        }
+                        else{
+                                //user-defined
+                                var schema = Cookies.get(r).trim().split(";");
 				$('#relation').val(schema[0]);
-				$('#fds').val(schema.slice(1).join("\\n"));
-				btn.button('reset');
-			});
+                                $('#fds').val(schema.slice(1).join("\\n"));
+                                btn.button('reset');
+                        }
 		}
-	</script>
+
+                function getSavedSchemas(){
+                        var schemas = Cookies.get();
+			var result = {};
+			for(var s in schemas){
+				if ($.isNumeric(s)){
+					result[s] = schemas[s];
+				}
+			}
+			return result;
+                }
+		var pathVisible = '/~becher';
+                function saveSchema(){
+                       schemas = getSavedSchemas();
+			var newSchemaId = 1;
+			if (Object.keys(schemas).length>0){
+				var schemaIds = Object.keys(schemas);
+	                       	newSchemaId = Math.max.apply(Math,schemaIds)+1;
+			}
+			else{
+				appendDropdownHeader();
+			}
+			addSchemaToList(newSchemaId);
+			Cookies.set(newSchemaId, $('#relation').val()+';'+$('#fds').val().replace('\\n', ';'), { expires: 180, path: pathVisible });
+			alert('Schema gespeichert als "Schema '+newSchemaId+'"');
+                }
+		
+		function deleteSchema(id){
+			$('#schemaDropdown').find('li[name='+id+']').remove();
+			Cookies.remove(id, { path: pathVisible });
+			schemas = getSavedSchemas();
+			if (Object.keys(schemas).length == 0){
+				removeDropdownHeader();
+			}
+		}
+        </script>
 	</body>
 </html>
 """
