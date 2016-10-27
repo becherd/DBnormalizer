@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+#!/usr/bin/python
+# -*- coding: utf8 -*-
 import cgi
 import cgitb; cgitb.enable()
 import views
@@ -32,7 +33,7 @@ def printQuizStart(string):
 		return quizForms.formQuizStart(relation, fds, mvds)
 
 
-	
+print "Content-Type: text/html"	
 print """
 	<html>
 		<head>

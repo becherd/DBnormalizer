@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+#!/usr/bin/python
+# -*- coding: utf8 -*-
 import cgi
 import cgitb; cgitb.enable()
 import views
@@ -11,6 +12,7 @@ form = cgi.FieldStorage()
 
 EMPTY_SET = "$"
 
+print "Content-Type: text/html"
 print """
 	<html>
 		<head>

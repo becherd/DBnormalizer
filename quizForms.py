@@ -1,4 +1,4 @@
-#! /usr/local/dist/bin/python
+#! /usr/bin/python
 # -*- coding: utf8 -*-
 
 import DBnormalizer 

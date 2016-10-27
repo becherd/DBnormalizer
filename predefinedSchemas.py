@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+#!/usr/bin/python
+# -*- coding: utf8 -*-
 import cgi
 import cgitb; cgitb.enable()
 
