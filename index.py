@@ -39,10 +39,10 @@ print """
 		<head>
 			<meta charset="utf-8">
 			<title>DB->normalizer</title>
-			<link rel="stylesheet" type="text/css" href="http://home.in.tum.de/~becher/static/css/bootstrapcosmo.min.css" />
-			<script src="http://home.in.tum.de/~becher/static/js/jquery-1.11.3.min.js"></script>
-			<script src="http://home.in.tum.de/~becher/static/js/bootstrap.min.js"></script>
-			<script src="http://home.in.tum.de/~becher/static/js/js.cookie.js"></script>
+			<link rel="stylesheet" type="text/css" href="/becher/static/css/bootstrapcosmo.min.css" />
+			<script src="/becher/static/js/jquery-1.11.3.min.js"></script>
+			<script src="/becher/static/js/bootstrap.min.js"></script>
+			<script src="/becher/static/js/js.cookie.js"></script>
 		</head>"""
 
 
