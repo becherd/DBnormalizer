@@ -68,8 +68,6 @@ def html(relation, fds, numberOfAttributes, funMode):
 """+ fds + """
 </textarea>
 					<input type="hidden" value="
-"""+str(funMode)+"""" name="fun"></input>
-					<input type="hidden" value="
 """+str(numberOfAttributes)+"""
 " name="numberOfAttributes"></input>
 					<input type="hidden" value="1" name="step"></input>
@@ -94,8 +92,7 @@ def html(relation, fds, numberOfAttributes, funMode):
 				Generiere neues Schema mit
 				<select class="form-control input-sm" name="numberOfAttributes">
 """+attributesOptions+"""
-</select> <input type="hidden" value="
-"""+str(funMode)+"""" name="fun"></input>Attributen
+</select> Attributen
 			<button id="mode" name="mode" type="submit" class="btn btn-default btn-sm" value="generateFds">nur mit FDs</button>
 			<button id="mode" name="mode"  type="submit" class="btn btn-default btn-sm" value="generateMvds">auch mit MVDs</button>	
 		</div>
