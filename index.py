@@ -73,7 +73,7 @@ def html(relation, fds, numberOfAttributes, funMode):
 					<input type="hidden" value="1" name="step"></input>
 				</div>
 				<div class="form-group">
-						<button id="submitbutton" name="mode" type="submit" class="btn btn-default" value="showResults">Absenden</button>
+						<button id="submitbutton" name="mode" type="submit" class="btn btn-default" value="showResults">Ergebnis anzeigen</button>
 						<button id="quizButton" name="mode" type="submit" class="btn btn-primary" value="quiz">Quiz</button>
 						<div class="pull-right dropup">					
 						<a href="#" class="btn btn-default btn-sm" id="saveSchema" onclick="saveSchema();"><span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span> Schema speichern</a>
