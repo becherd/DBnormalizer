@@ -133,7 +133,7 @@ htmlend="""
 	<br/>
 		<!-- Modal: help -->
 		<div id="helpModal" class="modal fade" role="dialog">
-			<div class="modal-dialog">
+			<div class="modal-dialog modal-lg">
 			<!-- Modal content-->
 			<div class="modal-content">
 				<div class="modal-header">
@@ -142,10 +142,36 @@ htmlend="""
 				</div>
 				<div class="modal-body">
 					<p>
-						<h4>Relationen und FDs/MVDs eingeben</h4>
-						<p>Eine Relation kann z.B. als <code>ABCD</code> eingegeben werden, wobei dann jeder Buchstabe ein Attribut bezeichet (hier gäbe es Attribute A,B,C,D). Alternativ können auch längere Attributnamen verwendet werden, diese sind dann durch Kommata zu trennen, z.B. <code>AttributA,AttributB,AttributC</code></p>
-						<p>FDs werden mittels <code>-></code> eingegeben, wobei links und rechts des Pfeils Attribute stehen können. Diese können wieder entweder ohne Kommata eingegeben werden (jeder Buchstabe ein Attribut, z.B. <code>ABC->D</code>), oder durch Kommata getrennt (z.B. <code>AttributA,AttributB->AttributC</code>). Wird kein Attribut angegeben, wird dies als leere Menge (&empty;) interpretiert.</p>
-						<p>MVDs werden mittels <code>->></code> angegeben, ansonsten analog zu FDs
+						<h4>Relation eingeben</h4>
+						<p>Du kannst eine Relation eingeben, indem du Attribute in das obere Textfeld schreibst. Hier hast du zwei Möglichkeiten:
+						<ul><li>Jeder Buchstabe ein Attribut: Wenn du die Attribute nicht durch Kommas trennst, bezeichnet jeder Buchstabe ein Attribut. <code>ABCD</code> bedeutet also, dass die Relation die Attribute <code>A</code>, <code>B</code>, <code>C</code> und <code>D</code> enthält.</li>
+						<li>Lange Attributnamen: Du kannst auch längere Attributnamen verwenden, diese musst du dann durch Kommas trennen. Beispiel: <code>AttributA,AttributB,AttributC</code>
+						</ul>	
+						</p>
+						<h4>FDs/MVDs eingeben</h4>
+						<p>
+						Abhängigkeiten kannst du ins untere Textfeld schreiben; verwende für jede Abhängigkeit eine neue Zeile. Verwende <code>-></code>, um eine FD bzw. <code>->></code>, um eine MVD einzugeben. Links und rechts vom Pfeil kannst du Attribute in der gleichen Form angeben wie oben in der Relation. Wenn du auf einer Seite kein Attribut angibst, wird dies als leere Menge (<code>&empty;</code>) interpretiert. 
+						</p>
+						<h4>Schema generieren</h4>
+						<p>
+						Du kannst ein neues, zufälliges Schema generieren, indem du die gewünschte Attributzahl über das Dropdown wählst und dann über Klick auf <span class="btn btn-default btn-xs">nur mit FDs</span> oder <span class="btn btn-default btn-xs">auch mit MVDs</span> entscheidest, ob im generierten Schema MVDs enthalten sein sollen oder nicht. Ein manuelles Neuladen der Webseite generiert immer ein Schema mit 5 Attributen ohne MVDs.
+						</p>
+						<h4>Schema speichern</h4>
+						<p>
+						Mit Klick auf <span class="btn btn-default btn-xs">Schema speichern</span> kannst du das aktuell eingegebene Schema speichern, um es später wieder laden zu können. Das Schema wird dabei als Cookie gespeichert; ist also verloren, wenn du die Cookies für diese Seite löschst.
+						</p>
+						<h4>Schema laden</h4>
+						<p>
+						Mit Klick auf <span class="btn btn-default btn-xs">Schema laden</span> kannst du deine gespeicherten Schemata laden. Zusätzlich sind auch GDB-Schemata hinterlegt; das sind Übungsaufgaben aus der GDB-Übung.
+						</p>
+						<h4>Ergebnis anzeigen</h4>
+						<p>
+						Mit Klick auf <span class="btn btn-default btn-xs">Ergebnis anzeigen</span> werden alle relevanten Eigenschaften des Schemas berechnet und das Schema anschließend in höhere Normalformen überführt. Es werden dabei von allen Algorithmen alle Zwischenschritte angezeigt. Es wird allerdings jeweils nur eine mögliche Lösung angezeigt, möglicherweise gibt es noch andere, richtige Lösungen.
+						</p>
+						<h4>Quiz</h4>
+						<p>
+						Mit Klick auf <span class="btn btn-default btn-xs">Quiz</span> kannst du das Quiz starten. Hier wirst du nacheinander alles abgefragt (Eigenschaften des Schemas sowie Überführung in höhere Normalformen) und bekommst nach jedem Schritt Feedback, ob deine Lösung richtig ist oder nicht. 
+						</p>
 					</p>
 				</div>
 				<div class="modal-footer">
