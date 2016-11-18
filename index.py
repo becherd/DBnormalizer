@@ -109,7 +109,7 @@ def htmlstart(funModeAlert = ""):
 			<div class="col-md-6">
 """+views.getHeading()+"""</div>
 			<div class="col-md-6">
-				<p class="text-right"><button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#helpModal">
+				<p class="text-right"><a href="tutorial.py" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-education" aria-hidden="true"></span> Tutorial</a> <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#helpModal" style="display:inline;">
 		 			<span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Hilfe</button>
 				</p>
 			</div>
@@ -170,7 +170,7 @@ htmlend="""
 						</p>
 						<h4>Quiz</h4>
 						<p>
-						Mit Klick auf <span class="btn btn-default btn-xs">Quiz</span> kannst du das Quiz starten. Hier wirst du nacheinander alles abgefragt (Eigenschaften des Schemas sowie Überführung in höhere Normalformen) und bekommst nach jedem Schritt Feedback, ob deine Lösung richtig ist oder nicht. 
+						Mit Klick auf <span class="btn btn-primary btn-xs">Quiz</span> kannst du das Quiz starten. Hier wirst du nacheinander alles abgefragt (Eigenschaften des Schemas sowie Überführung in höhere Normalformen) und bekommst nach jedem Schritt Feedback, ob deine Lösung richtig ist oder nicht. 
 						</p>
 					</p>
 				</div>
