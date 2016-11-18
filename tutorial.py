@@ -177,7 +177,7 @@ Wir fangen bei der ersten Normalform (1NF) an:
 		</div>
 		</p>
 		<p>
-			Offensichtlich ist z.B. die erste FD nicht in 3NF: <code>AB->C</code> ist weder trivial, noch steht links ein Superschlüssel, noch ist das <code>C</code> auf der rechten Seite in einem Kandidatenschlüssel enthalten. Wir können hier also schon aufhören und sagen: 3NF ist nicht erfüllt. In diesem Beispiel ist es sogar so, dass keine der FDs die Bedingungen für die 3NF erfüllen würde. Also ganz klar (was wir auch schon vorher wussten):
+			Offensichtlich ist z.B. die erste FD nicht in 3NF: <code>AB->C</code> ist weder trivial, noch steht links ein Superschlüssel, noch ist das <code>C</code> auf der rechten Seite in einem Kandidatenschlüssel enthalten. Wir können hier also schon aufhören und sagen: 3NF ist nicht erfüllt. In diesem Beispiel ist es sogar so, dass keine der FDs die 3NF erfüllen würde. Also ganz klar (was wir auch schon vorher wussten):
 		</p>
 		<p>
 		<div class="well well-lg">
@@ -250,7 +250,7 @@ Wir fangen bei der ersten Normalform (1NF) an:
 		<p>Wir wollen nun die Kanonische Überdeckung der gegebenen FDs ermitteln. Die Kanonische Überdeckung ist äquivalent zu den ursprünglichen FDs, ist aber im Gegensatz zu den ursprünglichen FDs in jedem Fall minimal (d.h. es gibt keine "Redundanzen" mehr). Zur Bestimmung der Kanonischen Überdeckung müssen vier Schritte nacheinander durchgeführt werden:
 		</p>
 		<h3>Linksreduktion</h3>
-		<p>Als erstes schauen wir, welche Attribute wir auf den linken Seiten weglassen können, ohne die Aussage der FDs zu verändern. In unserem Beispiel können wir - wen überhaupt - nur die erste FD linksreduzieren; bei allen anderen FDs steht links nur ein Attribut. Würden wir da was weglassen stünde links die leere Menge und die Aussage der FD wäre komplett anders als vorher. Und das wollen wir nicht.
+		<p>Als erstes schauen wir, welche Attribute wir auf den linken Seiten weglassen können, ohne die Aussage der FDs zu verändern. In unserem Beispiel können wir - wenn überhaupt - nur die erste FD linksreduzieren; bei allen anderen FDs steht links nur ein Attribut. Würden wir da was weglassen stünde links die leere Menge und die Aussage der FD wäre komplett anders als vorher. Und das wollen wir nicht.
 		</p>
 		<p>
 		Wir betrachten also die erste FD
@@ -264,7 +264,7 @@ Wir fangen bei der ersten Normalform (1NF) an:
 		  Erste Frage lautet jetzt also: "<i>Kann ich A weglassen?</i>". Anders formuliert: "<i>Komme ich mit dem Rest trotzdem zur kompletten rechten Seite?</i>". Die Antwort: Ja, weil man kommt auch nur mit dem <code>B</code> zum <code>C</code>, sogar über zwei verschiedene Wege:
 		  <ol>
 			<li>ganz einfach über die letzte FD <code>B->C</code></li>
-			<li>oder mithilfe der zweiten FD <code>B->DA</code>: Mit dem <code>B</code> bekomme ich das <code>A</code>, dann habe ich <code>AB</code> und kann wieder die erste FD gehen, um das <code>C</code> zu bekommen.
+			<li>oder mithilfe der zweiten FD <code>B->DA</code>: Mit dem <code>B</code> bekommen wir das <code>A</code>, dann haben wir <code>AB</code> und können wieder die erste FD gehen, um das <code>C</code> zu erreichen.
 		  </ol>
 		Hier haben wir jetzt zwei Wege, einer reicht aber aus. Wir können also <code>A</code> weglassen, weil wir auch nur mit dem <code>B</code> zum <code>C</code> kommen. <code>B</code> können wir natürlich nicht auch noch weglassen, dann hätten wir nämlich eine leere linke Seite.
 		</p>
