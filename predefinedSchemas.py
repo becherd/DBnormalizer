@@ -10,12 +10,13 @@ param = cgi.FieldStorage()
 
 schemas = {}
 #format: "[attributes];[dependency#1];...;[dependency#n]"
-schemas["s0"] = "ABCDEF;A->BC;C->DA;E->ABC;F->CD;CD->BEF"
+schemas["s0"] = "ABCDEF;B->DA;DEF->B;C->EA"
 schemas["s1"] = "Name,Aufgabe,Max,Erzielt,ErzieltSumme,MaxSumme,KNote,Bonus,GNote;KNote,Bonus->GNote;Aufgabe->Max;ErzieltSumme->KNote;Name,Aufgabe->Erzielt;Name->ErzieltSumme,Bonus,GNote;->MaxSumme"
-schemas["s2"] = "ABCDEFG;A->BC;DE->B;F->A;E->BF;A->DE;C->A"
-schemas["s3"] = "ABCD;AB->>C;BC->>D;BA->CD;DA->B"
-schemas["s4"] = "person,kindName,kindAlter,fahrradTyp,fahrradFarbe;person->>kindName,kindAlter;person->>fahrradTyp,fahrradFarbe;kindName->kindAlter"
-schemas["s5"] = "ABCDEF;AB->CD;ABC->D;E->C;D->C;CDE->AB"
+schemas["s2"] = "ABCDEF;A->BC;C->DA;E->ABC;F->CD;CD->BEF"
+schemas["s3"] = "ABCDEFG;A->BC;DE->B;F->A;E->BF;A->DE;C->A"
+schemas["s4"] = "ABCD;AB->>C;BC->>D;BA->CD;DA->B"
+schemas["s5"] = "person,kindName,kindAlter,fahrradTyp,fahrradFarbe;person->>kindName,kindAlter;person->>fahrradTyp,fahrradFarbe;kindName->kindAlter"
+schemas["s6"] = "ABCDEF;AB->CD;ABC->D;E->C;D->C;CDE->AB"
 
 def getSchemaIds():
 	schema_ids = []
