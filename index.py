@@ -200,8 +200,12 @@ htmlend="""
 		});
 	</script>
 	<script>
-		function addSchemaToList(id){
-			$('#schemaDropdown').append("<li name='"+id+"'><a href='#'><span onclick='setContent(\\""+id+"\\")'>Schema "+id+"</span> <span class='glyphicon glyphicon-trash btn-xs' onclick='deleteSchema(\\""+id+"\\")'></span></a></li>");			
+		function addSchemaToList(id, schema=""){
+			if(schema == ""){
+				schema = Cookies.get(id);
+			}
+			schema = schema.trim().replace(/;/g, '; ').replace(';', '):');
+			$('#schemaDropdown').append("<li name='"+id+"'><a href='#'><span onclick='setContent(\\""+id+"\\")'><span data-toggle='tooltip' data-placement='top'  data-html='true' title='R("+schema+"'>Schema "+id+"</span></span> <span class='glyphicon glyphicon-trash btn-xs' onclick='deleteSchema(\\""+id+"\\")'></span></a></li>");			
 		}
 		function appendDropdownHeader(){
 			 $('#schemaDropdown').append("<span id='dropdownHeader'><li role='separator' class='divider'></li><li class='dropdown-header'>Meine Schemata</li></span>");
@@ -267,10 +271,11 @@ htmlend="""
 			else{
 				appendDropdownHeader();
 			}
-			addSchemaToList(newSchemaId);
-			Cookies.set(newSchemaId, $('#relation').val()+';'+$('#fds').val().replace('\\n', ';'), { expires: 180, path: pathVisible });
+			var schema = $('#relation').val().trim()+';'+$('#fds').val().trim().replace(/(\s*\\n\s*)*$/g, '').replace(/\\n/g, ';');
+			addSchemaToList(newSchemaId, schema);
+			Cookies.set(newSchemaId, schema, { expires: 180, path: pathVisible });
 			alert('Schema gespeichert als "Schema '+newSchemaId+'"');
-                }
+		}
 		
 		function deleteSchema(id){
 			$('#schemaDropdown').find('li[name='+id+']').remove();

@@ -2,7 +2,7 @@
 # -*- coding: utf8 -*-
 import cgi
 import cgitb; cgitb.enable()
-
+import views
 param = cgi.FieldStorage()
 
 #this file contains some schemas appearing in the exercise sheets of the tum gdb course
@@ -33,5 +33,5 @@ except KeyError:
 	predefindedSchemaIds = getSchemaIds()
 	schemaList = ""
 	for i, schemaId in enumerate(predefindedSchemaIds):
-		schemaList = schemaList + "<li><a href=\"#\" onclick=\"setContent('"+str(schemaId)+"')\">Schema "+str(i+1)+"</a></li>"
+		schemaList = schemaList + "<li><a href=\"#\" onclick=\"setContent('"+str(schemaId)+"')\">"+views.addTooltipText("Schema "+str(i+1), "R("+schemas[schemaId].replace(";", "; ").replace(";", "):", 1))+"</a></li>"
 	print schemaList
