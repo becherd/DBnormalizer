@@ -245,7 +245,9 @@ def getInfoMessageBox(message):
 	
 
 def getPanelHeading(id, expanded=False, info=""):
-	if id=="canonicalCover":
+	if id=="normalforms":
+		heading = "Normalformen"
+	elif id=="canonicalCover":
 		heading = "Kanonische Überdeckung"
 	elif id=="synthese":
 		 heading = "Synthesealgorithmus (überführt R in 3NF)"
@@ -361,7 +363,32 @@ def resultToString(relation, fds, mvds, result) :
 
 def getAlgorithmString(algorithm):
 	resultString = ""
-	if algorithm == 'canonicalCover':
+	if algorithm == 'normalforms':
+		resultString = """<div class="row">"""
+		resultString =  resultString+wrapInPanel("1NF", "Schema ist in 1NF, wenn alle Attribute atomar sind (trivial).", 1, "info")
+		resultString =  resultString+wrapInPanel("2NF", """Schema ist in 2NF, wenn es in 1NF ist und für jedes Attribut b auf der rechten Seite gilt:
+							<ol>
+								<li>b ist Teil eines Kandidatenschlüssels <b>oder</b></li>
+								<li>b ist nicht von einer echten Teilmenge eines Kandidatenschlüssels abhängig</li>
+							</ol>""", 1, "info")
+		resultString =  resultString+wrapInPanel("3NF", """Schema ist in 3NF, wenn jede FD &#x3b1;->&#x3b2; mindestens eine der folgenden Bedingungen erfüllt:
+			<ol>
+				<li>&#x3b1;->&#x3b2; ist trivial (&#x3b2;&#x2286;&#x3b1;)</li>
+				<li>&#x3b1; ist Superschlüssel</li>
+				<li>Jedes Attribut in &#x3b2; ist in einem Kandidatenschlüssel enthalten</li>
+			</ol>""", 1, "info")
+		resultString =  resultString+wrapInPanel("BCNF", """Schema ist in BCNF, wenn jede FD &#x3b1;->&#x3b2; mindestens eine der folgenden Bedingungen erfüllt:
+			<ol>
+				<li>&#x3b1;->&#x3b2; ist trivial (&#x3b2;&#x2286;&#x3b1;)</li>
+				<li>&#x3b1; ist Superschlüssel</li>
+			</ol>""", 1, "info")
+		resultString =  resultString+wrapInPanel("4NF", """Schema ist in 4NF, wenn jede MVD &#x3b1;->>&#x3b2; mindestens eine der folgenden Bedingungen erfüllt:
+			<ol>
+				<li>&#x3b1;->>&#x3b2; ist trivial (&#x3b2;&#x2286;&#x3b1; oder &#x3b1;&#x222a;&#x3b2; = R)</li>
+				<li>&#x3b1; ist Superschlüssel</li>
+			</ol>""", 1, "info")
+		resultString =  resultString + """</div>"""
+	elif algorithm == 'canonicalCover':
 		resultString = """<div class="row">"""
 		resultString =  resultString+wrapInPanel("<span class='badge'>1</span> Linksreduktion", "Was kann ich links weglassen?", 4, "info")
 		resultString =  resultString+wrapInPanel("<span class='badge'>2</span> Rechtsreduktion", "Was kann ich rechts weglassen?", 4, "info")
@@ -402,7 +429,7 @@ def getAlgorithmString(algorithm):
 
 
 def getAlgorithmTutorial():
-	return """<div class="panel-body"><h2>Algorithmen</h2><div class="panel panel-default"><div class="panel-body">"""+getPanelHeading('canonicalCover')+  getPanelHeading('synthese') + getPanelHeading('decompositionBCNF') + getPanelHeading('decomposition4NF') + "</div></div></div>"
+	return """<div class="panel-body"><h2>Algorithmen</h2><div class="panel panel-default"><div class="panel-body">"""+getPanelHeading('normalforms') + getPanelHeading('canonicalCover')+  getPanelHeading('synthese') + getPanelHeading('decompositionBCNF') + getPanelHeading('decomposition4NF') + "</div></div></div>"
 
 def getHeading(sub=""):
 	return """<h1><big><a href="index.py" style="text-decoration:none;"><span class="text-muted">DB<span id="arrow" name="arrow" style="display:none;">-></span>normalizer</span></a></big><small>
