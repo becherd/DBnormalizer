@@ -423,11 +423,25 @@ def getAdditionalFDs(fds):
 	additionalFds = collapseEqualLeftSides(additionalFds)
 	return additionalFds
 
+def getAdditionalMVDs(mvds, relation):
+	additionalMVDs=[]
+	for mvd in mvds:
+		additionalMVD = (mvd[0], (relation-mvd[0])-mvd[1] | set(EMPTY_SET))
+		if additionalMVD[1] != set(EMPTY_SET) and additionalMVD not in mvds and additionalMVD not in additionalMVDs:
+			additionalMVDs.append(additionalMVD)
+	return additionalMVDs
+	
+
+
+
 def decompositionAlgorithm(targetNf, fds, relation, mvds=[]):
 	fds = fds[:]
 
 	additionalFds = getAdditionalFDs(fds)
 	fds.extend(additionalFds)
+
+	additionalMvds = getAdditionalMVDs(mvds+fds, relation)
+	mvds.extend(additionalMvds)
 
 	if targetNf == "BCNF":
 		to4NF=False
@@ -446,6 +460,7 @@ def decompositionAlgorithm(targetNf, fds, relation, mvds=[]):
 
 	while not targetNfReached:
 		additionalFdsInR = []
+		additionalMvdsInR = []
 		if not to4NF:
 			#BCNF
 			i,r=getFirstNonBCNFRelation([x[0] for x in relations], fds)
@@ -469,6 +484,7 @@ def decompositionAlgorithm(targetNf, fds, relation, mvds=[]):
 				if len(relations) == 1:
 					#show alert for additional FDs only in the first step
 					additionalFdsInR = fdsInRelation(additionalFds, r)
+					additionalMvdsInR = mvdsInRelation(additionalMvds, r)
 				mvdsInR = mvdsInRelation(mvds, r)
 				currentfd = getFirstNonBCNFfd(r, fdsInR)
 				if currentfd is ():
@@ -491,7 +507,7 @@ def decompositionAlgorithm(targetNf, fds, relation, mvds=[]):
 			relations.append((r2, relations[i][1]+"2", keysOfR2, fdsInR2, mvdsInR2))
 			
 			
-			relationString = views.relationToString(relations[i][0], relations[i][1], getKeys(r, fdsInR), fdsInR, mvdsInR, additionalFdsInR)
+			relationString = views.relationToString(relations[i][0], relations[i][1], getKeys(r, fdsInR), fdsInR, mvdsInR, additionalFdsInR, additionalMvdsInR)
 
 
 			stepsStrings.append(views.wrapInPanel(relationString+"  nicht in "+targetNf, currentfdString+" verletzt die "+targetNf+".<br/>"+relationString+"""  zerlegen in<br/><ul style="list-style-type:square;"><li>"""+views.relationToString(r1, relations[i][1]+"1", keysOfR1, fdsInR1, mvdsInR1)+"</li><li>"+views.relationToString(r2, relations[i][1]+"2", keysOfR2, fdsInR2, mvdsInR2), 2)+"""</li></ul>""")
@@ -500,10 +516,11 @@ def decompositionAlgorithm(targetNf, fds, relation, mvds=[]):
 			
 	resultString = ""
 	if len(relations) > 1:
-		#at least one relation has been split, thus additional fds have been displayed in this step (if there are any). We do not mark them again when displaying the result.
+		#at least one relation has been split, thus additional fds/mvds have been displayed in this step (if there are any). We do not mark them again when displaying the result.
 		additionalFds = []
+		additionalMvds = []
 	for r in relations:
-		resultString = resultString + views.relationToString(r[0], r[1], r[2], r[3], r[4], additionalFds)+"<br/>"
+		resultString = resultString + views.relationToString(r[0], r[1], r[2], r[3], r[4], additionalFds, additionalMvds)+"<br/>"
 	
 	if len(stepsStrings) % 2 == 0:
 		numberOfColumns = 1

@@ -61,7 +61,7 @@ def stringToRelation(relationString):
 	relationString = relationString.replace("\n", "").replace("\r", "").replace(" ", "")
 	return set(relationString) | set(EMPTY_SET)
 
-def relationToString(relation, i, candidateKeys = None, fds = [], mvds = [], additionalFds = [], primaryKey=None):
+def relationToString(relation, i, candidateKeys = None, fds = [], mvds = [], additionalFds = [], additionalMvds = [], primaryKey=None):
 	if candidateKeys is not None:
 		if mvds:
 			show = "FDs/MVDs"
@@ -73,10 +73,12 @@ def relationToString(relation, i, candidateKeys = None, fds = [], mvds = [], add
 		if not fds and not mvds:
 			tooltiptext = tooltiptext + "In dieser Relation gelten keine nicht-trivialen Abhängigkeiten."
 		else:
-			tooltiptext = tooltiptext + fdsToHtmlString(fds, additionalFds)+mvdsToHtmlString(mvds)
+			tooltiptext = tooltiptext + fdsToHtmlString(fds, additionalFds) + mvdsToHtmlString(mvds, additionalMvds)
 		tooltiptext = tooltiptext + "</div></div><div class='panel panel-primary'><div class='panel-heading'><h3 class='panel-title'>Kandidatenschlüssel</h3></div><div class='panel-body'>"+ keysToString(candidateKeys)+"</div></div>"
-		if "*" in tooltiptext:
+		if additionalFds:
 			tooltiptext = tooltiptext + "<h6><small>* Unter anderem diese FD kann mithilfe der Armstrong-Axiome zusätzlich hergeleitet werden</small></h6>"
+		if additionalMvds:
+			tooltiptext = tooltiptext + "<h6><small>** Unter anderem diese MVD kann mithilfe der Komplementregel zusätzlich hergeleitet werden</small></h6>"
         else:
 		#Do not show tooltip, only blank relation
 		primaryKey = None
@@ -108,8 +110,11 @@ def fdsToHtmlString(fds, additionalFds = []):
 def mvdsToString(mvds):
 	return fdsMvdsToString(mvds, False)
 
-def mvdsToHtmlString(mvds):
-        return mvdsToString(mvds).replace("\n", "<br/>").replace(EMPTY_SET, EMPTY_SET_HTML)
+def mvdsToHtmlString(mvds, additionalMvds = []):
+        string =  mvdsToString([mvd for mvd in mvds if mvd not in additionalMvds]).replace("\n", "<br/>")
+	string = string + mvdsToString(additionalMvds).replace("\n", "**<br/>")
+	string = string.replace(EMPTY_SET, EMPTY_SET_HTML)
+	return string
 
 
 
@@ -139,15 +144,13 @@ def mvdToHtmlString(mvd):
 	return mvdsToHtmlString([mvd]).replace("<br/>", "")
 
 	
-def inputToString(relation, fds, mvds, additionalFds=[], panelType="primary", keys=[]):
+def inputToString(relation, fds, mvds, additionalFds=[], additionalMvds=[], panelType="primary", keys=[]):
 	numberOfColumns = 2
 	if mvds:
 		numberOfColumns = numberOfColumns+1
 	if keys:
 		numberOfColumns = numberOfColumns+1
-	mvdsPanel= ""
-	if mvds:
-		mvdsPanel = wrapInPanel("MVDs", "<strong>"+mvdsToHtmlString(mvds)+"</strong>",numberOfColumns,panelType)
+	
 	keysPanel = ""
 	if keys:
 		keysPanel = wrapInPanel("Kandidatenschlüssel", "<strong>"+keysToString(keys)+"</strong>",numberOfColumns, panelType)
@@ -156,6 +159,14 @@ def inputToString(relation, fds, mvds, additionalFds=[], panelType="primary", ke
 	if additionalFds:
 		additionalFdsInfo = "<h6><small>* Unter anderem diese FD kann mithilfe der Armstrong-Axiome zusätzlich hergeleitet werden</small></h6>"
 	fdsPanel = wrapInPanel("FDs", "<strong>"+fdsToHtmlString(fds, additionalFds)+"</strong>"+additionalFdsInfo,numberOfColumns, panelType)
+
+	mvdsPanel= ""
+	if mvds:
+		additionalMvdsInfo = ""
+		if additionalMvds:
+			additionalMvdsInfo = "<h6><small>** Unter anderem diese MVD kann mithilfe der Komplementregel zusätzlich hergeleitet werden</small></h6>"
+		mvdsPanel = wrapInPanel("MVDs", "<strong>"+mvdsToHtmlString(mvds, additionalMvds)+"</strong>"+additionalMvdsInfo,numberOfColumns,panelType)
+
 	return "<div class=\"row\">"+relationPanel+keysPanel+fdsPanel+mvdsPanel+"</div>"
 
 def getJumbotron(heading, content):
@@ -189,7 +200,7 @@ def schemaToString(schema, keysAndFDsMVDs=None, primaryKeys=[]):
 			schemaString = schemaString + relationToString(relation, i)
 		else:
 			if primaryKeys:
-				schemaString = schemaString + relationToString(relation, i, keysAndFDsMVDs[i-1]["keys"], keysAndFDsMVDs[i-1]["FDs"], keysAndFDsMVDs[i-1]["MVDs"], [], primaryKeys[i-1])
+				schemaString = schemaString + relationToString(relation, i, keysAndFDsMVDs[i-1]["keys"], keysAndFDsMVDs[i-1]["FDs"], keysAndFDsMVDs[i-1]["MVDs"], [], [], primaryKeys[i-1])
 			else:
 				schemaString = schemaString + relationToString(relation, i, keysAndFDsMVDs[i-1]["keys"], keysAndFDsMVDs[i-1]["FDs"], keysAndFDsMVDs[i-1]["MVDs"])
 		schemaString = schemaString + "<br/>"
