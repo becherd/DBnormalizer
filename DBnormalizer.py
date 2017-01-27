@@ -364,8 +364,9 @@ def fdsInRelation(fds, relation):
 			for b in fd[1]:
 				if b in relation:
 					rightOfFd.add(b)
-			if rightOfFd != set(EMPTY_SET):
-				fdsInRelation.append((fd[0], rightOfFd))
+			addfd = (fd[0], rightOfFd)
+			if rightOfFd != set(EMPTY_SET) and addfd not in fdsInRelation:
+				fdsInRelation.append(addfd)
 	return fdsInRelation
 	
 	
@@ -415,11 +416,17 @@ def getAdditionalFDs(fds):
 	newValidFds = collapseEqualLeftSides(newValidFds)
 	
 	additionalFds = []
+
 	for addfd in leftReduction(newValidFds + fds):
 		for fd in fds:
 			if addfd not in fds and addfd[0] == fd[0] and not addfd[1] <= fd[1]:
 				additionalFds.append((addfd[0], addfd[1]-fd[1] | set(EMPTY_SET)))
 				break
+
+	for addfd in canonicalCover(fds[:])[-1]:
+		if addfd not in additionalFds and addfd not in fds:
+			additionalFds.append(addfd)
+
 	additionalFds = collapseEqualLeftSides(additionalFds)
 	return additionalFds
 
@@ -437,16 +444,21 @@ def getAdditionalMVDs(mvds, relation):
 def decompositionAlgorithm(targetNf, fds, relation, mvds=[]):
 	fds = fds[:]
 
-	additionalFds = getAdditionalFDs(fds)
-	fds.extend(additionalFds)
-
-	additionalMvds = getAdditionalMVDs(mvds+fds, relation)
-	mvds.extend(additionalMvds)
 
 	if targetNf == "BCNF":
 		to4NF=False
 	else:
 		to4NF=True
+
+
+	additionalFds = getAdditionalFDs(fds)
+	fds.extend(additionalFds)
+
+	additionalMvds = []
+	if(to4NF):
+		additionalMvds = getAdditionalMVDs(mvds+fds, relation)
+		mvds.extend(additionalMvds)
+
 
 	heading = "Schema in "+targetNf
 	keysOfRelation = getKeys(relation,fdsInRelation(fds, relation))
@@ -472,6 +484,7 @@ def decompositionAlgorithm(targetNf, fds, relation, mvds=[]):
 					#show alert for additional FDs only in the first step
 					additionalFdsInR = fdsInRelation(additionalFds, r)
 				mvdsInR = []
+				
 				currentfd = getFirstNonBCNFfd(r, fdsInR)
 				currentfdString = views.fdToHtmlString(currentfd)
 		else:
