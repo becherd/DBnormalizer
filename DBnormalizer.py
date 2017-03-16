@@ -4,8 +4,10 @@
 import random 
 import string
 from datetime import datetime
+from itertools import chain, combinations
 import re
 import views
+
 
 
 EMPTY_SET = "$"
@@ -402,32 +404,43 @@ def splitRelationAtFdMvd(relation, fdmvd):
 	return (r1,r2)
 
 
+
+def powerset(attributes):
+	s = list(attributes)
+	return map(set, chain.from_iterable(combinations(s,r) for r in range(len(s)+1)))
+
+
 def getAdditionalFDs(fds):
 	#only unique left sides
 	fds = collapseEqualLeftSides(fds[:])
 	newValidFds = []
 	for fd in fds:
 		#compute the closure for each left side. This left side plus the closure as right side produces a new valid FD
-		fdclosure = closure(fd[0], fds)
-		validFd = (fd[0], (fdclosure-fd[0])-fd[1] | set(EMPTY_SET))
-		newValidFds.append(validFd)
-	#compute the canonical cover of those new valid FDs to get a minimal set of FDs
-	newValidFds = canonicalCover(newValidFds)[-1]
-	newValidFds = collapseEqualLeftSides(newValidFds)
+		ps = powerset(fd[0])
+		for leftSide in ps:
+			leftSide = leftSide | set(EMPTY_SET)
+			fdclosure = closure(leftSide, fds)
+			validFd = (leftSide, (fdclosure-leftSide) | set(EMPTY_SET))
+			newValidFds.append(validFd)
 	
+	
+	newValidFds = collapseEqualLeftSides(newValidFds[:])
+
 	additionalFds = []
-
-	for addfd in leftReduction(newValidFds + fds):
-		for fd in fds:
-			if addfd not in fds and addfd[0] == fd[0] and not addfd[1] <= fd[1]:
-				additionalFds.append((addfd[0], addfd[1]-fd[1] | set(EMPTY_SET)))
-				break
-
-	for addfd in canonicalCover(fds[:])[-1]:
+	
+	for addfd in newValidFds:
 		if addfd not in additionalFds and addfd not in fds:
-			additionalFds.append(addfd)
+			added=False
+			for fd in fds:
+				if fd[0] == addfd[0]:
+					additionalFd = (fd[0], (addfd[1]-fd[1]) | set(EMPTY_SET))
+					if additionalFd[1] != set(EMPTY_SET):
+						additionalFds.append(additionalFd)
+						added = True
+						continue
+			if not added:
+				additionalFds.append(addfd)
 
-	additionalFds = collapseEqualLeftSides(additionalFds)
 	return additionalFds
 
 def getAdditionalMVDs(mvds, relation):
