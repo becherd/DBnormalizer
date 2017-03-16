@@ -434,9 +434,19 @@ def getAdditionalFDs(fds):
 			for fd in fds:
 				if fd[0] == addfd[0]:
 					additionalFd = (fd[0], (addfd[1]-fd[1]) | set(EMPTY_SET))
-					if additionalFd[1] != set(EMPTY_SET):
+					if additionalFd[1] <= fd[1]:
+						#do not add a FD for which a FD with equal left sides exists such that the right side of the new FD is a subset of the right side of the existing FD
+						added=True
+						continue
+					elif additionalFd[1] != set(EMPTY_SET):
+						#add new FD if the FD has a larger right side than the existing FD with the same left side 
 						additionalFds.append(additionalFd)
 						added = True
+						continue
+				elif fd[0] < addfd[0]:
+					if addfd[1] <= fd[1]:
+						#this is to prevent that e.g. AB->C will be added if there is an existing FD A->BC
+						added=True
 						continue
 			if not added:
 				additionalFds.append(addfd)
