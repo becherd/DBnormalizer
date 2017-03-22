@@ -5,7 +5,7 @@ import cgitb; cgitb.enable()
 import views
 
 
-print "Content-Type: text/html"	
+print "Content-type: text/html\r\n\r\n"
 print """
 	<html>
 		<head>

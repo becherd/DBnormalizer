@@ -33,7 +33,7 @@ def printQuizStart(string):
 		return quizForms.formQuizStart(relation, fds, mvds)
 
 
-print "Content-Type: text/html"	
+print "Content-type: text/html\r\n\r\n"
 print """
 	<html>
 		<head>
