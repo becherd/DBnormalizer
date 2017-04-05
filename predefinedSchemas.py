@@ -17,6 +17,7 @@ schemas["s3"] = "ABCDEFG;A->BC;DE->B;F->A;E->BF;A->DE;C->A"
 schemas["s4"] = "ABCD;AB->>C;BC->>D;BA->CD;DA->B"
 schemas["s5"] = "person,kindName,kindAlter,fahrradTyp,fahrradFarbe;person->>kindName,kindAlter;person->>fahrradTyp,fahrradFarbe;kindName->kindAlter"
 schemas["s6"] = "ABCDEF;AB->CD;ABC->D;E->C;D->C;CDE->AB"
+schemas["s7"] = "matrnr,name,semester,vorlnr,titel,sws,gelesenvon;matrnr->name,semester;vorlnr->titel,sws,gelesenvon"
 
 def getSchemaIds():
 	schema_ids = []
