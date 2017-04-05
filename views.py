@@ -7,12 +7,15 @@ EMPTY_SET_HTML="&empty;"
 EMPTY_SET = "$"
 
 
+def keyToString(key):
+	return "{" + setOfAttributesToString(key) + "}"
+
+
+
 def keysToString(keys):
 	keyString=""
 	for key in keys:
-		keyString = keyString + "{"
-		keyString = keyString + setOfAttributesToString(key)
-		keyString = keyString + "}<br/>"
+		keyString = keyString + keyToString(key) + "<br/>"
 	return keyString
 	
 	
@@ -458,3 +461,38 @@ def getHeading(sub=""):
                                 $(document).ready(changeArrowColor());
                                 setInterval(changeArrowColor,10000);
                         </script>"""
+
+
+def getHTMLHint(hint, hintNr):
+	return """<span style="display:none;" id="hint"""+str(hintNr)+"""">"""+hint+"""</span>"""
+
+
+def getCandidateKeyHints(candidateKeys, noRightSideAttributes):
+	hintHTML = """<div class="input-group input-group-sm" style="width:100%;">
+    		<span href="#" class="btn btn-primary input-group-addon" id="helpButton" style="width:20%;text-align:left;"><span class="glyphicon glyphicon-hand-up" aria-hidden="true"></span> Ich brauch Hilfe :/</span>
+    		<input type="text" class="form-control" aria-describedby="btnGroupAddon" placeholder="" id="hint"></input>
+  	</div>"""
+	hintNr=1
+	hintHTML = hintHTML + getHTMLHint("Es gibt " + str(len(candidateKeys)) + " Kandidatenschlüssel", hintNr)
+	for rsoa in noRightSideAttributes:
+		hintNr = hintNr+1
+		hintHTML = hintHTML + getHTMLHint("Das Attribut "+rsoa + " kommt in jedem Kandidatenschlüssel vor", hintNr)
+	for candidateKey in candidateKeys:
+		hintNr = hintNr+1
+		hintHTML = hintHTML + getHTMLHint("Ein Kandidatenschlüssel ist "+keyToString(candidateKey), hintNr)
+	hintHTML = hintHTML + """<script>
+		var i=0;
+		$('#helpButton').on('click', function () {
+			i=i+1;
+			if(i%"""+str(hintNr+1)+""" == 0){
+				i=0;
+				$('#helpButton').html('<span class="glyphicon glyphicon-hand-up" aria-hidden="true"></span> Ich brauch Hilfe :/');
+				$('#hint').attr('placeholder', "");
+			}
+			else{
+				$('#helpButton').html('<span class="glyphicon glyphicon-hand-right" aria-hidden="true"></span> Zeige nächsten Tipp');
+				$('#hint').attr('placeholder', $('#hint'+i).html());
+			}	
+		});
+	</script>"""
+	return hintHTML

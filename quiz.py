@@ -74,6 +74,7 @@ try:
 	additionalMvds = []
 	step = str(form['step'].value).replace(" ", "").replace("\n", "").replace("\r", "")
 	candidatekeys = DBnormalizer.getKeys(relation, fds)
+	noRightSideAttributes = relation - DBnormalizer.getRightSideAttributes(fds)
 	alert = ""
 	info = ""
 	inputpanel = views.inputToString(relation, fds, mvds, additionalFds, additionalMvds, "default")
@@ -89,7 +90,7 @@ try:
 	if (step=='1'):
 		#candidate keys
 		numberOfSteps = numberOfSteps + 1
-		quizform = quizForms.candidateKeys(numberOfTries, numberOfSteps, relationString, fdsString) + htmlend()
+		quizform = quizForms.candidateKeys(numberOfTries, numberOfSteps, relationString, fdsString, candidatekeys, noRightSideAttributes) + htmlend()
 	if (step=='2'):
 		#validate candidate keys
 		try:
@@ -103,7 +104,7 @@ try:
 			quizform = quizForms.normalForm(numberOfTries, numberOfSteps, relationString, fdsString) + htmlend()
 		else:
 			alert =  views.getErrorMessageBox("Leider falsch!")
-			quizform = quizForms.candidateKeys(numberOfTries, numberOfSteps, relationString, fdsString) + htmlend()
+			quizform = quizForms.candidateKeys(numberOfTries, numberOfSteps, relationString, fdsString, candidateKeys, noRightSideAttributes) + htmlend()
 	if (step=='3-1'):
 		#validate normal form
 		selectedNF = str(form['normalform'].value)

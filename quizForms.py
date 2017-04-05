@@ -35,7 +35,9 @@ def formQuizStart(relation, fds, mvds):
 	"""
 	return  views.getJumbotron("Hallo.", html ) + inputString
 
-def candidateKeys(numberOfTries, numberOfSteps, relationString, fdsString):
+def candidateKeys(numberOfTries, numberOfSteps, relationString, fdsString, candidateKeys, noRightSideAttributes):
+	hints =views.getCandidateKeyHints(candidateKeys, noRightSideAttributes)
+
 	html = """<form class="form" action="quiz.py" method="POST">
 		<div class="row">
 		<div class="col-sm-12">
@@ -50,7 +52,7 @@ def candidateKeys(numberOfTries, numberOfSteps, relationString, fdsString):
 """+str(numberOfTries)+"""" name="numberOfTries"></input>
 		<input type="hidden" value="
 """+str(numberOfSteps)+"""" name="numberOfSteps"></input>
-		<div class="row">
+		"""+hints+"""<div class="row">
 		<div class="col-xs-2 pull-right">
 		<br/>
 		<button id="step" name="step" type="submit" class="btn btn-primary" value="2">Weiter</button>
